@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+}
+
+model SuperAdmin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(SUPER_ADMIN)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // One SuperAdmin creates many Admins
+  admins Admin[]
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  adminId   String   @unique
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(ADMIN)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Created by SuperAdmin
+  createdById String
+  createdBy   SuperAdmin @relation(fields: [createdById], references: [id])
+}
+
+enum VerificationStatus {
+  HOLD
+  APPROVED
+  BLOCKED
+}
+
+enum SubscriptionType {
+  FREE
+  STANDARD
+  PREMIUM
+}
+
+enum BusinessType {
+  RESTAURANT
+  CAFE
+  BAKERY
+  BAR
+  GYM
+  OTHER
+}
+
+model Business {
+  id                 String             @id @default(uuid())
+  businessId         String             @unique
+  businessName       String
+  ownerName          String
+  phoneNumber        String
+  emailAddress       String             @unique
+  address            String
+  verificationStatus VerificationStatus
+  subscriptionType   SubscriptionType
+  gstNumber          String
+  websiteLink        String
+  businessType       BusinessType
+  joinedDate         DateTime           @default(now())
+
+  latitude  Float
+  longitude Float
+
+  socialLinks SocialLink[]
+
+  @@index([businessId])
+}
+
+model SocialLink {
+  id         String   @id @default(uuid())
+  platform   String
+  link       String
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String
+}
