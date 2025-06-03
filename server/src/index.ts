@@ -1,5 +1,9 @@
 import express from "express";
 import cors from "cors";
+import apiRoutes from "./routes/api.routes";
+import AdminAuthRouter from "./routes/adminAuth.routes";
+import SuperAdminAuthRouter from "./routes/superAdmin.routes";
+// import authRouter from "./routes/auth.routes";
 
 
 const app = express();
@@ -20,7 +24,9 @@ declare module "express" {
     }
 }
 
-// app.use('/api', apiRoutes);
+app.use('/api', apiRoutes);
+app.use('/auth/super-admin', SuperAdminAuthRouter);
+app.use('/auth/admin', AdminAuthRouter);
 // app.use('/auth', authRouter);
 // app.use('/restaurant', restaurantRouter);
 // app.use('/menu', menuRouter);
