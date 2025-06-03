@@ -1,0 +1,391 @@
+'use client';
+
+import backendUrl from '@/app/Utils/backendUrl';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import axios from 'axios';
+export default function AddBusinessForm({ editingCompany, isEditing, setIsEditing }) {
+
+    const initialFormData = {
+        businessName: '',
+        ownerName: '',
+        phoneNumber: '',
+        emailAddress: '',
+        address: '',
+
+        verificationStatus: 'Pending',
+        subscriptionType: '',
+        gstNumber: '',
+        latitude: '',
+        longitude: '',
+        websiteLink: '',
+        businessType: '',
+        socialLinks: [{ platform: '', link: '' }],
+    };
+    const [formData, setFormData] = useState(initialFormData);
+    const subscriptionTypes = ['Free', 'Basic', 'Standard', 'Premium', 'Enterprise'];
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const businessTypes = [
+        'Retail Store',
+        'Restaurant/Café',
+        'Salon/Spa',
+        'Gym/Fitness Center',
+        'Medical/Health Store',
+        'Service Provider',
+        'Freelancer/Consultant',
+        'Event Organizer',
+        'Education/Coaching',
+        'Home-based Business',
+        'Real Estate/Rentals',
+        'Courier/Delivery',
+        'Automobile Services',
+        'Pet Services',
+        'NGO/Community Org.',
+        'Shop/Store/Office',
+    ];
+    useEffect(() => {
+        if (isEditing && editingCompany) {
+            setFormData({
+                ...editingCompany,
+                socialLinks: editingCompany.socialMediaLinks || [{ platform: '', link: '' }],
+            });
+        } else if (!isEditing) {
+            setFormData({
+                businessName: '',
+                ownerName: '',
+                phoneNumber: '',
+                emailAddress: '',
+                address: '',
+
+                verificationStatus: 'Pending',
+                subscriptionType: '',
+                gstNumber: '',
+                latitude: '',
+                longitude: '',
+                websiteLink: '',
+                businessType: '',
+                socialLinks: [{ platform: '', link: '' }],
+            });
+        }
+    }, [isEditing, editingCompany]);
+    function handleSocialLinkChange(index, field, value) {
+        const updatedLinks = [...formData.socialLinks];
+        updatedLinks[index][field] = value;
+        setFormData(prev => ({ ...prev, socialLinks: updatedLinks }));
+    }
+    const addSocialLink = () => {
+        setFormData(prev => ({
+            ...prev,
+            socialLinks: [...prev.socialLinks, { platform: '', link: '' }]
+        }));
+    };
+
+    const removeSocialLink = (index) => {
+        const updatedLinks = [...formData.socialLinks];
+        updatedLinks.splice(index, 1);
+        setFormData(prev => ({ ...prev, socialLinks: updatedLinks }));
+    };
+
+    function handleChange(e) {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    }
+    async function handleSubmit(e) {
+        e.preventDefault();
+
+        if (!formData.businessName || !formData.businessType || !formData.phoneNumber || !formData.latitude || !formData.longitude) {
+            toast.error('Business Name, Phone Number, and Business Type are required');
+            return;
+        }
+
+        const newBusiness = {
+            businessId: editingCompany?.businessId || `BUS${Date.now()}`,
+            ...formData,
+            joinedDate: editingCompany?.joinedDate || new Date().toISOString().split('T')[0],
+        };
+
+        setIsSubmitting(true);
+
+        try {
+            const url = isEditing
+                ? `${backendUrl}/updatebusinesse/${editingCompany.businessId}`
+                : '/api/businesse';
+
+            const response = await axios.post(url, newBusiness, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = response.data;
+
+            toast.success(editingCompany ? 'Business updated successfully!' : 'Business added successfully!');
+
+            if (!editingCompany) {
+                setFormData(initialFormData);
+            }
+
+        } catch (error) {
+            console.error(error);
+            toast.error('Error submitting business');
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
+    return (
+        <form
+            onSubmit={handleSubmit}
+            className="bg-white p-6 rounded-lg shadow space-y-6 max-w-4xl mx-auto"
+        >
+            <h2 className="text-2xl font-bold text-black">{isEditing ? 'Edit Business' : 'Add Business'}</h2>
+
+            {/* Row 1: Business ID (auto) and Name */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block font-medium text-black">Business ID</label>
+                    <input
+                        type="text"
+                        value="Auto-generated"
+                        disabled
+                        className="w-full bg-gray-100 text-black px-3 py-2 rounded border border-gray-300"
+                    />
+                </div>
+                <div>
+                    <label className="block font-medium text-black">
+                        Business Name <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="businessName"
+                        value={formData.businessName}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
+                    />
+                </div>
+            </div>
+
+            {/* Row 2: Owner, Phone */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block font-medium text-black">Owner Name</label>
+                    <input
+                        type="text"
+                        name="ownerName"
+                        value={formData.ownerName}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
+                    />
+                </div>
+                <div>
+                    <label className="block font-medium text-black">
+                        Phone Number <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                        type="tel"
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
+                        onChange={handleChange}
+                        required
+                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
+                    />
+                </div>
+            </div>
+
+            {/* Row 3: Email, Address */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block font-medium text-black">Email Address</label>
+                    <input
+                        type="email"
+                        name="emailAddress"
+                        value={formData.emailAddress}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
+                    />
+                </div>
+                <div>
+                    <label className="block font-medium text-black">Address</label>
+                    <input
+                        type="text"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
+                    />
+                </div>
+            </div>
+
+            {/* Row 4: Latitude, Longitude and Verification Status */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block font-medium text-black">
+                            Latitude <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                            type="number"
+                            step="any"
+                            name="latitude"
+                            value={formData.latitude}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-3 py-2 rounded border border-gray-300 text-black"
+                        />
+                    </div>
+                    <div>
+                        <label className="block font-medium text-black">
+                            Longitude <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                            type="number"
+                            step="any"
+                            name="longitude"
+                            value={formData.longitude}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-3 py-2 rounded border border-gray-300 text-black"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label className="block font-medium text-black">Verification Status</label>
+                    <select
+                        name="verificationStatus"
+                        value={formData.verificationStatus}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
+                    >
+                        <option value="Pending">Pending</option>
+                        <option value="Verified">Verified</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+            </div>
+
+            {/* Row 5: Subscription Type, GST */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block font-medium text-black">Subscription Type</label>
+                    <select
+                        name="subscriptionType"
+                        value={formData.subscriptionType}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
+                    >
+                        <option value="">Select subscription type</option>
+                        {subscriptionTypes.map((type, index) => (
+                            <option key={index} value={type}>
+                                {type}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label className="block font-medium text-black">GST/Business Reg No</label>
+                    <input
+                        type="text"
+                        name="gstNumber"
+                        value={formData.gstNumber}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
+                    />
+                </div>
+            </div>
+
+            {/* Row 6: Social Media, Website */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block font-medium text-black">Website Link</label>
+                    <input
+                        type="url"
+                        name="websiteLink"
+                        value={formData.websiteLink}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
+                    />
+                </div>
+                <div>
+                    <label className="block font-medium text-black mb-2">Social Links</label>
+                    {formData.socialLinks.map((link, index) => (
+                        <div key={index} className="flex space-x-2 mb-2">
+                            <input
+                                type="text"
+                                placeholder="Platform"
+                                value={link.platform}
+                                onChange={e => handleSocialLinkChange(index, 'platform', e.target.value)}
+                                className="flex-1 px-3 py-2 rounded border border-gray-300 text-black w-[100px]"
+                            />
+                            <input
+                                type="url"
+                                placeholder="Link"
+                                value={link.link}
+                                onChange={e => handleSocialLinkChange(index, 'link', e.target.value)}
+                                className="flex-1 px-3 py-2 rounded border border-gray-300 text-black w-[100px]"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => removeSocialLink(index)}
+                                disabled={formData.socialLinks.length === 1}
+                                className="text-red-600 font-bold px-3"
+                            >
+                                &times;
+                            </button>
+                        </div>
+                    ))}
+                    <button
+                        type="button"
+                        onClick={addSocialLink}
+                        className="text-blue-600 hover:underline text-sm mt-2"
+                    >
+                        + Add another social link
+                    </button>
+                </div>
+            </div>
+
+            {/* Business Type Dropdown */}
+            <div>
+                <label className="block font-medium text-black">
+                    Business Type <span className="text-red-600">*</span>
+                </label>
+                <select
+                    name="businessType"
+                    value={formData.businessType}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 rounded border border-gray-300 text-black"
+                >
+                    <option value="">Select business type</option>
+                    {businessTypes.map((type, index) => (
+                        <option key={index} value={type}>
+                            {index + 1}. {type}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            {/* Submit */}
+            <div className="pt-4 flex space-x-4">
+                <button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+                >
+                    Save Business
+                </button>
+                {isEditing && (
+                    <button
+                        type="button" // <-- important, so it doesn't submit form
+                        onClick={() => setIsEditing(false)}
+                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded"
+                    >
+                        Cancel Editing
+                    </button>
+                )}
+            </div>
+
+        </form>
+
+    );
+}
