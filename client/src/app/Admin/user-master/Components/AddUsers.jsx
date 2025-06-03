@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import axios from 'axios';
+import { BACKEND_URL } from '@/app/Utils/backendUrl';
+import { toast } from 'react-toastify';
 
 export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser }) {
     const [formData, setFormData] = useState({
@@ -52,13 +54,17 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser 
             setErrors({});
 
             try {
+                const token = localStorage.getItem('token');
                 if (edit) {
                     // Update existing user
-                    await axios.put(`/api/users/${formData._id}`, formData); // Assuming _id is present
+                    await axios.put(`${BACKEND_URL}/admin/${formData._id}`, formData); // Assuming _id is present
                     alert('User updated successfully!');
                 } else {
                     // Add new user
-                    await axios.post('/api/users', formData);
+                    await axios.post(`${BACKEND_URL}/admin`, formData, {headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                }});
                     alert('User saved successfully!');
                 }
 

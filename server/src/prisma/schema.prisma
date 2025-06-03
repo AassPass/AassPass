@@ -43,9 +43,9 @@ model Admin {
 }
 
 enum VerificationStatus {
-  HOLD
-  APPROVED
-  BLOCKED
+  PENDING
+  VERIFIED
+  REJECTED
 }
 
 enum SubscriptionType {
@@ -60,6 +60,7 @@ enum BusinessType {
   BAKERY
   BAR
   GYM
+  Retail
   OTHER
 }
 

@@ -91,10 +91,10 @@ const SuperAdminLogin = async (req: Request, res: Response): Promise<any> => {
 const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
   try {
     const {
-      name,
+      businessName,
       ownerName,
       phoneNumber,
-      email,
+      emailAddress,
       address,
       gstNumber,
       websiteLink,
@@ -106,7 +106,7 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
 
     console.log('RegisterBusiness Request Body:', req.body);
     // Validate required fields
-    if (!name || !ownerName || !phoneNumber || !email || !address || !gstNumber || !businessType) {
+    if (!businessName || !ownerName || !phoneNumber || !emailAddress || !address || !gstNumber || !businessType) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
@@ -118,15 +118,15 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
     const newBusiness = await prisma.business.create({
       data: {
         businessId,
-        businessName: name,
+        businessName,
         ownerName,
         phoneNumber,
-        emailAddress: email,
+        emailAddress,
         address,
         gstNumber,
         websiteLink,
         businessType: businessType as BusinessType,
-        verificationStatus: VerificationStatus.HOLD,
+        verificationStatus: VerificationStatus.PENDING,
         subscriptionType: SubscriptionType.FREE,
         latitude: parseFloat(latitude),
         longitude: parseFloat(longitude),
@@ -152,6 +152,7 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
 const UpdateBusiness = async (req: Request, res: Response): Promise<any> => {
   try {
     const { businessId } = req.params;
+    // console.log("asdfhaskdjfhaksdhfklashdfkhasdiof", businessId);
     const {
       name,
       ownerName,
@@ -216,9 +217,9 @@ const UpdateBusiness = async (req: Request, res: Response): Promise<any> => {
 
 const CreateAdmin = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { name, email } = req.body;
+    const { userName, email, mobile } = req.body;
 
-    if (!name || !email) {
+    if (!userName || !email) {
       return res.status(400).json({ message: 'Name and email are required' });
     }
 
@@ -234,7 +235,7 @@ const CreateAdmin = async (req: Request, res: Response): Promise<any> => {
 
     const newAdmin = await prisma.admin.create({
       data: {
-        name,
+        name: userName,
         email,
         role: 'ADMIN',
         adminId,

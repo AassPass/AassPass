@@ -1,32 +1,47 @@
-'use client'
-import React, { useState } from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
 import AddUsers from './Components/AddUsers';
 import UserList from './Components/UserList';
+import { BACKEND_URL } from '@/app/Utils/backendUrl';
 
 export default function UserMaster() {
     const [edit, setEdit] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null); // ✅ Fixed: added this state
-    const [users, setUsers] = useState([
-        {
-            id: 1,
-            userName: 'John Doe',
-            email: 'john@example.com',
-            mobile: '1234567890',
-            joiningDate: '2025-05-20',
-            active: 'YES',
-        },
-        {
-            id: 2,
-            userName: 'Jane Smith',
-            email: 'jane@example.com',
-            mobile: '9876543210',
-            joiningDate: '2025-06-01',
-            active: 'NO',
-        },
-    ]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [users, setUsers] = useState([]);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            const token = localStorage.getItem('token'); // 🔐 Fetch token from localStorage
+
+            if (!token) {
+                toast.error('No authentication token found.');
+                return;
+            }
+
+            try {
+                const response = await axios.get(`${BACKEND_URL}/admin`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // ✅ Send token in Authorization header
+                    },
+                });
+
+                setUsers(response.data);
+                toast.success('Users loaded successfully!');
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                toast.error('Failed to load users.');
+            }
+        };
+
+        fetchUsers();
+    }, []);
+
     return (
         <div className="p-6 space-y-8">
-
+            <ToastContainer position="top-right" autoClose={3000} />
 
             {/* Add User Form */}
             <AddUsers

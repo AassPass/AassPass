@@ -1,9 +1,10 @@
 'use client';
 
-import backendUrl from '@/app/Utils/backendUrl';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import {BACKEND_URL} from '@/app/Utils/backendUrl';
+
 export default function AddBusinessForm({ editingCompany, isEditing, setIsEditing }) {
 
     const initialFormData = {
@@ -27,7 +28,7 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const businessTypes = [
-        'Retail Store',
+        'Retail',
         'Restaurant/Café',
         'Salon/Spa',
         'Gym/Fitness Center',
@@ -106,15 +107,19 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
         };
 
         setIsSubmitting(true);
-
+        
         try {
+            const token = localStorage.getItem('token');
+            console.log('bus id', newBusiness.businessId);
             const url = isEditing
-                ? `${backendUrl}/updatebusinesse/${editingCompany.businessId}`
-                : '/api/businesse';
-
+                ? `${BACKEND_URL}/update-business/${editingCompany.businessId}`
+                : `${BACKEND_URL}/business`;
+            
+            console.log(url);
             const response = await axios.post(url, newBusiness, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
                 }
             });
 

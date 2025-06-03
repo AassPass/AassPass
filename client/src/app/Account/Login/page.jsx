@@ -1,4 +1,5 @@
 'use client'
+import { BACKEND_URL } from "@/app/Utils/backendUrl";
 import { useRole } from "@/Context/RoleContext";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -14,15 +15,17 @@ export default function Page() {
         const password = e.target.password.value;
 
         try {
-            await axios.post(
-                "/api/login",
+            const response = await axios.post(
+                 `${BACKEND_URL}/login`,
                 { email, password },
                 { withCredentials: true } // important for cookie
             );
 
-            await fetchUser(); // set user in context
+            console.log(response.data);
+            // await fetchUser(); // set user in context
+            localStorage.setItem('token', response.data.token);
             toast.success("Logged in successfully!");
-            router.push('/dashboard');
+            router.push('/Admin/dashboard');
         } catch (err) {
             console.error(err);
             toast.error("Login failed. Please check your credentials.");

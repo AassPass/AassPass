@@ -1,36 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AddCompanyForm from '../Components/AddCompanyForm';
 import CompanyList from './Components/CompanyList';
+import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import { BACKEND_URL } from '@/app/Utils/backendUrl';
 
 export default function CompanyManagement() {
-    const [companies, setCompanies] = useState([
-        {
-
-            businessId: 'CMP1685560800000',
-            businessName: 'Acme Corp',
-            ownerName: 'John Doe',
-            phoneNumber: '9876543210',
-            emailAddress: 'john@acme.com',
-            address: '123 Main St',
-            latitude: '12.9716',
-            longitude: '77.5946',
-            gstNumber: '29ABCDE1234F2Z5',
-            websiteLink: 'https://acme.com',
-            socialMediaLinks: [
-                { platform: 'Instagram', link: 'https://instagram.com/acme' },
-                { platform: 'Twitter', link: 'https://twitter.com/acme' },
-            ],
-            verificationStatus: 'Pending',
-            joinedDate: '2023-06-01',
-            subscriptionType: 'Premium',
-            businessType: 'Retail Store',
-        },
-
-    ]);
-    const [editingCompany, setEditingCompany] = useState(null); // for edit
+    const [companies, setCompanies] = useState([]);
+    const [editingCompany, setEditingCompany] = useState(null); 
     const [isEditing, setIsEditing] = useState(false)
+
+    useEffect(() => {
+        const fetchCompanies = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get(`${BACKEND_URL}/business`, {headers: {
+                    Authorization: `Bearer ${token}`
+                }});
+                console.log(response.data);
+                setCompanies(response.data);
+                toast.success('Companies loaded successfully!');
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        fetchCompanies();
+        }, []);
 
     return (
         <div className="flex flex-col h-full p-6 overflow-hidden">

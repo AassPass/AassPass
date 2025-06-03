@@ -26,6 +26,7 @@ export function authorize(allowedRoles: string[]) {
             // Attach decoded data to the request
             (req as any).admin = decoded;
 
+            console.log(decoded.role);
             if (!allowedRoles.includes(decoded.role)) {
                 res.status(403).json({ message: "Forbidden. You don't have permission to access this resource." });
                 return;
