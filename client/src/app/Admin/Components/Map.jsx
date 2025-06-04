@@ -1,29 +1,21 @@
 'use client';
+
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { MAPBOX_TOKEN } from '@/app/Utils/backendUrl';
 import ReactDOM from 'react-dom/client';
 import PopupContent from './PopupContent';
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
-const markerData = [
-    { id: 1, coordinates: [77.5946, 12.9716], popupText: 'Bangalore', color: 'red' },
-    { id: 2, coordinates: [72.8777, 19.0760], popupText: 'Mumbai', color: 'blue' },
-    { id: 3, coordinates: [88.3639, 22.5726], popupText: 'Kolkata', color: 'green' },
-    { id: 4, coordinates: [78.4867, 17.3850], popupText: 'Hyderabad', color: 'purple' },
-    { id: 5, coordinates: [77.1025, 28.7041], popupText: 'Delhi', color: 'orange' },
-];
-
-const Map = () => {
+const Map = ({ markerData }) => {
     const mapRef = useRef(null);
     const markersRef = useRef([]);
 
     useEffect(() => {
-        if (!mapRef.current) return;
+        if (!mapRef.current || markerData.length === 0) return;
 
         const map = new mapboxgl.Map({
             container: mapRef.current,
@@ -36,9 +28,7 @@ const Map = () => {
         map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
         map.addControl(
             new mapboxgl.GeolocateControl({
-                positionOptions: {
-                    enableHighAccuracy: true,
-                },
+                positionOptions: { enableHighAccuracy: true },
                 trackUserLocation: true,
                 showUserHeading: true,
             }),
@@ -54,24 +44,21 @@ const Map = () => {
         map.addControl(geocoder, 'top-left');
 
         const addMarkers = () => {
-            markersRef.current = markerData.map(({ coordinates, popupText, color }) => {
-                // Create popup node with React
+            markersRef.current = markerData.map(({ coordinates, popupText }) => {
                 const popupNode = document.createElement('div');
                 ReactDOM.createRoot(popupNode).render(
                     <PopupContent name={popupText} coordinates={coordinates} />
                 );
+
                 const popup = new mapboxgl.Popup({ offset: 25 }).setDOMContent(popupNode);
 
-                // Create custom marker element
                 const el = document.createElement('div');
                 el.className = 'custom-image-marker';
-
-                // Add an image inside the marker
                 el.innerHTML = `
-            <div class="marker-image-wrapper">
-                <img src="/marker.png" alt="marker" />
-            </div>
-        `;
+                    <div class="marker-image-wrapper">
+                        <img src="/marker.png" alt="marker" />
+                    </div>
+                `;
 
                 const marker = new mapboxgl.Marker(el)
                     .setLngLat(coordinates)
@@ -81,9 +68,6 @@ const Map = () => {
                 return marker;
             });
         };
-
-
-
 
         const removeMarkers = () => {
             markersRef.current.forEach(marker => marker.remove());
@@ -107,7 +91,7 @@ const Map = () => {
             removeMarkers();
             map.remove();
         };
-    }, []);
+    }, [markerData]);
 
     return (
         <div className="h-screen w-full">

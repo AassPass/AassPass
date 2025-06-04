@@ -3,17 +3,19 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import {BACKEND_URL} from '@/app/Utils/backendUrl';
+import { BACKEND_URL } from '@/app/Utils/backendUrl';
+import { useRole } from '@/Context/RoleContext';
 
 export default function AddBusinessForm({ editingCompany, isEditing, setIsEditing }) {
+    const { businessId: contextBusinessId } = useRole();
 
     const initialFormData = {
+        businessId: '',
         businessName: '',
         ownerName: '',
         phoneNumber: '',
         emailAddress: '',
         address: '',
-
         verificationStatus: 'Pending',
         subscriptionType: '',
         gstNumber: '',
@@ -23,10 +25,11 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
         businessType: '',
         socialLinks: [{ platform: '', link: '' }],
     };
+
     const [formData, setFormData] = useState(initialFormData);
-    const subscriptionTypes = ['Free', 'Basic', 'Standard', 'Premium', 'Enterprise'];
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const subscriptionTypes = ['Free', 'Basic', 'Standard', 'Premium', 'Enterprise'];
     const businessTypes = [
         'Retail',
         'Restaurant/Café',
@@ -45,36 +48,32 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
         'NGO/Community Org.',
         'Shop/Store/Office',
     ];
+
     useEffect(() => {
         if (isEditing && editingCompany) {
             setFormData({
                 ...editingCompany,
                 socialLinks: editingCompany.socialMediaLinks || [{ platform: '', link: '' }],
             });
-        } else if (!isEditing) {
+        } else {
             setFormData({
-                businessName: '',
-                ownerName: '',
-                phoneNumber: '',
-                emailAddress: '',
-                address: '',
+                ...initialFormData,
 
-                verificationStatus: 'Pending',
-                subscriptionType: '',
-                gstNumber: '',
-                latitude: '',
-                longitude: '',
-                websiteLink: '',
-                businessType: '',
-                socialLinks: [{ platform: '', link: '' }],
             });
         }
-    }, [isEditing, editingCompany]);
+    }, [isEditing, editingCompany, contextBusinessId]);
+
+    function handleChange(e) {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    }
+
     function handleSocialLinkChange(index, field, value) {
         const updatedLinks = [...formData.socialLinks];
         updatedLinks[index][field] = value;
         setFormData(prev => ({ ...prev, socialLinks: updatedLinks }));
     }
+
     const addSocialLink = () => {
         setFormData(prev => ({
             ...prev,
@@ -88,10 +87,6 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
         setFormData(prev => ({ ...prev, socialLinks: updatedLinks }));
     };
 
-    function handleChange(e) {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    }
     async function handleSubmit(e) {
         e.preventDefault();
 
@@ -101,29 +96,25 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
         }
 
         const newBusiness = {
-            businessId: editingCompany?.businessId || `BUS${Date.now()}`,
+            businessId: editingCompany?.businessId || formData.businessId || `BUS${Date.now()}`,
             ...formData,
             joinedDate: editingCompany?.joinedDate || new Date().toISOString().split('T')[0],
         };
 
         setIsSubmitting(true);
-        
+
         try {
             const token = localStorage.getItem('token');
-            console.log('bus id', newBusiness.businessId);
             const url = isEditing
                 ? `${BACKEND_URL}/update-business/${editingCompany.businessId}`
                 : `${BACKEND_URL}/business`;
-            
-            console.log(url);
+
             const response = await axios.post(url, newBusiness, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 }
             });
-
-            const result = response.data;
 
             toast.success(editingCompany ? 'Business updated successfully!' : 'Business added successfully!');
 
@@ -146,13 +137,13 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
         >
             <h2 className="text-2xl font-bold text-black">{isEditing ? 'Edit Business' : 'Add Business'}</h2>
 
-            {/* Row 1: Business ID (auto) and Name */}
+            {/* Row 1: Business ID and Name */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block font-medium text-black">Business ID</label>
                     <input
                         type="text"
-                        value="Auto-generated"
+                        value={formData.businessId || 'Auto-generated'}
                         disabled
                         className="w-full bg-gray-100 text-black px-3 py-2 rounded border border-gray-300"
                     />
@@ -172,7 +163,7 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
                 </div>
             </div>
 
-            {/* Row 2: Owner, Phone */}
+            {/* Owner & Phone */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block font-medium text-black">Owner Name</label>
@@ -199,7 +190,7 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
                 </div>
             </div>
 
-            {/* Row 3: Email, Address */}
+            {/* Email & Address */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block font-medium text-black">Email Address</label>
@@ -223,7 +214,7 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
                 </div>
             </div>
 
-            {/* Row 4: Latitude, Longitude and Verification Status */}
+            {/* Latitude, Longitude, Verification */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -270,7 +261,7 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
                 </div>
             </div>
 
-            {/* Row 5: Subscription Type, GST */}
+            {/* Subscription, GST */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block font-medium text-black">Subscription Type</label>
@@ -300,7 +291,7 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
                 </div>
             </div>
 
-            {/* Row 6: Social Media, Website */}
+            {/* Website & Social Links */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block font-medium text-black">Website Link</label>
@@ -350,7 +341,7 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
                 </div>
             </div>
 
-            {/* Business Type Dropdown */}
+            {/* Business Type */}
             <div>
                 <label className="block font-medium text-black">
                     Business Type <span className="text-red-600">*</span>
@@ -371,17 +362,18 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
                 </select>
             </div>
 
-            {/* Submit */}
+            {/* Submit Buttons */}
             <div className="pt-4 flex space-x-4">
                 <button
                     type="submit"
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+                    disabled={isSubmitting}
                 >
-                    Save Business
+                    {isSubmitting ? 'Saving...' : 'Save Business'}
                 </button>
                 {isEditing && (
                     <button
-                        type="button" // <-- important, so it doesn't submit form
+                        type="button"
                         onClick={() => setIsEditing(false)}
                         className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded"
                     >
@@ -389,8 +381,6 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
                     </button>
                 )}
             </div>
-
         </form>
-
     );
 }

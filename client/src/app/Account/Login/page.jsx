@@ -1,5 +1,5 @@
 'use client'
-import { BACKEND_URL } from "@/app/Utils/backendUrl";
+import { BACKEND_AUTH_URL, BACKEND_URL } from "@/app/Utils/backendUrl";
 import { useRole } from "@/Context/RoleContext";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 
 export default function Page() {
     const router = useRouter();
-    const { fetchUser } = useRole();
+    const { setRole } = useRole();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -16,12 +16,13 @@ export default function Page() {
 
         try {
             const response = await axios.post(
-                 `${BACKEND_URL}/login`,
+                `${BACKEND_AUTH_URL_AUTH_URL}/login`,
                 { email, password },
                 { withCredentials: true } // important for cookie
             );
 
-            console.log(response.data);
+
+            setRole(response.data.role)
             // await fetchUser(); // set user in context
             localStorage.setItem('token', response.data.token);
             toast.success("Logged in successfully!");

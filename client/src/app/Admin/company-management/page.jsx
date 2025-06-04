@@ -9,16 +9,18 @@ import { BACKEND_URL } from '@/app/Utils/backendUrl';
 
 export default function CompanyManagement() {
     const [companies, setCompanies] = useState([]);
-    const [editingCompany, setEditingCompany] = useState(null); 
+    const [editingCompany, setEditingCompany] = useState(null);
     const [isEditing, setIsEditing] = useState(false)
 
     useEffect(() => {
         const fetchCompanies = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get(`${BACKEND_URL}/business`, {headers: {
-                    Authorization: `Bearer ${token}`
-                }});
+                const response = await axios.get(`${BACKEND_URL}/business`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
                 console.log(response.data);
                 setCompanies(response.data);
                 toast.success('Companies loaded successfully!');
@@ -27,7 +29,7 @@ export default function CompanyManagement() {
             }
         }
         fetchCompanies();
-        }, []);
+    }, []);
 
     return (
         <div className="flex flex-col h-full p-6 overflow-hidden">

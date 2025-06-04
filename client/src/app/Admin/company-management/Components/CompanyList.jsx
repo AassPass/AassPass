@@ -1,14 +1,15 @@
 'use client';
 
+import { useRole } from '@/Context/RoleContext';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
 const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing }) => {
     const [loadingKycIds, setLoadingKycIds] = useState(new Set());
-
+    const { businessId } = useRole()
     async function verifyKYC(companyId, newStatus) {
         try {
-            const response = await fetch(`/api/companies/${companyId}/verify`, {
+            const response = await fetch(`${BACKEND_URL}/business/verify/${businessId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ kycStatus: newStatus }),

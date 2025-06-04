@@ -1,15 +1,18 @@
 'use client'
+import { useRole } from '@/Context/RoleContext';
 import Link from 'next/link';
 
-export default function Sidebar({ role }) {
+export default function Sidebar() {
+    // const { role } = useRole();
+    const role = "superadmin"
     return (
         <aside className="bg-gray-800 text-white w-64 min-h-screen fixed p-6">
             <h2 className="text-2xl font-bold mb-6">
-                {role === 'admin' ? 'Admin Panel' : 'Company Panel'}
+                {role === 'superadmin' ? 'superadmin' : 'admin'}
             </h2>
 
             <nav className="space-y-3">
-                {role === 'admin' ? (
+                {role === 'superadmin' ? (
                     <>
                         <Link href="/Admin/dashboard" className="block hover:bg-gray-700 p-2 rounded">
                             Dashboard
