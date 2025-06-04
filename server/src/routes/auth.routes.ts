@@ -1,7 +1,14 @@
-import { Router } from 'express';
+import { Router } from "express";
+import { AdminLogin, AdminRegister, BusinessLogin, BusinessRegister } from "../controllers/auth.controller";
 
-const authRouter = Router();
+const AuthRouter = Router();
 
-// authRouter.post("/register", handleRegister);            // to register a restaurant
+// admin auth routes
+AuthRouter.post("/admin/register", AdminRegister);
+AuthRouter.post("/admin/login", AdminLogin);
 
-export default authRouter;
+// business auth routes
+AuthRouter.post("/business/register", BusinessRegister);
+AuthRouter.post("/business/login", BusinessLogin);
+
+export default AuthRouter;

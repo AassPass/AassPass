@@ -16,7 +16,7 @@ export default function Page() {
 
         try {
             const response = await axios.post(
-                `${BACKEND_AUTH_URL_AUTH_URL}/login`,
+                `${BACKEND_AUTH_URL}/admin/login`,
                 { email, password },
                 { withCredentials: true } // important for cookie
             );

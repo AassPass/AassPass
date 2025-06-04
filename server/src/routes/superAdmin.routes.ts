@@ -1,14 +1,21 @@
 import { Router } from "express";
-import { CreateAdmin, SuperAdminLogin, RegisterBusiness, UpdateBusiness, SuperAdminRegister, GetBusiness } from "../controllers/superAdminAuth.controller";
+import {
+  CreateAdmin,
+  GetAdmins,
+  GetBusiness,
+  VerifyBusiness
+} from "../controllers/superAdmin.controller";
 import { authorize } from "../middlewares/auth.middlewares";
 
-const SuperAdminAuthRouter = Router();
+const SuperAdminRouter = Router();
 
-SuperAdminAuthRouter.post("/register", SuperAdminRegister);
-SuperAdminAuthRouter.post("/login", SuperAdminLogin);
-SuperAdminAuthRouter.post("/business", authorize(["SUPER_ADMIN", "ADMIN"]), RegisterBusiness);
-SuperAdminAuthRouter.post("/update-business/:businessId", authorize(["SUPER_ADMIN", "ADMIN"]), UpdateBusiness);
-SuperAdminAuthRouter.post("/admin", authorize(["SUPER_ADMIN"]), CreateAdmin);
-SuperAdminAuthRouter.get("/business", authorize(["SUPER_ADMIN"]), GetBusiness);
+// Only SUPER_ADMIN can create new admins or view businesses
+SuperAdminRouter.post("/admin", authorize(["SUPER_ADMIN"]), CreateAdmin);
+SuperAdminRouter.patch("/business/verfiy/:businessId", authorize(["SUPER_ADMIN"]), VerifyBusiness);
+SuperAdminRouter.get("/admins", authorize(["SUPER_ADMIN"]), GetAdmins);
 
-export default SuperAdminAuthRouter;
+// SUPER_ADMIN and ADMIN can register or update business info
+SuperAdminRouter.get("/business", authorize(["SUPER_ADMIN", "ADMIN"]), GetBusiness);
+
+
+export default SuperAdminRouter;

@@ -8,8 +8,8 @@ import { BACKEND_BUSINESS_URL } from '@/app/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
 
 const categories = [
-    'Deals & Discounts',
-    'Events',
+    'DEAL',
+    'EVENT',
     'Services',
     'Products for Sale',
     'Job Openings',
@@ -20,6 +20,7 @@ const categories = [
 
 export default function AdListing({ setIsAdEditing, editingAd, isAdEditing }) {
     const { businessId } = useRole()
+    // const { businessId } = ''
     const initialAddData = {
         adCode: `AD${Date.now()}`,
         title: '',

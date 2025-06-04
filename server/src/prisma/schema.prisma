@@ -68,21 +68,23 @@ model Business {
   id                 String             @id @default(uuid())
   businessId         String             @unique
   businessName       String
-  ownerName          String
-  phoneNumber        String
+  ownerName          String?
+  phoneNumber        String?
   emailAddress       String             @unique
-  address            String
+  password           String?
+  address            String?
   verificationStatus VerificationStatus
-  subscriptionType   SubscriptionType
-  gstNumber          String
-  websiteLink        String
-  businessType       BusinessType
+  subscriptionType   SubscriptionType?
+  gstNumber          String?
+  websiteLink        String?
+  businessType       BusinessType?
   joinedDate         DateTime           @default(now())
 
-  latitude  Float
-  longitude Float
+  latitude  Float?
+  longitude Float?
 
   socialLinks SocialLink[]
+  ads         Ads[]
 
   @@index([businessId])
 }
@@ -93,4 +95,31 @@ model SocialLink {
   link       String
   business   Business @relation(fields: [businessId], references: [id])
   businessId String
+}
+
+enum AdCategory {
+  EVENT
+  DEAL
+  ACTIVITY
+  OFFER
+  SERVICE
+}
+
+enum AdStage {
+  DRAFT
+  SAVED
+}
+
+model Ads {
+  id          String     @id @default(uuid())
+  adCode      String
+  title       String
+  category    AdCategory
+  visibleFrom DateTime
+  visibleTo   DateTime
+  imageUrl    String
+  stage       AdStage
+  reset       Boolean    @default(false)
+  businessId  String
+  business    Business   @relation(fields: [businessId], references: [id])
 }

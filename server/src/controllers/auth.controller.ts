@@ -1,193 +1,165 @@
-// import { Request, Response } from "express";
-// import { Restaurant } from "../models/Restaurant.model";
-// import bcrypt from "bcrypt";
-// import jwt from "jsonwebtoken";
-// import { config } from "dotenv";
-// import { sendVerificationEmail, sendResetPasswordEmail } from "../services/email.service";
-// import otpStorage from "../utils/otpStorage";
+import { config } from "dotenv";
+import { Request, Response } from "express";
+import bcrypt from "bcrypt";
+import { prisma } from "../utils/prisma";
+import jwt from "jsonwebtoken";
+import { VerificationStatus } from "@prisma/client";
+
+config();
+
+const jwtSecret = process.env.JWT_SECRET;
+
+const AdminRegister = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { email, password, name } = req.body;
+
+        if (!email || !password || !name) {
+            return res.status(400).json({ message: "Email, name, and password are required" });
+        }
+
+        // Check if the email already exists
+        const existingAdmin = await prisma.superAdmin.findUnique({
+            where: { email },
+        });
+
+        if (existingAdmin) {
+            return res.status(409).json({ message: "SuperAdmin with this email already exists" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newAdmin = await prisma.superAdmin.create({
+            data: {
+                email,
+                password: hashedPassword,
+                name,
+                role: "SUPER_ADMIN",
+            }
+        });
+
+        res.status(201).json({
+            message: "Super Admin registered successfully",
+        });
+    } catch (err) {
+        console.error("Error during Super Admin registration:", err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+const AdminLogin = async (req: Request, res: Response): Promise<any> => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    try {
+        const admin = await prisma.superAdmin.findUnique({
+            where: { email },
+        });
+
+        if (!admin) {
+            return res.status(404).json({ message: "Super Admin not found" });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, admin.password);
+
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Invalid password" });
+        }
+
+        const jwtToken = jwt.sign(
+            { id: admin.id, role: admin.role },
+            jwtSecret as string,
+            { expiresIn: "1d" }
+        );
+
+        res.status(200).json({
+            message: "Super Admin logged in successfully",
+            token: jwtToken,
+            role: admin.role
+        });
+    } catch (err) {
+        console.error("Error during Super Admin login:", err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+const BusinessRegister = async (req: Request, res: Response): Promise<any> => {
+    try{
+        const { email, password, name } = req.body;
+
+        if(!email || !password || !name) {
+            return res.status(400).json({message: "Email, name and password are required"});
+        }
+
+        const existingBusiness = await prisma.business.findUnique({
+            where: { emailAddress: email },
+        });
+
+        if(existingBusiness) {
+            return res.status(409).json({message: "Business with this email already exists"});
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const businessId = `BUS-${Date.now()}`;
+
+        const newBusiness = await prisma.business.create({
+            data: {
+                emailAddress: email,
+                password: hashedPassword,
+                businessName: name,
+                businessId,
+                verificationStatus: VerificationStatus.PENDING,
+                joinedDate: new Date()
+            }
+        });
+
+        res.status(201).json({
+            message: "Business registered successfully",
+        });
 
 
-// config();
+    } catch (error){
+        console.error("Error during Business Register:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
 
-// const jwtSecret = process.env.JWT_SECRET as string;
+const BusinessLogin = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const {email, password} = req.body;
 
-// interface UserPayload {
-//     id: string;
-//     role: string;
-//     username: string;
-// }
+        if(!email || !password) {
+            return res.status(404).json({message: "Email and password are required"});
+        }
 
-// export async function handleRegister (req: Request, res: Response): Promise<any> {
-//     try {
-//         const { email, password, username } = req.body;
+        const business = await prisma.business.findUnique({
+            where: {emailAddress: email}
+        })
 
-//         // Check if restaurant already exists
-//         const existingRestaurant = await Restaurant.findOne({ email });
-//         if (existingRestaurant) {
-//             return res.status(400).json({ message: "Restaurant already registered!" });
-//         }
+        if(!business){
+            return res.status(404).json({message: "Business not found"});
+        }
 
-//         // Hash password
-//         const hashedPassword = await bcrypt.hash(password, 10);
+        const isPasswordValid = await bcrypt.compare(password, business.password != null? business.password: "");
 
-//         // Create new restaurant
-//         const newRestaurant = new Restaurant({
-//             email,
-//             username,
-//             password: hashedPassword,
-//             isVerified: false, // Add a verification flag
-//         });
+        if(!isPasswordValid) {
+            return res.status(401).json({message: "Invalid password"});
+        }
 
-//         await newRestaurant.save();
+        const jwtToken = jwt.sign(
+            {id: business.id, role: "BUSINESS", businessId: business.businessId}, 
+            jwtSecret as string,
+            {expiresIn: "1d"}
+        )
 
-//         // Generate verification token
-//         const verificationToken = jwt.sign(
-//             { id: newRestaurant._id, email },
-//             jwtSecret,
-//             { expiresIn: "1d" }
-//         );
+        res.status(200).json({message: "Business logged in successfully", token: jwtToken});
 
-//         // Send verification email
-//         await sendVerificationEmail(newRestaurant.email, verificationToken);
+    } catch(error) {
+        console.error("Error during Business login:", error);
+        res.status(500).json({message: "Internal server error"});
+    }
+}
 
-//         res.status(201).json({ message: "Restaurant registered successfully. Please verify your email." });
-
-//     } catch (error) {
-//         console.error("Error registering restaurant:", error);
-//         res.status(500).json({ message: "Server error❌", error });
-//     }
-// }
-
-// export async function checkValidUsername(req: Request, res: Response): Promise<any> {
-//     try{const {username} = req.body;
-
-//     const result = await Restaurant.findOne({username});
-//     if(!result){
-//         return res.status(200).json({message: "Username is available", available: true});
-//     }
-//     else{
-//         return res.status(200).json({message: "User is already taken", available: false});
-//     }
-//     } catch(err){
-//         console.log("Error checking username:", err);
-//         return res.status(500).json({message: "Server error"});
-//     }
-// }
-
-// export async function handleVerifyEmail(req: Request, res: Response): Promise<any>{
-//     try {
-//         const { token } = req.body;
-//         // console.log("token:", token);
-
-//         if (!token) {
-//             return res.status(400).json({ message: "Verification token is required." });
-//         }
-
-//         // Verify JWT Token
-//         const decoded = jwt.verify(token, jwtSecret) as { id: string; email: string };
-
-//         if (!decoded) {
-//             return res.status(400).json({ message: "Invalid or expired token." });
-//         }
-
-//         // Find the restaurant in the database
-//         const restaurant = await Restaurant.findById(decoded.id);
-//         // console.log("decoded id: ",decoded.id);
-//         if (!restaurant) {
-//             return res.status(404).json({ message: "Not Found ab kya hi kare." });
-//         }
-
-//         if (restaurant.isVerified) {
-//             return res.status(200).json({ message: "Email already verified." });
-//         }
-
-//         // Update restaurant's verification status
-//         restaurant.isVerified = true;
-//         restaurant.trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-//         await restaurant.save();
-
-//         res.status(200).json({ message: "Email verified successfully. You can now log in!" });
-
-//     } catch (error) {
-//         console.error("Error verifying email:", error);
-//         res.status(500).json({ message: "Server error❌", error });
-//     }
-// }
-
-// export async function handleSendOTP(req: Request, res: Response): Promise<any>{
-//     try {
-//         const { email } = req.body;
-//         if (!email) return res.status(400).json({ message: "Email is required" });
-
-//         const user = await Restaurant.findOne({ email });
-//         if (!user) return res.status(404).json({ message: "User not found" });
-
-//         const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
-//         otpStorage.set(email, { otp, expiresAt: Date.now() + 10 * 60 * 1000 }); // Expires in 10 mins
-
-//         await sendResetPasswordEmail(email, otp);
-//         res.status(200).json({ message: "OTP sent to your email" });
-//     } catch (error) {
-//         console.error("Error sending OTP:", error);
-//         res.status(500).json({ message: "Server error", error });
-//     }
-// }
-
-// export async function handleResetPassword(req: Request, res: Response): Promise<any>{
-//     try {
-//         const { email, otp, newPassword } = req.body;
-//         if (!email || !otp || !newPassword)
-//             return res.status(400).json({ message: "All fields are required" });
-
-//         const storedOtp = otpStorage.get(email);
-//         if (!storedOtp || storedOtp.otp !== otp || storedOtp.expiresAt < Date.now()) {
-//             return res.status(400).json({ message: "Invalid or expired OTP" });
-//         }
-
-//         const user = await Restaurant.findOne({ email });
-//         if (!user) return res.status(404).json({ message: "User not found" });
-
-//         user.password = await bcrypt.hash(newPassword, 10);
-//         await user.save();
-
-//         otpStorage.delete(email); // Remove OTP after successful password reset
-//         res.status(200).json({ message: "Password reset successfully" });
-//     } catch (error) {
-//         console.error("Error resetting password:", error);
-//         res.status(500).json({ message: "Server error", error });
-//     }
-// }
-
-// export async function handleLogin(req: Request, res: Response): Promise<any>{
-//     try {
-//         const { email, password } = req.body;
-
-//         // Check if restaurant exists
-//         const restaurant = await Restaurant.findOne({ email });
-//         if (!restaurant) {
-//             return res.status(400).json({ message: "Invalid email or password" });
-//         }
-        
-//         if(!(restaurant.isVerified)){
-//             return res.status(400).json({message: "Verify your email first."});
-//         }
-
-//         // Compare password
-//         const isMatch = await bcrypt.compare(password, restaurant.password);
-//         if (!isMatch) {
-//             return res.status(400).json({ message: "Invalid email or password" });
-//         }
-
-//         // Generate JWT token
-//         const token = jwt.sign(
-//             { id: restaurant._id, name: restaurant.name },
-//             jwtSecret,
-//             { expiresIn: "7d" }
-//         );
-
-//         res.status(200).json({ message: "Login successful", token, id: restaurant._id, username: restaurant.username });
-    
-//     } catch (error) {
-//         res.status(500).json({ message: "Server error❌", error });
-//     }
-// }
+export { AdminRegister, AdminLogin, BusinessRegister, BusinessLogin };

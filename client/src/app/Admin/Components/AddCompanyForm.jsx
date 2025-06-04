@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { BACKEND_URL } from '@/app/Utils/backendUrl';
+import { BACKEND_ADMIN_URL } from '@/app/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
 
 export default function AddBusinessForm({ editingCompany, isEditing, setIsEditing }) {
@@ -106,8 +106,8 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
         try {
             const token = localStorage.getItem('token');
             const url = isEditing
-                ? `${BACKEND_URL}/update-business/${editingCompany.businessId}`
-                : `${BACKEND_URL}/business`;
+                ? `${BACKEND_ADMIN_URL}/update-business/${editingCompany.businessId}`
+                : `${BACKEND_ADMIN_URL}/business`;
 
             const response = await axios.post(url, newBusiness, {
                 headers: {
