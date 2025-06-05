@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 
 export default function Page() {
     const router = useRouter();
-    const { setRole, setBuisnessId } = useRole();
+    const { setRole, setBusinessId } = useRole();
     const [isSignup, setIsSignup] = useState(false);
 
     const handleLogin = async (e) => {
@@ -23,7 +23,7 @@ export default function Page() {
                 { withCredentials: true }
             );
 
-            setBuisnessId(response.data.buisnessId);
+            setBusinessId(response.data.buisnessId);
             setRole(response.data.role);
             localStorage.setItem('token', response.data.token);
             toast.success("Logged in successfully!");

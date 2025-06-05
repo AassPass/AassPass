@@ -7,10 +7,10 @@ import { hasPermission } from '@/libs/hasPermisson';
 
 
 export default function Sidebar() {
-    // const { role } = useRole(); // Assumes role is from context like 'super_admin', 'admin', or 'business'
+    const { role } = useRole(); // Assumes role is from context like 'super_admin', 'admin', or 'business'
 
     // Temporary override for testing
-    const role = 'super_admin';
+    // const role = 'super_admin';
 
     return (
         <aside className="bg-gray-800 text-white w-64 min-h-screen fixed p-6">

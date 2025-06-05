@@ -13,8 +13,8 @@ export default function CompanyManagement() {
     const [editingCompany, setEditingCompany] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
 
-    const [status, setStatus] = useState('verified');
-    const [type, setType] = useState('restaurant');
+    const [status, setStatus] = useState('');
+    const [type, setType] = useState('');
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(5);
 
@@ -22,7 +22,7 @@ export default function CompanyManagement() {
         const token = localStorage.getItem('token');
 
         try {
-            const response = await axios.get(`${BACKEND_URL}/api/business`, {
+            const response = await axios.get(`${BACKEND_URL}/business`, {
                 params: {
                     status,
                     type,
@@ -33,7 +33,7 @@ export default function CompanyManagement() {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
+            // console.log("respoiasdfbnasjkdfbgas",response.data);
             setCompanies(response.data.data || []);
             toast.success('Companies fetched successfully');
         } catch (err) {

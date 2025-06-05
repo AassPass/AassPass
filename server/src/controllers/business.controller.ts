@@ -39,6 +39,46 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
+export const UpdateAd = async (req: Request, res: Response): Promise<any> => {
+  try{
+    const {adId} = req.params;
+    const {title, category, visibleFrom, visibleTo, imageUrl, stage, reset} = req.body;
+    if (!adId || !title || !category || !visibleFrom || !visibleTo || !imageUrl || !stage) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const ad = await prisma.ads.findUnique({where: {id: adId}});
+    if(!ad){
+      return res.status(404).json({message: "Ad not found"});
+    }
+
+    if(ad.businessId !== req.user?.id) {
+      return res.status(403).json({ message: "You do not have permission to update this ad"});
+    }
+
+    const updateData: any = {};
+
+    if(title) updateData.title = title;
+    if(category) updateData.category = category;
+    if(visibleFrom) updateData.visibleFrom = new Date(visibleFrom);
+    if(visibleTo) updateData.visibleTo = new Date(visibleTo);
+    if(imageUrl) updateData.imageUrl = imageUrl;
+    if(stage) updateData.stage = stage;
+    if(reset !== undefined) updateData.reset = reset; 
+
+
+    const updatedAd = await prisma.ads.update({
+      where: {id: adId},
+      data: updateData,
+    });
+
+    res.status(200).json({message: "Ad updated successfully", ad: updatedAd});
+  } catch (error){
+    console.error("UpdateAd error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 export const GetAds = async (req: Request, res: Response): Promise<any> => {
   try {
     const { businessId } = req.params;

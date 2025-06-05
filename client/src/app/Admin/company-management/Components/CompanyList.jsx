@@ -5,16 +5,19 @@ import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { BACKEND_URL } from '@/app/Utils/backendUrl';
 
 const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing }) => {
+    // console.log(companies);
     const [loadingKycIds, setLoadingKycIds] = useState(new Set());
     const { businessId, role } = useRole()
 
     async function verifyKYC(companyId, newStatus) {
         try {
-            const response = await fetch(`${BACKEND_URL}/business/verify/${businessId}`, {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${BACKEND_URL}/business/verify/${companyId}`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                 body: JSON.stringify({ kycStatus: newStatus }),
             });
 

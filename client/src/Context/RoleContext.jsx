@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 const RoleContext = createContext();
 
 export const RoleProvider = ({ children }) => {
-    const [role, setRole] = useState("super_admin");
+    const [role, setRole] = useState("SUPER_ADMIN");
     const [businessId, setBusinessId] = useState(null)
 
 

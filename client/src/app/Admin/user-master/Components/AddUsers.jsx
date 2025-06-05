@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 
 export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser }) {
     const [formData, setFormData] = useState({
-        userName: '',
+        name: '',
         joiningDate: '',
         password: '',
         mobile: '',
@@ -31,8 +31,8 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser 
     const validate = () => {
         const newErrors = {};
 
-        if (!formData.userName.trim()) newErrors.userName = 'User Name is required';
-        if (!formData.joiningDate) newErrors.joiningDate = 'Joining Date is required';
+        if (!formData.name.trim()) newErrors.name = 'User Name is required';
+        // if (!formData.joiningDate) newErrors.joiningDate = 'Joining Date is required';
         if (!formData.password) newErrors.password = 'Password is required';
         if (!formData.mobile) newErrors.mobile = 'Mobile No. is required';
         else if (!/^\d{10}$/.test(formData.mobile))
@@ -54,10 +54,16 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser 
             setErrors({});
 
             try {
+                // console.log(selectedUser);
                 const token = localStorage.getItem('token');
                 if (edit) {
                     // Update existing user
-                    await axios.put(`${BACKEND_URL}/admin/${formData._id}`, formData); // Assuming _id is present
+                    await axios.put(`${BACKEND_URL}/admin/update/${selectedUser.adminId}`, formData, 
+                        {headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                }}
+                    ); // Assuming _id is present
                     alert('User updated successfully!');
                 } else {
                     // Add new user
@@ -70,7 +76,7 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser 
 
                 // Reset form and edit state
                 setFormData({
-                    userName: '',
+                    name: '',
                     joiningDate: '',
                     password: '',
                     mobile: '',
@@ -118,20 +124,20 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser 
                         User Name<span className="text-red-500">*</span>
                     </label>
                     <input
-                        name="userName"
+                        name="name"
                         type="text"
-                        value={formData.userName}
+                        value={formData.name}
                         onChange={handleChange}
                         onKeyDown={handleKeyDown}
-                        className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring-2 ${errors.userName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                        className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring-2 ${errors.name ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
                             } text-black`}
                         required
-                        aria-invalid={errors.userName ? 'true' : 'false'}
-                        aria-describedby="userName-error"
+                        aria-invalid={errors.name ? 'true' : 'false'}
+                        aria-describedby="name-error"
                     />
-                    {errors.userName && (
-                        <p id="userName-error" className="text-red-500 text-xs mt-1">
-                            {errors.userName}
+                    {errors.name && (
+                        <p id="name-error" className="text-red-500 text-xs mt-1">
+                            {errors.name}
                         </p>
                     )}
                 </div>

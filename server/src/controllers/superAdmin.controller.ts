@@ -13,9 +13,9 @@ config();
 
 const CreateAdmin = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { userName, email, mobile } = req.body;
+    const { name, email, mobile } = req.body;
 
-    if (!userName || !email) {
+    if (!name || !email) {
       return res.status(400).json({ message: 'Name and email are required' });
     }
 
@@ -31,7 +31,7 @@ const CreateAdmin = async (req: Request, res: Response): Promise<any> => {
 
     const newAdmin = await prisma.admin.create({
       data: {
-        name: userName,
+        name: name,
         email,
         role: 'ADMIN',
         adminId,
@@ -64,20 +64,97 @@ const CreateAdmin = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-const GetBusiness = async (req: Request, res: Response): Promise<any> => {
+const UpdateAdmin = async (req: Request, res: Response): Promise<any> => {
     try {
-        const businesses = await prisma.business.findMany({
-            include: {
-                socialLinks: true,
-            },
-        });
+      const { adminId } = req.params;
+      const {name, email, isActive} = req.body;
 
-        res.status(200).json(businesses);
+      if(!adminId){
+        return res.status(400).json({message: "Admin ID is required"});
+      }
+
+      const admin = await prisma.admin.findUnique({
+        where: {adminId}
+      });
+
+      if(!admin){
+        return res.status(404).json({message: "Admin not found"});
+      }
+
+      const updatedAdmin = await prisma.admin.update({
+        where: {adminId},
+        data: {
+          name,
+          email,
+          isActive,
+        },
+        select: {
+          id: true,
+          adminId: true,
+          name: true,
+          email: true,
+          role: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        }
+      });
+
+      res.status(200).json({message: "Admin updated successfully", admin: updatedAdmin});
     } catch (error) {
-        console.error("Error fetching businesses:", error);
-        res.status(500).json({ message: "Internal server error" });
-    }    
+      console.error("Error updating admin:", error);
+      res.status(500).json({message: "Internal server error"});
+    }
 }
+
+const GetBusinesses = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { status, type, limit = "10", page = "1" } = req.query;
+
+    console.log("GetBusinesses called with params:", { status, type, limit, page });
+    const filters: any = {};
+
+    // Optional filter: verification status
+    if (status && typeof status === 'string') {
+      filters.verificationStatus = status.toUpperCase(); // PENDING, VERIFIED, etc.
+    }
+
+    // Optional filter: business type
+    if (type && typeof type === 'string') {
+      filters.businessType = type.toUpperCase(); // RESTAURANT, etc.
+    }
+
+    // Pagination values
+    const take = parseInt(limit as string, 10);
+    const skip = (parseInt(page as string, 10) - 1) * take;
+
+    const [businesses, totalCount] = await Promise.all([
+      prisma.business.findMany({
+        where: filters,
+        skip,
+        take,
+      }),
+      prisma.business.count({
+        where: filters
+      })
+    ]);
+
+    return res.status(200).json({
+      message: "Businesses retrieved successfully",
+      data: businesses,
+      pagination: {
+        total: totalCount,
+        page: parseInt(page as string, 10),
+        limit: take,
+        totalPages: Math.ceil(totalCount / take)
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching businesses:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 
 const GetAdmins = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -92,11 +169,12 @@ const GetAdmins = async (req: Request, res: Response): Promise<any> => {
 const VerifyBusiness = async (req: Request, res: Response): Promise<any> => {
     try{
       const { businessId } = req.params;
+      // console.log(businessId);
       if(!businessId){
         return res.status(400).json({message: "Business ID is required"});
       }
-      const business = await prisma.business.findUnique({
-        where: {businessId}
+      const business = await prisma.business.findFirst({
+        where: {businessId: businessId}
       });
       if(!business){
         return res.status(404).json({message: "Business not found"});
@@ -106,7 +184,7 @@ const VerifyBusiness = async (req: Request, res: Response): Promise<any> => {
       }
 
       const updatedBusiness = await prisma.business.update({
-        where: {businessId},
+        where: { businessId: businessId },
         data: {
           verificationStatus: VerificationStatus.VERIFIED,
         }
@@ -120,4 +198,4 @@ const VerifyBusiness = async (req: Request, res: Response): Promise<any> => {
     }
 }
 
-export { CreateAdmin, GetBusiness, VerifyBusiness, GetAdmins };
+export { CreateAdmin, GetBusinesses, VerifyBusiness, GetAdmins, UpdateAdmin };

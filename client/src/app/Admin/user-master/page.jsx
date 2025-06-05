@@ -27,6 +27,7 @@ export default function UserMaster() {
                         Authorization: `Bearer ${token}`, // ✅ Send token in Authorization header
                     },
                 });
+                console.log(response.data);
 
                 setUsers(response.data);
                 toast.success('Users loaded successfully!');

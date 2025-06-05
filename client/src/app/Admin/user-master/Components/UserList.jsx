@@ -41,18 +41,18 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
                             users.map((user, index) => (
                                 <tr key={user.id} className="hover:bg-gray-50 text-sm">
                                     <td className="py-3 px-4 border-b">{index + 1}</td>
-                                    <td className="py-3 px-4 border-b">{user.userName}</td>
+                                    <td className="py-3 px-4 border-b">{user.name}</td>
                                     <td className="py-3 px-4 border-b">{user.email}</td>
                                     <td className="py-3 px-4 border-b">{user.mobile}</td>
-                                    <td className="py-3 px-4 border-b">{user.joiningDate}</td>
+                                    <td className="py-3 px-4 border-b">{user.createdAt}</td>
                                     <td className="py-3 px-4 border-b">
                                         <span
-                                            className={`inline-block px-2 py-1 text-xs rounded-full ${user.active === 'YES'
+                                            className={`inline-block px-2 py-1 text-xs rounded-full ${user.isActive
                                                 ? 'bg-green-100 text-green-700'
                                                 : 'bg-red-100 text-red-700'
                                                 }`}
                                         >
-                                            {user.active}
+                                            {user.isActive? "Active": "Inactive"}
                                         </span>
                                     </td>
                                     <td className="py-3 px-4 border-b text-center space-x-2">

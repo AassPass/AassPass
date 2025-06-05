@@ -111,15 +111,16 @@ enum AdStage {
 }
 
 model Ads {
-  id          String     @id @default(uuid())
-  adCode      String
-  title       String
-  category    AdCategory
-  visibleFrom DateTime
-  visibleTo   DateTime
-  imageUrl    String
-  stage       AdStage
-  reset       Boolean    @default(false)
-  businessId  String
-  business    Business   @relation(fields: [businessId], references: [id])
+  id                 String             @id @default(uuid())
+  adCode             String             @unique
+  title              String
+  category           AdCategory
+  verificationStatus VerificationStatus @default(PENDING)
+  visibleFrom        DateTime
+  visibleTo          DateTime
+  imageUrl           String
+  stage              AdStage
+  reset              Boolean            @default(false)
+  businessId         String
+  business           Business           @relation(fields: [businessId], references: [id])
 }

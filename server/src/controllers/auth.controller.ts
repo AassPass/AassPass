@@ -87,7 +87,7 @@ const AdminLogin = async (req: Request, res: Response): Promise<any> => {
 
 const BusinessRegister = async (req: Request, res: Response): Promise<any> => {
     try{
-        const { email, password, name } = req.body;
+        const { email, password, name = "juned" } = req.body;
 
         if(!email || !password || !name) {
             return res.status(400).json({message: "Email, name and password are required"});
@@ -154,7 +154,7 @@ const BusinessLogin = async (req: Request, res: Response): Promise<any> => {
             {expiresIn: "1d"}
         )
 
-        res.status(200).json({message: "Business logged in successfully", token: jwtToken});
+        res.status(200).json({message: "Business logged in successfully", token: jwtToken, role: "BUSINESS"});
 
     } catch(error) {
         console.error("Error during Business login:", error);

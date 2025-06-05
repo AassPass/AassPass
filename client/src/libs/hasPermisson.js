@@ -2,7 +2,7 @@
 import { PERMISSIONS } from './permissions';
 
 const permissions = {
-    super_admin: [
+    SUPER_ADMIN: [
         PERMISSIONS.CREATE_ADMIN,
         PERMISSIONS.EDIT_ADMIN,
         PERMISSIONS.CREATE_BUSINESS,
@@ -14,13 +14,13 @@ const permissions = {
         PERMISSIONS.VERIFY_KYC,
         PERMISSIONS.VERIFY_AD,        // ✅ NEW
     ],
-    admin: [
+    ADMIN: [
         PERMISSIONS.EDIT_ADS,
         PERMISSIONS.DELETE_ADS,
         PERMISSIONS.VERIFY_ADS,
         // PERMISSIONS.VERIFY_KYC            // ✅ Optional: Give to admin too
     ],
-    business: [
+    BUSINESS: [
         PERMISSIONS.CREATE_BUSINESS,
         PERMISSIONS.ADD_ADS,
         PERMISSIONS.EDIT_ADS,

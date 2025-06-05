@@ -70,8 +70,9 @@ const UpdateBusiness = async (req: Request, res: Response): Promise<any> => {
   try {
     const { businessId } = req.params;
     // console.log("asdfhaskdjfhaksdhfklashdfkhasdiof", businessId);
+    console.log(req.body);
     const {
-      name,
+      businessName,
       ownerName,
       phoneNumber,
       email,
@@ -93,7 +94,7 @@ const UpdateBusiness = async (req: Request, res: Response): Promise<any> => {
     // Prepare update data
     const updateData: any = {};
 
-    if (name) updateData.businessName = name;
+    if (businessName) updateData.businessName = businessName;
     if (ownerName) updateData.ownerName = ownerName;
     if (phoneNumber) updateData.phoneNumber = phoneNumber;
     if (email) updateData.emailAddress = email;
@@ -101,8 +102,8 @@ const UpdateBusiness = async (req: Request, res: Response): Promise<any> => {
     if (gstNumber) updateData.gstNumber = gstNumber;
     if (websiteLink) updateData.websiteLink = websiteLink;
     if (businessType) updateData.businessType = businessType as BusinessType;
-    if (subscriptionType) updateData.subscriptionType = subscriptionType as SubscriptionType;
-    if (verificationStatus) updateData.verificationStatus = verificationStatus as VerificationStatus;
+    if (subscriptionType) updateData.subscriptionType = subscriptionType.toUpperCase() as SubscriptionType;
+    if (verificationStatus) updateData.verificationStatus = verificationStatus.toUpperCase() as VerificationStatus;
     if (latitude !== undefined) updateData.latitude = parseFloat(latitude);
     if (longitude !== undefined) updateData.longitude = parseFloat(longitude);
 
@@ -133,4 +134,138 @@ const UpdateBusiness = async (req: Request, res: Response): Promise<any> => {
 };
 
 
-export { RegisterBusiness, UpdateBusiness };
+const VerifyAd = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { adId } = req.params;
+
+    if(!adId){
+      return res.status(400).json({ message: "Ad Id is required"});
+    }
+
+    const ad = await prisma.ads.findUnique({
+      where: { adCode: adId }
+    });
+
+    if(!ad){
+      return res.status(404).json({message: "Ad not found"});
+    }
+    if(ad.verificationStatus === VerificationStatus.VERIFIED){
+      return res.status(400).json({message: "Ad is already verified"});
+    }
+    const updatedAd = await prisma.ads.update({
+      where: {adCode: adId},
+      data: {
+        verificationStatus: VerificationStatus.VERIFIED,
+      }
+    });
+    return res.status(200).json({
+      message: "Ad verified successfully",
+      ad: updatedAd
+    });
+  } catch (error) {
+    console.error("Error verifying ad:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+const GetAds = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const {
+      status,
+      category,
+      stage,
+      limit = "10",
+      page = "1",
+    } = req.query;
+
+    const filters: any = {};
+
+    // Optional filter: verification status
+    if (status && typeof status === "string") {
+      filters.verificationStatus = status.toUpperCase(); // PENDING, VERIFIED, etc.
+    }
+
+    // Optional filter: ad category
+    if (category && typeof category === "string") {
+      filters.category = category.toUpperCase(); // FOOD, ELECTRONICS, etc.
+    }
+
+    // Optional filter: ad stage
+    if (stage && typeof stage === "string") {
+      filters.stage = stage.toUpperCase(); // CREATED, APPROVED, etc.
+    }
+
+    // Pagination values
+    const take = parseInt(limit as string, 10);
+    const skip = (parseInt(page as string, 10) - 1) * take;
+
+    const [ads, totalCount] = await Promise.all([
+      prisma.ads.findMany({
+        where: filters,
+        skip,
+        take,
+        include: {
+          business: true, // Include related business data if needed
+        },
+      }),
+      prisma.ads.count({
+        where: filters,
+      }),
+    ]);
+
+    return res.status(200).json({
+      message: "Ads retrieved successfully",
+      data: ads,
+      pagination: {
+        total: totalCount,
+        page: parseInt(page as string, 10),
+        limit: take,
+        totalPages: Math.ceil(totalCount / take),
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching ads:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const ChangeAdStatus = async (req: Request, res: Response): Promise<any> => {
+  try{
+    const { adId } = req.params;
+    const { status } = req.body;
+    if(!adId || !status){
+      return res.status(400).json({message: "Ad Id and status are required"});
+    }
+
+    const allowedStatuses = ["PENDING", "VERIFIED", "REJECTED"];
+    if (!allowedStatuses.includes(status.toUpperCase())) {
+      return res.status(400).json({ message: "Invalid status provided" });
+    }
+
+    const ad = await prisma.ads.findUnique({
+      where: {adCode: adId}
+    });
+
+    if(!ad){
+      return res.status(404).json({message: "Ad not found"});
+    }
+
+    const updatedAd = await prisma.ads.update({
+      where: { id: adId },
+      data: {
+        verificationStatus: status.toUpperCase(),
+      },
+    });
+
+    return res.status(200).json({
+      message: "Ad status updated successfully",
+      data: updatedAd,
+    });
+
+  } catch(error){
+    console.error("Error updating ad status:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export { RegisterBusiness, UpdateBusiness, VerifyAd, GetAds, ChangeAdStatus };
