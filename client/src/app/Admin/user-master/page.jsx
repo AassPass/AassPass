@@ -22,7 +22,7 @@ export default function UserMaster() {
             }
 
             try {
-                const response = await axios.get(`${BACKEND_URL}/admin`, {
+                const response = await axios.get(`${BACKEND_URL}/admins`, {
                     headers: {
                         Authorization: `Bearer ${token}`, // ✅ Send token in Authorization header
                     },

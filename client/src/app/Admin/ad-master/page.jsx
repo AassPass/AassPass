@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import AdList from './Component/AdList';
 import AdListing from './Component/AdListing';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRole } from '@/Context/RoleContext';
 import { BACKEND_BUSINESS_URL } from '@/app/Utils/backendUrl';
@@ -61,7 +61,7 @@ export default function CompanyManagement() {
 
     return (
         <div className="flex flex-col h-full p-6 overflow-hidden">
-            <ToastContainer />
+
             <h1 className="text-2xl font-bold mb-4 text-black">Ad Management</h1>
 
             <div className="mb-4">

@@ -1,6 +1,10 @@
+import { useRole } from '@/Context/RoleContext';
+import { hasPermission } from '@/libs/hasPermisson';
+import { PERMISSIONS } from '@/libs/permissions';
 import React from 'react';
 
 const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
+    const { role } = useRole()
     const handleEdit = (user) => {
         setSelectedUser(user);
         setEdit(true);
@@ -27,7 +31,9 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
                             <th className="py-3 px-4 border-b">Mobile</th>
                             <th className="py-3 px-4 border-b">Joining Date</th>
                             <th className="py-3 px-4 border-b">Active</th>
-                            <th className="py-3 px-4 border-b text-center">Actions</th>
+                            {(hasPermission(role, PERMISSIONS.EDIT_ADMIN) || hasPermission(role, PERMISSIONS.DELETE_USER)) && (
+                                <th className="py-3 px-4 border-b text-center">Actions</th>
+                            )}
                         </tr>
                     </thead>
                     <tbody>
@@ -50,18 +56,22 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
                                         </span>
                                     </td>
                                     <td className="py-3 px-4 border-b text-center space-x-2">
-                                        <button
-                                            onClick={() => handleEdit(user)}
-                                            className="text-blue-600 hover:underline text-sm"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(user.id)}
-                                            className="text-red-600 hover:underline text-sm"
-                                        >
-                                            Delete
-                                        </button>
+                                        {hasPermission(role, PERMISSIONS.EDIT_ADMIN) && (
+                                            <button
+                                                onClick={() => handleEdit(user)}
+                                                className="text-blue-600 hover:underline text-sm"
+                                            >
+                                                Edit
+                                            </button>
+                                        )}
+                                        {hasPermission(role, PERMISSIONS.DELETE_ADMIN) && (
+                                            <button
+                                                onClick={() => handleDelete(user.id)}
+                                                className="text-red-600 hover:underline text-sm"
+                                            >
+                                                Delete
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))

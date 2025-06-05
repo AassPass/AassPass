@@ -1,12 +1,15 @@
 'use client';
 
 import { useRole } from '@/Context/RoleContext';
+import { hasPermission } from '@/libs/hasPermisson';
+import { PERMISSIONS } from '@/libs/permissions';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
 const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing }) => {
     const [loadingKycIds, setLoadingKycIds] = useState(new Set());
-    const { businessId } = useRole()
+    const { businessId, role } = useRole()
+
     async function verifyKYC(companyId, newStatus) {
         try {
             const response = await fetch(`${BACKEND_URL}/business/verify/${businessId}`, {
@@ -78,8 +81,12 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
                             <th className="py-2 px-4 border-b">Subscription</th>
                             <th className="py-2 px-4 border-b">Business Type</th>
                             <th className="py-2 px-4 border-b">KYC</th>
-                            <th className="py-2 px-4 border-b">Verify</th>
-                            <th className="py-2 px-4 border-b">Edit</th>
+                            {hasPermission(role, PERMISSIONS.VERIFY_KYC) && (
+                                <th className="py-2 px-4 border-b">Verify</th>
+                            )}
+                            {hasPermission(role, PERMISSIONS.EDIT_BUSINESS) && (
+                                <th className="py-2 px-4 border-b">Edit</th>
+                            )}
                         </tr>
                     </thead>
                     <tbody>
@@ -169,26 +176,30 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
                                     <td className="py-2 px-4">{company.subscriptionType}</td>
                                     <td className="py-2 px-4">{company.businessType}</td>
                                     <td className="py-2 px-4">{company.verificationStatus}</td>
-                                    <td className="py-2 px-4">
-                                        <input
-                                            type="checkbox"
-                                            checked={company.kycStatus === 'Verified'}
-                                            onChange={() => handleKycToggle(company)}
-                                            disabled={loadingKycIds.has(company.businessId)}
-                                        />
-                                    </td>
+                                    {hasPermission(role, PERMISSIONS.VERIFY_KYC) && (
+                                        <td className="py-2 px-4">
+                                            <input
+                                                type="checkbox"
+                                                checked={company.kycStatus === 'Verified'}
+                                                onChange={() => handleKycToggle(company)}
+                                                disabled={loadingKycIds.has(company.businessId)}
+                                            />
+                                        </td>
+                                    )}
 
-                                    <td className="py-2 px-4">
-                                        <button
-                                            onClick={() => {
-                                                setEditingCompany(company);
-                                                setIsEditing(true);
-                                            }}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
-                                        >
-                                            Edit
-                                        </button>
-                                    </td>
+                                    {hasPermission(role, PERMISSIONS.EDIT_BUSINESS) && (
+                                        <td className="py-2 px-4">
+                                            <button
+                                                onClick={() => {
+                                                    setEditingCompany(company);
+                                                    setIsEditing(true);
+                                                }}
+                                                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                                            >
+                                                Edit
+                                            </button>
+                                        </td>
+                                    )}
                                 </tr>
                             ))
                         )}

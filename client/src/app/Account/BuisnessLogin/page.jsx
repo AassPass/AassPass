@@ -1,5 +1,5 @@
 'use client'
-import { BACKEND_URL } from "@/app/Utils/backendUrl";
+import { BACKEND_AUTH_URL, BACKEND_URL } from "@/app/Utils/backendUrl";
 import { useRole } from "@/Context/RoleContext";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,7 @@ export default function Page() {
 
         try {
             const response = await axios.post(
-                `${BACKEND_URL}/login`,
+                `${BACKEND_AUTH_URL}/business/login`,
                 { email, password },
                 { withCredentials: true }
             );
@@ -47,7 +47,7 @@ export default function Page() {
 
         try {
             const response = await axios.post(
-                `${BACKEND_URL}/register`,
+                `${BACKEND_AUTH_URL}/business/register`,
                 { email, password },
                 { withCredentials: true }
             );
