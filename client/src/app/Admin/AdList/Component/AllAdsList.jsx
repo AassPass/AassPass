@@ -1,5 +1,6 @@
 'use client';
 
+import { BACKEND_ADMIN_URL } from '@/app/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
 import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
@@ -13,7 +14,7 @@ const AllAdsList = ({ allAds, setAllAds }) => {
 
     async function updateVerification(adCode, newStatus) {
         try {
-            const response = await axios.patch(`/api/admin/ads/${adCode}/verify`, {
+            const response = await axios.patch(`${BACKEND_ADMIN_URL}/verify-ad/${adCode}`, {
                 verificationStatus: newStatus,
             });
 

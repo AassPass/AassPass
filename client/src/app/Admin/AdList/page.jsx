@@ -11,7 +11,7 @@ const AllAdsPage = () => {
     // Fetch ads from API
     const fetchAllAds = async () => {
         try {
-            const response = await axios.get('/api/admin/ads');
+            const response = await axios.get(`${BACKEND_ADMIN_URL}/ads`);
             setAllAds(response.data);
         } catch (error) {
             console.error('Failed to fetch ads:', error);
