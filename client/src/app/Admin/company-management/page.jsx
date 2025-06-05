@@ -3,37 +3,64 @@
 import { useState, useEffect } from 'react';
 import AddCompanyForm from '../Components/AddCompanyForm';
 import CompanyList from './Components/CompanyList';
+import CompanyFilter from './Components/CompanyFilter';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { BACKEND_URL } from '@/app/Utils/backendUrl';
 
 export default function CompanyManagement() {
     const [companies, setCompanies] = useState([]);
     const [editingCompany, setEditingCompany] = useState(null);
-    const [isEditing, setIsEditing] = useState(false)
+    const [isEditing, setIsEditing] = useState(false);
+
+    const [status, setStatus] = useState('verified');
+    const [type, setType] = useState('restaurant');
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(5);
+
+    const fetchBusinesses = async () => {
+        const token = localStorage.getItem('token');
+
+        try {
+            const response = await axios.get(`${BACKEND_URL}/api/business`, {
+                params: {
+                    status,
+                    type,
+                    page,
+                    limit,
+                },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            setCompanies(response.data.data || []);
+            toast.success('Companies fetched successfully');
+        } catch (err) {
+            console.error("Error:", err.response?.data || err.message);
+            toast.error('Failed to fetch companies');
+        }
+    };
 
     useEffect(() => {
-        const fetchCompanies = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const response = await axios.get(`${BACKEND_URL}/business`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                console.log(response.data);
-                setCompanies(response.data);
-                toast.success('Companies loaded successfully!');
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        fetchCompanies();
-    }, []);
+        fetchBusinesses();
+    }, []); // Only once on load
 
     return (
         <div className="flex flex-col h-full p-6 overflow-hidden">
             <h1 className="text-2xl font-bold mb-4 text-black">Company Management</h1>
+
+            <CompanyFilter
+                status={status}
+                type={type}
+                page={page}
+                limit={limit}
+                setStatus={setStatus}
+                setType={setType}
+                setPage={setPage}
+                setLimit={setLimit}
+                onFilter={fetchBusinesses} // Now this works
+            />
 
             <div className="mb-4">
                 <AddCompanyForm

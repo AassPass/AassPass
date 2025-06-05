@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import AllAdsList from './Component/AllAdsList';
+import { BACKEND_ADMIN_URL } from '@/app/Utils/backendUrl';
 
 const AllAdsPage = () => {
     const [allAds, setAllAds] = useState([]);
