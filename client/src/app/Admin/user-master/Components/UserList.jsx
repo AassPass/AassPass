@@ -1,19 +1,42 @@
+'use client';
+import React from 'react';
+import axios from 'axios';
 import { useRole } from '@/Context/RoleContext';
 import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
-import React from 'react';
+import { BACKEND_URL } from '@/app/Utils/backendUrl';
+import { toast } from 'react-toastify';
 
 const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
-    const { role } = useRole()
+    const { role } = useRole();
+
     const handleEdit = (user) => {
         setSelectedUser(user);
         setEdit(true);
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = async (id) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this user?');
-        if (confirmDelete) {
-            setUsers((prevUsers) => prevUsers.filter(user => user.id !== id));
+        if (!confirmDelete) return;
+
+        try {
+            const token = localStorage.getItem('token');
+
+            const response = await axios.delete(`${BACKEND_URL}/admin/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status === 200) {
+                toast.success('User deleted successfully!');
+                setUsers((prevUsers) => prevUsers.filter(user => user.id !== id));
+            } else {
+                toast.error('Failed to delete user.');
+            }
+        } catch (error) {
+            toast.error('Error deleting user.');
+            console.error('Delete error:', error);
         }
     };
 
@@ -31,7 +54,7 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
                             <th className="py-3 px-4 border-b">Mobile</th>
                             <th className="py-3 px-4 border-b">Joining Date</th>
                             <th className="py-3 px-4 border-b">Active</th>
-                            {(hasPermission(role, PERMISSIONS.EDIT_ADMIN) || hasPermission(role, PERMISSIONS.DELETE_USER)) && (
+                            {(hasPermission(role, PERMISSIONS.EDIT_ADMIN) || hasPermission(role, PERMISSIONS.DELETE_ADMIN)) && (
                                 <th className="py-3 px-4 border-b text-center">Actions</th>
                             )}
                         </tr>
@@ -46,33 +69,30 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
                                     <td className="py-3 px-4 border-b">{user.mobile}</td>
                                     <td className="py-3 px-4 border-b">{user.createdAt}</td>
                                     <td className="py-3 px-4 border-b">
-                                        <span
-                                            className={`inline-block px-2 py-1 text-xs rounded-full ${user.isActive
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-red-100 text-red-700'
-                                                }`}
-                                        >
-                                            {user.isActive? "Active": "Inactive"}
+                                        <span className={`inline-block px-2 py-1 text-xs rounded-full ${user.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                            {user.isActive ? "Active" : "Inactive"}
                                         </span>
                                     </td>
-                                    <td className="py-3 px-4 border-b text-center space-x-2">
-                                        {hasPermission(role, PERMISSIONS.EDIT_ADMIN) && (
-                                            <button
-                                                onClick={() => handleEdit(user)}
-                                                className="text-blue-600 hover:underline text-sm"
-                                            >
-                                                Edit
-                                            </button>
-                                        )}
-                                        {hasPermission(role, PERMISSIONS.DELETE_ADMIN) && (
-                                            <button
-                                                onClick={() => handleDelete(user.id)}
-                                                className="text-red-600 hover:underline text-sm"
-                                            >
-                                                Delete
-                                            </button>
-                                        )}
-                                    </td>
+                                    {(hasPermission(role, PERMISSIONS.EDIT_ADMIN) || hasPermission(role, PERMISSIONS.DELETE_ADMIN)) && (
+                                        <td className="py-3 px-4 border-b text-center space-x-2">
+                                            {hasPermission(role, PERMISSIONS.EDIT_ADMIN) && (
+                                                <button
+                                                    onClick={() => handleEdit(user)}
+                                                    className="text-blue-600 hover:underline text-sm"
+                                                >
+                                                    Edit
+                                                </button>
+                                            )}
+                                            {hasPermission(role, PERMISSIONS.DELETE_ADMIN) && (
+                                                <button
+                                                    onClick={() => handleDelete(user.id)}
+                                                    className="text-red-600 hover:underline text-sm"
+                                                >
+                                                    Delete
+                                                </button>
+                                            )}
+                                        </td>
+                                    )}
                                 </tr>
                             ))
                         ) : (

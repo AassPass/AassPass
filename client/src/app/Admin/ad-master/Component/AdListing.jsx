@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { BACKEND_BUSINESS_URL } from '@/app/Utils/backendUrl';
@@ -15,12 +15,12 @@ const categories = [
     'Job Openings',
     'Rentals & Properties',
     'Announcements',
-    'Contests & Giveaways'
+    'Contests & Giveaways',
 ];
 
-export default function AdListing({ setIsAdEditing, editingAd, isAdEditing }) {
-    const { businessId } = useRole()
-    // const { businessId } = ''
+export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setAds }) {
+    const { businessId } = useRole();
+
     const initialAddData = {
         adCode: `AD${Date.now()}`,
         title: '',
@@ -32,46 +32,60 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing }) {
     };
 
     const [form, setForm] = useState(initialAddData);
+    const [previewImages, setPreviewImages] = useState([]);
 
+    // Handle edit mode
     useEffect(() => {
         if (isAdEditing && editingAd) {
             setForm({
                 ...editingAd,
                 extra: editingAd.extra || {},
-                images: [], // clear images on edit or handle as needed
+                images: [], // reset new uploads
             });
+            // Clear previews
+            setPreviewImages([]);
         } else {
             setForm(initialAddData);
+            setPreviewImages([]);
         }
     }, [isAdEditing, editingAd]);
+
+    // Cleanup previews on unmount
+    useEffect(() => {
+        return () => {
+            previewImages.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [previewImages]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleImageUpload = (e) => {
-        let files = Array.from(e.target.files);
-        if (files.length > 3) {
-            toast.warn('You can upload up to 3 images only');
-            files = files.slice(0, 3);
-        }
-        setForm((prev) => ({ ...prev, images: files }));
-    };
-
     const handleExtraChange = (e) => {
         const { name, value } = e.target;
         setForm((prev) => ({
             ...prev,
-            extra: { ...prev.extra, [name]: value }
+            extra: { ...prev.extra, [name]: value },
         }));
     };
+
+    const handleImageUpload = (e) => {
+        const newFiles = Array.from(e.target.files);
+        const combinedFiles = [...form.images, ...newFiles].slice(0, 3); // Limit total to 3
+
+        const newPreviews = combinedFiles.map((file) => URL.createObjectURL(file));
+
+        setForm((prev) => ({ ...prev, images: combinedFiles }));
+        setPreviewImages(newPreviews);
+    };
+
 
     const handleSubmit = async (status) => {
         try {
             const token = localStorage.getItem('token');
-
             const formData = new FormData();
+
             formData.append('adCode', form.adCode);
             formData.append('title', form.title);
             formData.append('category', form.category);
@@ -90,20 +104,35 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing }) {
 
             const method = isAdEditing ? 'put' : 'post';
 
-            await axios({
+            const response = await axios({
                 method,
                 url: endpoint,
                 data: formData,
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
                 },
             });
 
-            toast.success(`Ad ${isAdEditing ? 'updated' : status === 'draft' ? 'saved as draft' : 'submitted'} successfully!`);
-            setForm(initialAddData);
-            setIsAdEditing(false); // exit edit mode
+            if (response.status === 200) {
+                const updatedAd = response.data;
 
+                if (isAdEditing) {
+                    setAds((prevAds) =>
+                        prevAds.map((ad) => (ad.adCode === updatedAd.adCode ? updatedAd : ad))
+                    );
+                } else {
+                    setAds((prevAds) => [updatedAd, ...prevAds]);
+                }
+
+                toast.success(
+                    `Ad ${isAdEditing ? 'updated' : status === 'draft' ? 'saved as draft' : 'submitted'} successfully!`
+                );
+
+                setForm(initialAddData);
+                setPreviewImages([]);
+                setIsAdEditing(false);
+            }
         } catch (error) {
             console.error('Ad submission error:', error);
             toast.error('Failed to submit ad. Please try again.');
@@ -112,7 +141,7 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing }) {
 
     const renderExtraFields = () => {
         switch (form.category) {
-            case 'Events':
+            case 'EVENT':
                 return (
                     <>
                         <Input name="location" placeholder="Location" onChange={handleExtraChange} value={form.extra.location || ''} />
@@ -167,7 +196,6 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing }) {
 
     return (
         <div className="max-w-2xl mx-auto p-6 bg-white rounded-2xl shadow-md text-gray-800 space-y-6">
-            <ToastContainer />
             <h2 className="text-2xl font-bold border-b pb-2">🗂️ Create New Ad Listing</h2>
 
             <div className="space-y-4">
@@ -190,7 +218,9 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing }) {
                     >
                         <option value="">Select Category</option>
                         {categories.map((cat) => (
-                            <option key={cat} value={cat}>{cat}</option>
+                            <option key={cat} value={cat}>
+                                {cat}
+                            </option>
                         ))}
                     </select>
                 </div>
@@ -216,13 +246,31 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing }) {
                         onChange={handleImageUpload}
                         className="w-full file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                     />
+                    {previewImages.length > 0 && (
+                        <div className="grid grid-cols-3 gap-4 mt-2">
+                            {previewImages.map((src, index) => (
+                                <img
+                                    key={index}
+                                    src={src}
+                                    alt={`preview-${index}`}
+                                    className="w-full h-24 object-cover rounded-md border"
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                    <button onClick={() => handleSubmit('submit')} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium">
+                    <button
+                        onClick={() => handleSubmit('submit')}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
+                    >
                         Submit
                     </button>
-                    <button onClick={() => handleSubmit('draft')} className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-md font-medium">
+                    <button
+                        onClick={() => handleSubmit('draft')}
+                        className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-md font-medium"
+                    >
                         Save as Draft
                     </button>
                 </div>

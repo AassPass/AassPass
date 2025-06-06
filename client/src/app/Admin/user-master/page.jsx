@@ -27,7 +27,7 @@ export default function UserMaster() {
                         Authorization: `Bearer ${token}`, // ✅ Send token in Authorization header
                     },
                 });
-                console.log(response.data);
+                
 
                 setUsers(response.data);
                 toast.success('Users loaded successfully!');
@@ -42,11 +42,13 @@ export default function UserMaster() {
 
     return (
         <div className="p-6 space-y-8">
-            <ToastContainer position="top-right" autoClose={3000} />
+
 
             {/* Add User Form */}
             <AddUsers
                 edit={edit}
+                users={users}
+                setUser={setUsers}
                 setEdit={setEdit}
                 selectedUser={selectedUser}
                 setSelectedUser={setSelectedUser}

@@ -5,7 +5,7 @@ import axios from 'axios';
 import { BACKEND_URL } from '@/app/Utils/backendUrl';
 import { toast } from 'react-toastify';
 
-export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser }) {
+export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser, setUsers, users }) {
     const [formData, setFormData] = useState({
         name: '',
         joiningDate: '',
@@ -54,37 +54,64 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser 
             setErrors({});
 
             try {
-                // console.log(selectedUser);
                 const token = localStorage.getItem('token');
+                let response;
+
                 if (edit) {
-                    // Update existing user
-                    await axios.put(`${BACKEND_URL}/admin/update/${selectedUser.adminId}`, formData, 
-                        {headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                }}
-                    ); // Assuming _id is present
-                    alert('User updated successfully!');
+                    // Update user
+                    response = await axios.put(
+                        `${BACKEND_URL}/admin/update/${selectedUser.adminId}`,
+                        formData,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
                 } else {
                     // Add new user
-                    await axios.post(`${BACKEND_URL}/admin`, formData, {headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                }});
-                    alert('User saved successfully!');
+                    response = await axios.post(
+                        `${BACKEND_URL}/admin`,
+                        formData,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
                 }
 
-                // Reset form and edit state
-                setFormData({
-                    name: '',
-                    joiningDate: '',
-                    password: '',
-                    mobile: '',
-                    email: '',
-                    active: 'YES',
-                });
-                setSelectedUser(null);
-                setEdit(false);
+                if (response.status === 200) {
+                    toast.success(edit ? 'User updated successfully!' : 'User saved successfully!');
+
+                    const returnedUser = response.data.data || formData;
+
+                    if (edit) {
+                        setUsers((prev) =>
+                            prev.map((u) =>
+                                u.adminId === selectedUser.adminId ? returnedUser : u
+                            )
+                        );
+                    } else {
+                        setUsers((prev) => [returnedUser, ...prev]);
+                    }
+
+                    // Reset form
+                    setFormData({
+                        name: '',
+                        joiningDate: '',
+                        password: '',
+                        mobile: '',
+                        email: '',
+                        active: 'YES',
+                    });
+                    setSelectedUser(null);
+                    setEdit(false);
+                } else {
+                    toast.error('Something went wrong. Please try again.');
+                }
             } catch (error) {
                 toast.error('Something went wrong. Please try again.');
                 console.error('Error saving user:', error);
@@ -93,6 +120,7 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser 
             setErrors(formErrors);
         }
     };
+
 
 
 
