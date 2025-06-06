@@ -63,6 +63,7 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
             return newSet;
         });
     }
+    
 
     return (
         <div className="flex-1 overflow-auto rounded border border-gray-300 bg-white">

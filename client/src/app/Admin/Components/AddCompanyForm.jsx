@@ -6,7 +6,7 @@ import axios from 'axios';
 import { BACKEND_ADMIN_URL } from '@/app/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
 
-export default function AddBusinessForm({ editingCompany, isEditing, setIsEditing }) {
+export default function AddBusinessForm({ editingCompany, isEditing, setIsEditing, companies, setCompanies }) {
     const { businessId: contextBusinessId } = useRole();
 
     const initialFormData = {
@@ -113,21 +113,36 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
-                }
+                },
             });
 
-            toast.success(editingCompany ? 'Business updated successfully!' : 'Business added successfully!');
+            if (response.status === 200) {
+                toast.success(isEditing ? 'Business updated successfully!' : 'Business added successfully!');
 
-            if (!editingCompany) {
-                setFormData(initialFormData);
+                const returnedCompany = response.data.data || newBusiness;
+
+                if (isEditing) {
+                    setCompanies(prev =>
+                        prev.map(company =>
+                            company.businessId === editingCompany.businessId ? returnedCompany : company
+                        )
+                    );
+                    setIsEditing(false);
+                } else {
+                    setCompanies(prev => [returnedCompany, ...prev]);
+                    setFormData(initialFormData);
+                }
+            } else {
+                toast.error('Something went wrong. Please try again.');
             }
-
         } catch (error) {
             console.error(error);
             toast.error('Error submitting business');
         } finally {
             setIsSubmitting(false);
         }
+
+
     }
 
     return (
