@@ -47,7 +47,7 @@ export default function UserMaster() {
             <AddUsers
                 edit={edit}
                 users={users}
-                setUser={setUsers}
+                setUsers={setUsers}
                 setEdit={setEdit}
                 selectedUser={selectedUser}
                 setSelectedUser={setSelectedUser}

@@ -21,16 +21,15 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
 
         try {
             const token = localStorage.getItem('token');
-
             const response = await axios.delete(`${BACKEND_URL}/admin/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
 
-            if (response.status === 200) {
+            if (response.status === 200 || response.status === 201) {
                 toast.success('User deleted successfully!');
-                setUsers((prevUsers) => prevUsers.filter(user => user.id !== id));
+                setUsers((prevUsers) => prevUsers.filter(user => user.adminId !== id));
             } else {
                 toast.error('Failed to delete user.');
             }
@@ -85,7 +84,7 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
                                             )}
                                             {hasPermission(role, PERMISSIONS.DELETE_ADMIN) && (
                                                 <button
-                                                    onClick={() => handleDelete(user.id)}
+                                                    onClick={() => handleDelete(user.adminId)}
                                                     className="text-red-600 hover:underline text-sm"
                                                 >
                                                     Delete

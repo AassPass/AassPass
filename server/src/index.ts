@@ -5,6 +5,7 @@ import AuthRouter from "./routes/auth.routes";
 import SuperAdminRouter from "./routes/superAdmin.routes";
 import AdminRouter from "./routes/admin.routes";
 import BusinessRouter from "./routes/business.routes";
+import UserRouter from "./routes/user.routes";
 // import authRouter from "./routes/auth.routes";
 
 
@@ -35,6 +36,7 @@ app.use('/auth', AuthRouter);
 app.use('/super-admin', SuperAdminRouter);
 app.use('/admin', AdminRouter);
 app.use('/business', BusinessRouter);
+app.use('/user', UserRouter);
 
 
 export default app;

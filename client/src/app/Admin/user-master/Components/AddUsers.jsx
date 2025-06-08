@@ -56,6 +56,7 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser,
             try {
                 const token = localStorage.getItem('token');
                 let response;
+                console.log(selectedUser);
 
                 if (edit) {
                     // Update user
@@ -83,7 +84,7 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser,
                     );
                 }
 
-                if (response.status === 200) {
+                if (response.status === 200 || response.status === 201) {
                     toast.success(edit ? 'User updated successfully!' : 'User saved successfully!');
 
                     const returnedUser = response.data.data || formData;

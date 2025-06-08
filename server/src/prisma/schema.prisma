@@ -50,20 +50,30 @@ enum VerificationStatus {
 }
 
 enum SubscriptionType {
-  FREE
   STANDARD
   PREMIUM
 }
 
 enum BusinessType {
-  RESTAURANT
-  CAFE
-  BAKERY
-  BAR
-  GYM
-  Retail
-  OTHER
+  RETAIL_STORE           @map("Retail Store")
+  RESTAURANT_CAFE        @map("Restaurant / Café")
+  SALON_SPA              @map("Salon / Spa")
+  GYM_FITNESS            @map("Gym / Fitness Center")
+  MEDICAL_HEALTH         @map("Medical / Health Store")
+  SERVICE_PROVIDER       @map("Service Provider")
+  FREELANCER_CONSULTANT  @map("Freelancer / Consultant")
+  EVENT_ORGANIZER        @map("Event Organizer")
+  EDUCATION_COACHING     @map("Education / Coaching")
+  HOME_BASED             @map("Home-based Business")
+  REAL_ESTATE_RENTALS    @map("Real Estate / Rentals")
+  COURIER_DELIVERY       @map("Courier / Delivery")
+  AUTOMOBILE_SERVICES    @map("Automobile Services")
+  PET_SERVICES           @map("Pet Services")
+  NGO_COMMUNITY          @map("NGO / Community Org.")
+  SHOP_STORE_OFFICE      @map("Shop/Store/Office")
+  OTHER                  @map("Other")
 }
+
 
 model Business {
   id                 String             @id @default(uuid())
@@ -99,11 +109,14 @@ model SocialLink {
 }
 
 enum AdCategory {
-  EVENT
-  DEAL
-  ACTIVITY
-  OFFER
-  SERVICE
+  DEALS_DISCOUNTS     @map("Deals & Discounts")
+  EVENTS              @map("Events")
+  SERVICES            @map("Services")
+  PRODUCTS_FOR_SALE   @map("Products for Sale")
+  JOB_OPENINGS        @map("Job Openings")
+  RENTALS_PROPERTIES  @map("Rentals & Properties")
+  ANNOUNCEMENTS       @map("Announcements")
+  CONTESTS_GIVEAWAYS  @map("Contests & Giveaways")
 }
 
 enum AdStage {
