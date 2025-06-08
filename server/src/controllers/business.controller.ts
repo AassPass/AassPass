@@ -9,9 +9,9 @@ const generateAdCode = (businessId: string) => {
 
 export const CreateAd = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { businessId } = req.params;
     const { title, category, visibleFrom, visibleTo, imageUrl, stage, reset = false } = req.body;
-
+    const businessId  = req.business?.businessId;
+    
     if (!title || !category || !visibleFrom || !visibleTo || !imageUrl || !stage)
       return res.status(400).json({ message: "Missing required fields" });
 
@@ -20,7 +20,7 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
 
     const ad = await prisma.ads.create({
       data: {
-        adCode: generateAdCode(businessId),
+        adId: generateAdCode(businessId as string),
         title,
         category,
         visibleFrom: new Date(visibleFrom),
@@ -52,7 +52,7 @@ export const UpdateAd = async (req: Request, res: Response): Promise<any> => {
       return res.status(404).json({message: "Ad not found"});
     }
 
-    if(ad.businessId !== req.user?.id) {
+    if(ad.businessId !== req.business?.businessId) {
       return res.status(403).json({ message: "You do not have permission to update this ad"});
     }
 
@@ -81,7 +81,7 @@ export const UpdateAd = async (req: Request, res: Response): Promise<any> => {
 
 export const GetAds = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { businessId } = req.params;
+    const businessId  = req.business?.businessId;
 
     if (!businessId) {
       return res.status(400).json({ message: "Business ID is required" });
@@ -103,7 +103,6 @@ export const GetAds = async (req: Request, res: Response): Promise<any> => {
     });
 
     res.status(200).json({ message: "Retrieved ads successfully", ads });
-
   } catch (error) {
     console.error("Error while getting ads:", error);
     res.status(500).json({ message: "Internal server error" });

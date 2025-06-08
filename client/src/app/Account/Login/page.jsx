@@ -21,7 +21,6 @@ export default function Page() {
                 { withCredentials: true } // important for cookie
             );
 
-
             setRole(response.data.role)
             // await fetchUser(); // set user in context
             localStorage.setItem('token', response.data.token);

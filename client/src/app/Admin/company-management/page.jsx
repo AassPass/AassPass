@@ -22,7 +22,7 @@ export default function CompanyManagement() {
         const token = localStorage.getItem('token');
 
         try {
-            const response = await axios.get(`${BACKEND_URL}/business`, {
+            const response = await axios.get(`${BACKEND_URL}/businesses`, {
                 params: {
                     status,
                     type,

@@ -32,6 +32,7 @@ model Admin {
   email     String   @unique
   password  String
   name      String
+  mobile    String   @default("0000000000")
   role      Role     @default(ADMIN)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -112,7 +113,7 @@ enum AdStage {
 
 model Ads {
   id                 String             @id @default(uuid())
-  adCode             String             @unique
+  adId               String             @unique
   title              String
   category           AdCategory
   verificationStatus VerificationStatus @default(PENDING)

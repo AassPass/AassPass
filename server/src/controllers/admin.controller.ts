@@ -133,41 +133,6 @@ const UpdateBusiness = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-
-const VerifyAd = async (req: Request, res: Response): Promise<any> => {
-  try {
-    const { adId } = req.params;
-
-    if(!adId){
-      return res.status(400).json({ message: "Ad Id is required"});
-    }
-
-    const ad = await prisma.ads.findUnique({
-      where: { adCode: adId }
-    });
-
-    if(!ad){
-      return res.status(404).json({message: "Ad not found"});
-    }
-    if(ad.verificationStatus === VerificationStatus.VERIFIED){
-      return res.status(400).json({message: "Ad is already verified"});
-    }
-    const updatedAd = await prisma.ads.update({
-      where: {adCode: adId},
-      data: {
-        verificationStatus: VerificationStatus.VERIFIED,
-      }
-    });
-    return res.status(200).json({
-      message: "Ad verified successfully",
-      ad: updatedAd
-    });
-  } catch (error) {
-    console.error("Error verifying ad:", error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-}
-
 const GetAds = async (req: Request, res: Response): Promise<any> => {
   try {
     const {
@@ -243,7 +208,7 @@ const ChangeAdStatus = async (req: Request, res: Response): Promise<any> => {
     }
 
     const ad = await prisma.ads.findUnique({
-      where: {adCode: adId}
+      where: {adId: adId}
     });
 
     if(!ad){
@@ -251,7 +216,7 @@ const ChangeAdStatus = async (req: Request, res: Response): Promise<any> => {
     }
 
     const updatedAd = await prisma.ads.update({
-      where: { id: adId },
+      where: { adId: adId },
       data: {
         verificationStatus: status.toUpperCase(),
       },
@@ -268,4 +233,4 @@ const ChangeAdStatus = async (req: Request, res: Response): Promise<any> => {
   }
 }
 
-export { RegisterBusiness, UpdateBusiness, VerifyAd, GetAds, ChangeAdStatus };
+export { RegisterBusiness, UpdateBusiness, GetAds, ChangeAdStatus };

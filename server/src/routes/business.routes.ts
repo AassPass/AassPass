@@ -5,8 +5,8 @@ import { businessAuth } from "../middlewares/businessAuth.middlewares";
 
 const BusinessRouter = Router();
 
-BusinessRouter.post("/:businessId/new-ad", CreateAd);
+BusinessRouter.post("/:businessId/new-ad", businessAuth, CreateAd);
 BusinessRouter.put("/ad/:adId", businessAuth, UpdateAd);
-BusinessRouter.get("/:businessId/ads", GetAds);
+BusinessRouter.get("/:businessId/ads", businessAuth, GetAds);
 
 export default BusinessRouter;

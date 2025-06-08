@@ -103,7 +103,7 @@ const UpdateAdmin = async (req: Request, res: Response): Promise<any> => {
       res.status(200).json({message: "Admin updated successfully", admin: updatedAdmin});
     } catch (error) {
       console.error("Error updating admin:", error);
-      res.status(500).json({message: "Internal server error"});
+      return res.status(500).json({message: "Internal server error"});
     }
 }
 
@@ -158,8 +158,36 @@ const GetBusinesses = async (req: Request, res: Response): Promise<any> => {
 
 const GetAdmins = async (req: Request, res: Response): Promise<any> => {
     try {
-      const admins = await prisma.admin.findMany();
-      res.status(200).json(admins);
+      const {isActive, limit="10", page="1"} = req.query;
+      const filters: any = {};
+      
+      if (isActive && typeof isActive === 'string') {
+        filters.isActive = isActive.toLowerCase() === 'true';
+      }
+
+      const take = parseInt(limit as string, 10);
+      const skip = (parseInt(page as string, 10) - 1) * take;
+
+      const [admins, totalCount] = await Promise.all([
+        prisma.admin.findMany({
+          where: filters,
+          skip, 
+          take,
+        }),
+        prisma.admin.count({
+          where: filters
+        })
+      ]);
+      return res.status(200).json({
+        message: "Admins retrived successfully",
+        data: admins,
+        pagination: {
+          total: totalCount,
+          page: parseInt(page as string, 10),
+          limit: take,
+          totalPage: Math.ceil(totalCount / take)
+        }
+      });
     } catch (error) {
       console.error("Error fetching admin:", error);
       res.status(500).json({message: "Internal server error"});
@@ -198,4 +226,38 @@ const VerifyBusiness = async (req: Request, res: Response): Promise<any> => {
     }
 }
 
-export { CreateAdmin, GetBusinesses, VerifyBusiness, GetAdmins, UpdateAdmin };
+const DeleteAdmin = async (req: Request, res: Response): Promise<any> => {
+  try{
+    const { adminId } = req.params;
+  
+    if(!adminId) {
+      return res.status(400).json({ message: "Admin ID is required"});
+    }
+  
+    const admin = await prisma.admin.findUnique({
+      where: { adminId }
+    });
+  
+    if(!admin){
+      return res.status(404).json({ message: "Admin not found"});
+    }
+  
+    try {
+      await prisma.admin.delete({
+        where: { adminId }
+      });
+      res.status(200).json({ message: "Admin deleted successfully" });
+    } catch (error) {
+      console.error("Error while deleting admin:", error);
+      res.status(500).json({ message: "Failed to delete admin" });
+    }
+
+    res.status(200).json({ message: "Admin deleted successfully" });
+    
+  } catch(error) {
+    console.error("Error while deleting admin", error);
+    res.status(500).json({message: "Internal server error"});
+  }
+}
+
+export { CreateAdmin, GetBusinesses, VerifyBusiness, GetAdmins, UpdateAdmin, DeleteAdmin };

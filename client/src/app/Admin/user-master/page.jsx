@@ -28,8 +28,7 @@ export default function UserMaster() {
                     },
                 });
                 
-
-                setUsers(response.data);
+                setUsers(response.data.data);
                 toast.success('Users loaded successfully!');
             } catch (error) {
                 console.error('Error fetching users:', error);
