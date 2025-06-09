@@ -111,7 +111,7 @@ const GetBusinesses = async (req: Request, res: Response): Promise<any> => {
   try {
     const { status, type, limit = "10", page = "1" } = req.query;
 
-    console.log("GetBusinesses called with params:", { status, type, limit, page });
+    // console.log("GetBusinesses called with params:", { status, type, limit, page });
     const filters: any = {};
 
     // Optional filter: verification status
@@ -133,6 +133,9 @@ const GetBusinesses = async (req: Request, res: Response): Promise<any> => {
         where: filters,
         skip,
         take,
+        include: {
+          socialLinks: true,
+        },
       }),
       prisma.business.count({
         where: filters
@@ -154,7 +157,6 @@ const GetBusinesses = async (req: Request, res: Response): Promise<any> => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 const GetAdmins = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -194,31 +196,37 @@ const GetAdmins = async (req: Request, res: Response): Promise<any> => {
     }
 }
 
-const VerifyBusiness = async (req: Request, res: Response): Promise<any> => {
+const ChangeStatus = async (req: Request, res: Response): Promise<any> => {
     try{
       const { businessId } = req.params;
+      const { status } = req.body;
       // console.log(businessId);
-      if(!businessId){
-        return res.status(400).json({message: "Business ID is required"});
+      if(!businessId || !status){
+        return res.status(400).json({message: "Business ID and Status is required"});
       }
       const business = await prisma.business.findFirst({
         where: {businessId: businessId}
       });
+
       if(!business){
         return res.status(404).json({message: "Business not found"});
       }
-      if(business.verificationStatus === VerificationStatus.VERIFIED){
+      const allowedStatuses = Object.values(VerificationStatus);
+      if (!allowedStatuses.includes(status.toUpperCase())){
+        return res.status(400).json({message: "Invalid status provided"});
+      } 
+      if(business.verificationStatus === status.toUpperCase()){
         return res.status(400).json({message: "Business is already verified"});
       }
 
       const updatedBusiness = await prisma.business.update({
         where: { businessId: businessId },
         data: {
-          verificationStatus: VerificationStatus.VERIFIED,
+          verificationStatus: status.toUpperCase(),
         }
       });
 
-      res.status(200).json({message: "Business verified successfully"});
+      res.status(200).json({message: "Changed Status of business successfully"});
 
     } catch (error){
         console.error("Error fetching business:", error);
@@ -260,4 +268,4 @@ const DeleteAdmin = async (req: Request, res: Response): Promise<any> => {
   }
 }
 
-export { CreateAdmin, GetBusinesses, VerifyBusiness, GetAdmins, UpdateAdmin, DeleteAdmin };
+export { CreateAdmin, GetBusinesses, ChangeStatus, GetAdmins, UpdateAdmin, DeleteAdmin };

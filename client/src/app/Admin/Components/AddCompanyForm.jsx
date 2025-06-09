@@ -5,6 +5,26 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import { BACKEND_ADMIN_URL } from '@/app/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
+const businessTypeMap = {
+    'Retail Store': 'RETAIL_STORE',
+    'Restaurant / Café': 'RESTAURANT_CAFE',
+    'Salon / Spa': 'SALON_SPA',
+    'Gym / Fitness Center': 'GYM_FITNESS',
+    'Medical / Health Store': 'MEDICAL_HEALTH',
+    'Service Provider': 'SERVICE_PROVIDER',
+    'Freelancer / Consultant': 'FREELANCER_CONSULTANT',
+    'Event Organizer': 'EVENT_ORGANIZER',
+    'Education / Coaching': 'EDUCATION_COACHING',
+    'Home-based Business': 'HOME_BASED',
+    'Real Estate / Rentals': 'REAL_ESTATE_RENTALS',
+    'Courier / Delivery': 'COURIER_DELIVERY',
+    'Automobile Services': 'AUTOMOBILE_SERVICES',
+    'Pet Services': 'PET_SERVICES',
+    'NGO / Community Org.': 'NGO_COMMUNITY',
+    'Shop / Store / Office': 'SHOP_STORE_OFFICE',
+    'Other': 'OTHER'
+};
+
 
 export default function AddBusinessForm({ editingCompany, isEditing, setIsEditing, companies, setCompanies }) {
     const { businessId: contextBusinessId } = useRole();
@@ -16,7 +36,7 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
         phoneNumber: '',
         emailAddress: '',
         address: '',
-        verificationStatus: 'Pending',
+
         subscriptionType: '',
         gstNumber: '',
         latitude: '',
@@ -31,22 +51,22 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
 
     const subscriptionTypes = ['Free', 'Basic', 'Standard', 'Premium', 'Enterprise'];
     const businessTypes = [
-        'Retail',
-        'Restaurant/Café',
-        'Salon/Spa',
-        'Gym/Fitness Center',
-        'Medical/Health Store',
+        'Retail Store',
+        'Restaurant / Café',
+        'Salon / Spa',
+        'Gym / Fitness Center',
+        'Medical / Health Store',
         'Service Provider',
-        'Freelancer/Consultant',
+        'Freelancer / Consultant',
         'Event Organizer',
-        'Education/Coaching',
+        'Education / Coaching',
         'Home-based Business',
-        'Real Estate/Rentals',
-        'Courier/Delivery',
+        'Real Estate / Rentals',
+        'Courier / Delivery',
         'Automobile Services',
         'Pet Services',
-        'NGO/Community Org.',
-        'Shop/Store/Office',
+        'NGO / Community Org.',
+        'Shop / Store / Office',
     ];
 
     useEffect(() => {
@@ -96,8 +116,9 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
         }
 
         const newBusiness = {
-            businessId: editingCompany?.businessId || formData.businessId || `BUS${Date.now()}`,
             ...formData,
+            businessId: editingCompany?.businessId || formData.businessId || `BUS${Date.now()}`,
+            businessType: businessTypeMap[formData.businessType] || 'OTHER',
             joinedDate: editingCompany?.joinedDate || new Date().toISOString().split('T')[0],
         };
 
@@ -109,14 +130,19 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
                 ? `${BACKEND_ADMIN_URL}/update-business/${editingCompany.businessId}`
                 : `${BACKEND_ADMIN_URL}/business`;
 
-            const response = await axios.post(url, newBusiness, {
+            const method = isEditing ? 'put' : 'post';
+
+            const response = await axios({
+                method,
+                url,
+                data: newBusiness,
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             });
 
-            if (response.status === 200) {
+            if (response.status === 200 || response.status === 201) {
                 toast.success(isEditing ? 'Business updated successfully!' : 'Business added successfully!');
 
                 const returnedCompany = response.data.data || newBusiness;
@@ -141,9 +167,8 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
         } finally {
             setIsSubmitting(false);
         }
-
-
     }
+
 
     return (
         <form
@@ -261,19 +286,7 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
                         />
                     </div>
                 </div>
-                <div>
-                    <label className="block font-medium text-black">Verification Status</label>
-                    <select
-                        name="verificationStatus"
-                        value={formData.verificationStatus}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
-                    >
-                        <option value="Pending">Pending</option>
-                        <option value="Verified">Verified</option>
-                        <option value="Rejected">Rejected</option>
-                    </select>
-                </div>
+
             </div>
 
             {/* Subscription, GST */}

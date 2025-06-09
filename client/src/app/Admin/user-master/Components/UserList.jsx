@@ -11,6 +11,7 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
     const { role } = useRole();
 
     const handleEdit = (user) => {
+        
         setSelectedUser(user);
         setEdit(true);
     };
@@ -51,7 +52,7 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
                             <th className="py-3 px-4 border-b">Name</th>
                             <th className="py-3 px-4 border-b">Email</th>
                             <th className="py-3 px-4 border-b">Mobile</th>
-                            <th className="py-3 px-4 border-b">Joining Date</th>
+
                             <th className="py-3 px-4 border-b">Active</th>
                             {(hasPermission(role, PERMISSIONS.EDIT_ADMIN) || hasPermission(role, PERMISSIONS.DELETE_ADMIN)) && (
                                 <th className="py-3 px-4 border-b text-center">Actions</th>
@@ -66,7 +67,7 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
                                     <td className="py-3 px-4 border-b">{user.name}</td>
                                     <td className="py-3 px-4 border-b">{user.email}</td>
                                     <td className="py-3 px-4 border-b">{user.mobile}</td>
-                                    <td className="py-3 px-4 border-b">{user.createdAt}</td>
+
                                     <td className="py-3 px-4 border-b">
                                         <span className={`inline-block px-2 py-1 text-xs rounded-full ${user.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                             {user.isActive ? "Active" : "Inactive"}

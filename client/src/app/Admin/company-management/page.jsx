@@ -33,7 +33,7 @@ export default function CompanyManagement() {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            // console.log("respoiasdfbnasjkdfbgas",response.data);
+            console.log("respoiasdfbnasjkdfbgas", response.data);
             setCompanies(response.data.data || []);
             toast.success('Companies fetched successfully');
         } catch (err) {

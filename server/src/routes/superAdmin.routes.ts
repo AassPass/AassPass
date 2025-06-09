@@ -4,7 +4,7 @@ import {
   GetAdmins,
   GetBusinesses,
   UpdateAdmin,
-  VerifyBusiness,
+  ChangeStatus,
   DeleteAdmin,
 } from "../controllers/superAdmin.controller";
 import { authorize } from "../middlewares/auth.middlewares";
@@ -18,7 +18,7 @@ SuperAdminRouter.put("/admin/update/:adminId", authorize(["SUPER_ADMIN"]), Updat
 SuperAdminRouter.delete("/admin/:adminId", authorize(["SUPER_ADMIN"]), DeleteAdmin);
 
 // business endpoints
-SuperAdminRouter.patch("/business/verify/:businessId", authorize(["SUPER_ADMIN"]), VerifyBusiness);
+SuperAdminRouter.patch("/business/change-status/:businessId", authorize(["SUPER_ADMIN"]), ChangeStatus);
 SuperAdminRouter.get("/businesses", authorize(["SUPER_ADMIN"]), GetBusinesses);
 SuperAdminRouter.delete("/business/:businessId", authorize(["SUPER_ADMIN"]), GetBusinesses);
 

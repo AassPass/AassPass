@@ -8,15 +8,18 @@ import { toast } from 'react-toastify';
 export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser, setUsers, users }) {
     const [formData, setFormData] = useState({
         name: '',
-        joiningDate: '',
-        password: '',
+
+
         mobile: '',
         email: '',
-        active: 'YES',
+        isActive: false,
     });
     useEffect(() => {
         if (edit && selectedUser) {
-            setFormData(selectedUser);
+            setFormData({
+                ...selectedUser,
+                isActive: selectedUser.isActive === true || selectedUser.isActive === "true"
+            });
         }
     }, [edit, selectedUser]);
     const [errors, setErrors] = useState({});
@@ -24,16 +27,17 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser,
     // Handle input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({
+            ...prev,
+            [name]: name === "isActive" ? value === "true" : value,
+        }));
     };
-
     // Validate form inputs
     const validate = () => {
         const newErrors = {};
 
         if (!formData.name.trim()) newErrors.name = 'User Name is required';
-        // if (!formData.joiningDate) newErrors.joiningDate = 'Joining Date is required';
-        if (!formData.password) newErrors.password = 'Password is required';
+
         if (!formData.mobile) newErrors.mobile = 'Mobile No. is required';
         else if (!/^\d{10}$/.test(formData.mobile))
             newErrors.mobile = 'Mobile No. must be 10 digits';
@@ -102,11 +106,10 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser,
                     // Reset form
                     setFormData({
                         name: '',
-                        joiningDate: '',
-                        password: '',
+
                         mobile: '',
                         email: '',
-                        active: 'YES',
+                        isActive: false,
                     });
                     setSelectedUser(null);
                     setEdit(false);
@@ -171,53 +174,8 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser,
                     )}
                 </div>
 
-                {/* Joining Date */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Joining Date<span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        name="joiningDate"
-                        type="date"
-                        value={formData.joiningDate}
-                        onChange={handleChange}
-                        onKeyDown={handleKeyDown}
-                        className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring-2 ${errors.joiningDate ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
-                            } text-black`}
-                        required
-                        aria-invalid={errors.joiningDate ? 'true' : 'false'}
-                        aria-describedby="joiningDate-error"
-                    />
-                    {errors.joiningDate && (
-                        <p id="joiningDate-error" className="text-red-500 text-xs mt-1">
-                            {errors.joiningDate}
-                        </p>
-                    )}
-                </div>
 
-                {/* Password */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Password<span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        name="password"
-                        type="password"
-                        value={formData.password || ''}
-                        onChange={handleChange}
-                        onKeyDown={handleKeyDown}
-                        className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring-2 ${errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
-                            } text-black`}
-                        required
-                        aria-invalid={errors.password ? 'true' : 'false'}
-                        aria-describedby="password-error"
-                    />
-                    {errors.password && (
-                        <p id="password-error" className="text-red-500 text-xs mt-1">
-                            {errors.password}
-                        </p>
-                    )}
-                </div>
+
 
                 {/* Mobile No. */}
                 <div>
@@ -273,14 +231,14 @@ export default function AddUsers({ edit, setEdit, selectedUser, setSelectedUser,
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Active</label>
                     <select
-                        name="active"
-                        value={formData.active}
+                        name="isActive"
+                        value={formData.isActive}
                         onChange={handleChange}
                         onKeyDown={handleKeyDown}
                         className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                     >
-                        <option value="YES">YES</option>
-                        <option value="NO">NO</option>
+                        <option value="true">YES</option>
+                        <option value="false">NO</option>
                     </select>
                 </div>
 
