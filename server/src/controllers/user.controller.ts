@@ -14,15 +14,16 @@ export const GetBusinesses = async (req: Request, res: Response): Promise<any> =
     const radiusInMeters = parseFloat(radius as string) * 1000;
 
     const businesses = await prisma.$queryRaw`
-    SELECT *
-    FROM "Business"
-    WHERE "latitude" IS NOT NULL AND "longitude" IS NOT NULL AND
-        ST_DWithin(
-        geography(ST_MakePoint("longitude"::double precision, "latitude"::double precision)),
-        geography(ST_MakePoint(${longitude}::double precision, ${latitude}::double precision)),
-        ${radiusInMeters}
-        )
+      SELECT *
+      FROM "Business"
+      WHERE "latitude" IS NOT NULL AND "longitude" IS NOT NULL AND
+          ST_DWithin(
+            geography(ST_MakePoint("longitude", "latitude")),
+            geography(ST_MakePoint(CAST(${longitude} AS double precision), CAST(${latitude} AS double precision))),
+            ${radiusInMeters}
+          )
     `;
+
 
     res.status(200).json({
       message: "Nearby businesses retrieved successfully",

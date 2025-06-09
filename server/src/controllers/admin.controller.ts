@@ -43,7 +43,7 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
         websiteLink,
         businessType: businessType as BusinessType,
         verificationStatus: VerificationStatus.PENDING,
-        subscriptionType: SubscriptionType.FREE,
+        subscriptionType: SubscriptionType.STANDARD,
         latitude: parseFloat(latitude),
         longitude: parseFloat(longitude),
         socialLinks: {
