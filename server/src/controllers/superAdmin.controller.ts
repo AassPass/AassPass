@@ -158,7 +158,6 @@ const GetBusinesses = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
-
 const GetAdmins = async (req: Request, res: Response): Promise<any> => {
     try {
       const {isActive, limit="10", page="1"} = req.query;

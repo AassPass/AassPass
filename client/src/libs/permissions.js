@@ -11,6 +11,7 @@ export const PERMISSIONS = {
     // Admin permissions
     EDIT_ADS: 'edit_ads',
     VERIFY_AD: 'verify_ads',
+    DELETE_BUSINESS: 'delete_business',
 
     // Business permissions
     CREATE_BUSINESS: 'create_business',

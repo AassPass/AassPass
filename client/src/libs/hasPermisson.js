@@ -13,6 +13,7 @@ const permissions = {
         PERMISSIONS.BLACKLIST_ADS,
         PERMISSIONS.VERIFY_KYC,
         PERMISSIONS.VERIFY_AD,        // ✅ NEW
+        PERMISSIONS.DELETE_BUSINESS
     ],
     ADMIN: [
         PERMISSIONS.EDIT_ADS,
