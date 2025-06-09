@@ -1,5 +1,6 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 const companies = [
     '/logo1.png',
@@ -10,35 +11,43 @@ const companies = [
 ];
 
 const Info = () => {
+    const [logoStyles, setLogoStyles] = useState([]);
+
+    useEffect(() => {
+        const styles = companies.map(() => {
+            return {
+                top: `${Math.random() * 80}%`,
+                left: `${Math.random() * 90}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${4 + Math.random() * 10}s`,
+            };
+        });
+        setLogoStyles(styles);
+    }, []);
+
+    if (logoStyles.length === 0) return null; // Wait for client
+
     return (
         <div className="relative min-h-screen bg-black w-full flex items-center justify-center">
             {/* Floating Logos */}
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
-                {companies.map((logo, index) => {
-                    const top = `${Math.random() * 80}%`;
-                    const left = `${Math.random() * 90}%`;
-                    const delay = `${Math.random() * 5}s`;
-                    const duration = `${4 + Math.random() * 10}s`; // 4s to 10s
-
-                    return (
-                        <img
-                            key={index}
-                            src={logo}
-                            alt={`Company ${index}`}
-                            className="absolute w-12 h-12 opacity-30 animate-float"
-                            style={{
-                                top,
-                                left,
-                                animationDelay: delay,
-                                animationDuration: duration,
-                            }}
-                        />
-                    );
-                })}
+                {companies.map((logo, index) => (
+                    <Image
+                        key={index}
+                        src={logo}
+                        alt={`Company ${index}`}
+                        width={48}
+                        height={48}
+                        className="absolute opacity-30 animate-float"
+                        style={{
+                            ...logoStyles[index],
+                        }}
+                    />
+                ))}
             </div>
 
             {/* Text Reveal */}
-            <div className="view absolute text-center flex flex-col items-center justify-center space-y-4">
+            <div className="view absolute text-center flex flex-col items-center justify-center space-y-4 text-white">
                 <div className="text font-bold">500+ users.</div>
                 <div className="text font-bold">100+ offers.</div>
                 <div className="text font-bold">100+ Deals.</div>
@@ -64,7 +73,6 @@ const Info = () => {
                     animation-duration: 1.5s;
                     animation-timing-function: ease-out;
                     animation-fill-mode: both;
-
                     animation-timeline: view();
                     animation-range: entry 0% cover 40%;
                 }
