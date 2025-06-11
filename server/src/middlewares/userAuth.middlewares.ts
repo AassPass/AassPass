@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import dotenv from "dotenv";
+
 
 dotenv.config();
 
-export const businessAuth = (req: Request, res: Response, next: NextFunction) => {
+export const userAuth = (req: Request, res: Response, next: NextFunction) => {
     const token = req.header("Authorization")?.split(' ')[1];
     
     if(!token){
@@ -13,9 +14,9 @@ export const businessAuth = (req: Request, res: Response, next: NextFunction) =>
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string; role: string; businessId: string};
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string; role: string };
 
-        (req as any).business = decoded;
+        (req as any).user = decoded;
 
         next();
     } catch (error){

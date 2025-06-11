@@ -37,8 +37,8 @@ const MapSection = () => {
 
                     response = await axios.get(`${BACKEND_USER_URL}/businesses`, {
                         params: {
-                            latitude,        // backend expects 'lat'
-                            longitude,  // backend expects 'lng' not 'long'
+                            lat: latitude,        // backend expects 'lat'
+                            lng: longitude,  // backend expects 'lng' not 'long'
                             // radius: RADIUS_KM,
                         },
                     });

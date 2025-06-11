@@ -15,7 +15,7 @@ const CreateAdmin = async (req: Request, res: Response): Promise<any> => {
   try {
     const { name, email, mobile } = req.body;
 
-    if (!name || !email) {
+    if (!name || !email || !mobile) {
       return res.status(400).json({ message: 'Name and email are required' });
     }
 
@@ -35,6 +35,7 @@ const CreateAdmin = async (req: Request, res: Response): Promise<any> => {
         email,
         role: 'ADMIN',
         adminId,
+        mobile,
         password: hashedPassword,
         createdById,
       },
@@ -67,7 +68,7 @@ const CreateAdmin = async (req: Request, res: Response): Promise<any> => {
 const UpdateAdmin = async (req: Request, res: Response): Promise<any> => {
     try {
       const { adminId } = req.params;
-      const {name, email, isActive} = req.body;
+      const {name, email, isActive, mobile} = req.body;
 
       if(!adminId){
         return res.status(400).json({message: "Admin ID is required"});
@@ -87,6 +88,8 @@ const UpdateAdmin = async (req: Request, res: Response): Promise<any> => {
           name,
           email,
           isActive,
+          mobile,
+          updatedAt: new Date()
         },
         select: {
           id: true,
@@ -166,6 +169,7 @@ const GetAdmins = async (req: Request, res: Response): Promise<any> => {
       if (isActive && typeof isActive === 'string') {
         filters.isActive = isActive.toLowerCase() === 'true';
       }
+      filters.role = 'ADMIN';
 
       const take = parseInt(limit as string, 10);
       const skip = (parseInt(page as string, 10) - 1) * take;
@@ -175,6 +179,18 @@ const GetAdmins = async (req: Request, res: Response): Promise<any> => {
           where: filters,
           skip, 
           take,
+          select: {
+            id: true,
+            adminId: true,
+            email: true,
+            name: true,
+            mobile: true,
+            role: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            createdById: true
+          },
         }),
         prisma.admin.count({
           where: filters
@@ -267,5 +283,21 @@ const DeleteAdmin = async (req: Request, res: Response): Promise<any> => {
     res.status(500).json({message: "Internal server error"});
   }
 }
+
+// const DeleteBusiness = async (req: Request, res: Response): Promise<any> => {
+//   try {
+//     const { businessId } = req.params;
+//     if(!businessId) {
+//       return res.status(400).json({ message: "Business ID is required" });
+//     }
+
+//     const business = await prisma.business
+    
+//   } catch(error) {
+//     console.error("Error while deleting business", error);
+//     res.status(500).json({message: "Internal server error"});
+//   }
+
+// }
 
 export { CreateAdmin, GetBusinesses, ChangeStatus, GetAdmins, UpdateAdmin, DeleteAdmin };
