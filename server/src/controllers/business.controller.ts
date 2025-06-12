@@ -10,13 +10,23 @@ const generateAdCode = (businessId: string) => {
 export const CreateAd = async (req: Request, res: Response): Promise<any> => {
   try {
     const { title, category, visibleFrom, visibleTo, imageUrl, stage, reset = false } = req.body;
-    const businessId  = req.business?.businessId;
+    const userId  = req.user?.id;
+    // console.log(userId);
+
+    const businessInfo = await prisma.user.findUnique({
+      where: {id: userId},
+      include: { businesses: true }
+    });
+
+    console.log("business :", businessInfo);
+
+    const businessId = businessInfo?.businesses[0].id;
     
     if (!title || !category || !visibleFrom || !visibleTo || !imageUrl || !stage)
       return res.status(400).json({ message: "Missing required fields" });
 
-    const business = await prisma.business.findUnique({ where: { businessId } });
-    if (!business) return res.status(404).json({ message: "Business not found" });
+    // const business = await prisma.business.findUnique({ where: { businessId } });
+    // if (!business) return res.status(404).json({ message: "Business not found" });
 
     const ad = await prisma.ads.create({
       data: {
@@ -28,7 +38,7 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
         imageUrl,
         stage,
         reset,
-        businessId: business.businessId,
+        businessId: businessId as string,
       },
     });
 
@@ -52,7 +62,17 @@ export const UpdateAd = async (req: Request, res: Response): Promise<any> => {
       return res.status(404).json({message: "Ad not found"});
     }
 
-    if(ad.businessId !== req.business?.businessId) {
+    const userId  = req.user?.id;
+
+    const businessInfo = await prisma.user.findUnique({
+      where: {id: userId},
+      include: { businesses: true }
+    });
+
+
+    const businessId = businessInfo?.businesses[0].businessId;
+
+    if(ad.businessId !== businessId) {
       return res.status(403).json({ message: "You do not have permission to update this ad"});
     }
 
@@ -81,24 +101,31 @@ export const UpdateAd = async (req: Request, res: Response): Promise<any> => {
 
 export const GetAds = async (req: Request, res: Response): Promise<any> => {
   try {
-    const businessId  = req.business?.businessId;
+    const userId  = req.user?.id;
+
+    const businessInfo = await prisma.user.findUnique({
+      where: {id: userId},
+      include: { businesses: true }
+    });
+
+    const businessId = businessInfo?.businesses[0].id;
 
     if (!businessId) {
       return res.status(400).json({ message: "Business ID is required" });
     }
 
     // Find business by businessId (BUS-1748949187121 format)
-    const business = await prisma.business.findUnique({
-      where: { businessId }
-    });
+    // const business = await prisma.business.findUnique({
+    //   where: { businessId }
+    // });
 
-    if (!business) {
-      return res.status(404).json({ message: "Business not found" });
-    }
+    // if (!business) {
+    //   return res.status(404).json({ message: "Business not found" });
+    // }
 
     const ads = await prisma.ads.findMany({
       where: {
-        businessId: business.id // UUID from the DB
+        businessId // UUID from the DB
       }
     });
 

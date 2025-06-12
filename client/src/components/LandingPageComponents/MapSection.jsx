@@ -43,9 +43,26 @@ const MapSection = () => {
                 });
                 console.log(response.data);
 
-                // Access the 'data' array inside response.data
-                const formatted = response.data.data.map((business) => ({
-                    id: business.id,
+                if (userLocation) {
+                    const { latitude, longitude } = userLocation; // assuming userLocation = { lat: 12.9716, long: 77.5946 }
+
+                    response = await axios.get(`${BACKEND_USER_URL}/businesses`, {
+                        params: {
+                            lat: latitude,        // backend expects 'lat'
+                            lng: longitude,  // backend expects 'lng' not 'long'
+                            // radius: RADIUS_KM,
+                        },
+                    });
+                } else {
+                    console.log("User location not available, skipping fetch.");
+                    return;
+                }
+
+                console.log("Business data:", response.data);
+
+                const formatted = response.data.map((business) => ({
+                    id: business._id,
+
                     coordinates: [business.longitude, business.latitude],
                     popupText: business.businessName,
                     city: business.city || "",

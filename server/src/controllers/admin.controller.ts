@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { prisma } from "../utils/prisma";
 import { VerificationStatus, SubscriptionType, BusinessType } from '@prisma/client';
+import { businessTypeMap, generatePassword } from "../utils/lib";
+import bcrypt from "bcrypt";
 
 
 
@@ -13,8 +15,8 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
       emailAddress,
       address,
       gstNumber,
-      websiteLink,
       businessType,
+      websiteLink,
       socialLinks,
       latitude,
       longitude
@@ -26,9 +28,23 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
+    const password = generatePassword();
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const owner = await prisma.user.create({
+      data: {
+        name: ownerName,
+        email: emailAddress,
+        mobile: phoneNumber,
+        password: hashedPassword
+      }
+    });
+    
 
     // Generate a unique businessId
     const businessId = `BUS-${Date.now()}`;
+    const prismaBusinessType = businessTypeMap[businessType as keyof typeof businessTypeMap] || undefined;
+
 
     // Create the business
     const newBusiness = await prisma.business.create({
@@ -36,12 +52,13 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
         businessId,
         businessName,
         ownerName,
+        ownerId: owner.id,
         phoneNumber,
         emailAddress,
         address,
         gstNumber,
         websiteLink,
-        businessType: businessType as BusinessType,
+        businessType: prismaBusinessType as BusinessType,
         verificationStatus: VerificationStatus.PENDING,
         subscriptionType: SubscriptionType.STANDARD,
         latitude: parseFloat(latitude),
@@ -58,7 +75,9 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
       }
     });
 
-    return res.status(201).json({ message: 'Business registered successfully', business: newBusiness });
+    
+
+    return res.status(201).json({ message: 'Business registered successfully', business: newBusiness, generatedPassword: password });
   } catch (error: any) {
     console.error('RegisterBusiness Error:', error);
     return res.status(500).json({ message: 'Internal server error', error: error.message });
@@ -70,7 +89,7 @@ const UpdateBusiness = async (req: Request, res: Response): Promise<any> => {
   try {
     const { businessId } = req.params;
     // console.log("asdfhaskdjfhaksdhfklashdfkhasdiof", businessId);
-    console.log(req.body);
+    // console.log(req.body);
     const {
       businessName,
       ownerName,
@@ -91,9 +110,10 @@ const UpdateBusiness = async (req: Request, res: Response): Promise<any> => {
       return res.status(400).json({ message: 'Business ID is required' });
     }
 
+    
     // Prepare update data
     const updateData: any = {};
-
+    
     if (businessName) updateData.businessName = businessName;
     if (ownerName) updateData.ownerName = ownerName;
     if (phoneNumber) updateData.phoneNumber = phoneNumber;
@@ -101,7 +121,10 @@ const UpdateBusiness = async (req: Request, res: Response): Promise<any> => {
     if (address) updateData.address = address;
     if (gstNumber) updateData.gstNumber = gstNumber;
     if (websiteLink) updateData.websiteLink = websiteLink;
-    if (businessType) updateData.businessType = businessType as BusinessType;
+    if (businessType){
+      const prismaBusinessType = businessTypeMap[businessType as keyof typeof businessTypeMap] || undefined;
+      updateData.businessType = prismaBusinessType as BusinessType;
+    }
     if (subscriptionType) updateData.subscriptionType = subscriptionType.toUpperCase() as SubscriptionType;
     if (verificationStatus) updateData.verificationStatus = verificationStatus.toUpperCase() as VerificationStatus;
     if (latitude !== undefined) updateData.latitude = parseFloat(latitude);

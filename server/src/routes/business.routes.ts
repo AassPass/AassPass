@@ -1,12 +1,13 @@
 import { Router } from "express";
-import { CreateAd, GetAds, UpdateAd } from "../controllers/business.controller";
-import { businessAuth } from "../middlewares/businessAuth.middlewares";
+import { CreateAd, UpdateAd } from "../controllers/business.controller";
+import { userAuth } from "../middlewares/userAuth.middlewares";
+import { GetAds } from "../controllers/admin.controller";
 
 
 const BusinessRouter = Router();
 
-BusinessRouter.post("/:businessId/new-ad", businessAuth, CreateAd);
-BusinessRouter.put("/ad/:adId", businessAuth, UpdateAd);
-BusinessRouter.get("/:businessId/ads", businessAuth, GetAds);
+BusinessRouter.post("/new-ad", userAuth, CreateAd);
+BusinessRouter.put("/ad/:adId", userAuth, UpdateAd);
+BusinessRouter.get("/ads", userAuth, GetAds);
 
 export default BusinessRouter;

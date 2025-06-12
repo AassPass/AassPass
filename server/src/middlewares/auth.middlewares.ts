@@ -7,7 +7,6 @@ dotenv.config();
 interface JwtPayload {
     id: string;
     role: string;
-    // add more fields as needed
 }
 
 // Middleware factory to accept allowed roles

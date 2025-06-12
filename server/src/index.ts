@@ -22,12 +22,17 @@ app.use(express.urlencoded({extended: true}));
 interface UserPayload {
     id: string;
     role: string;
-    username: string;
+}
+
+interface AdminPayload {
+    id: string;
+    role: string;
 }
 
 declare module "express" {
     interface Request {
         user?: UserPayload;
+        admin?: AdminPayload
     }
 }
 
