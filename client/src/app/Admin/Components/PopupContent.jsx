@@ -6,7 +6,8 @@ const PopupContent = ({
     coordinates,
     imageUrl = '/ad-banner.jpg',
     description = 'Limited-time offer! Visit us today for exclusive deals.',
-    ctaText = 'Learn More'
+    ctaText = 'Learn More',
+    websiteLink, // ← ✅ Add this line
 }) => {
     return (
         <div className="w-64 bg-white rounded-lg shadow-md shadow-gray-500/20 overflow-hidden border border-gray-200">
@@ -15,6 +16,7 @@ const PopupContent = ({
                 alt={name}
                 className="w-full h-28 object-cover"
             />
+
             <div className="p-3">
                 <h3 className="text-base font-bold text-gray-800 mb-1">{name}</h3>
                 <p className="text-xs text-gray-600 mb-2">
@@ -22,6 +24,19 @@ const PopupContent = ({
                 </p>
                 <div className="text-[10px] text-gray-400 mb-2">
                     Location: {coordinates[1].toFixed(2)}, {coordinates[0].toFixed(2)}
+                </div>
+                <div className="text-sm">
+                    <p className="font-semibold">{name}</p>
+                    {websiteLink && (
+                        <a
+                            href={websiteLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 underline"
+                        >
+                            Visit Website
+                        </a>
+                    )}
                 </div>
                 <button className="w-full text-xs font-semibold bg-blue-600 text-white py-1.5 rounded hover:bg-blue-700 transition duration-200">
                     {ctaText}

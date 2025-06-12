@@ -1,21 +1,78 @@
 'use client';
 
+import React, { useState, useEffect, useCallback } from 'react';
+import { FixedSizeList as List } from 'react-window';
+
 import { useRole } from '@/Context/RoleContext';
 import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
-import { useState } from 'react';
-import { toast } from 'react-toastify';
 import { BACKEND_URL } from '@/app/Utils/backendUrl';
+
+
+const DeferredLink = ({ children, ...props }) => {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        const id = requestIdleCallback(() => setMounted(true));
+        return () => cancelIdleCallback(id);
+    }, []);
+    return mounted ? <a {...props}>{children}</a> : <span className="text-gray-400">...</span>;
+};
+
+const CompanyRow = React.memo(({ company, role, setEditingCompany, setIsEditing, handleDeleteCompany, handleKycToggle, loadingKycIds, deletingId, style }) => {
+    const handleEdit = () => {
+        setEditingCompany(company);
+        setIsEditing(true);
+    };
+
+    const handleDelete = () => handleDeleteCompany(company.businessId);
+
+    return (
+        <div style={style} className="contents border-t border-gray-200">
+            {[company.businessId, company.businessName, company.ownerName, company.phoneNumber, company.emailAddress, company.address,
+            `${company.latitude}, ${company.longitude}`, company.gstNumber,
+            company.websiteLink ? <DeferredLink href={company.websiteLink} target="_blank" className="text-blue-600 underline">Link</DeferredLink> : '-',
+            company.socialLinks?.length ? company.socialLinks.map((s, i) => (
+                <DeferredLink key={i} href={s.link} target="_blank" className="text-blue-600 underline mr-1">{s.platform}</DeferredLink>
+            )) : '-',
+            company.joinedDate, company.subscriptionType, company.businessType, company.verificationStatus
+            ].map((data, idx) => <div key={idx} className="py-1 px-2 truncate">{data}</div>)}
+
+            {hasPermission(role, PERMISSIONS.VERIFY_KYC) && (
+                <div className="py-1 px-2">
+                    <input
+                        type="checkbox"
+                        checked={company.verificationStatus === 'VERIFIED'}
+                        onChange={() => handleKycToggle(company)}
+                        disabled={loadingKycIds.has(company.businessId)}
+                    />
+                </div>
+            )}
+            {hasPermission(role, PERMISSIONS.EDIT_BUSINESS) && (
+                <div className="py-1 px-2">
+                    <button onClick={handleEdit} className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded text-xs">Edit</button>
+                </div>
+            )}
+            {hasPermission(role, PERMISSIONS.DELETE_BUSINESS) && (
+                <div className="py-1 px-2">
+                    <button onClick={handleDelete} disabled={deletingId === company.businessId} className="bg-red-600 hover:bg-red-700 text-white px-2 py-0.5 rounded text-xs">
+                        {deletingId === company.businessId ? '...' : 'Delete'}
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+});
 
 const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing }) => {
     const [loadingKycIds, setLoadingKycIds] = useState(new Set());
     const [deletingId, setDeletingId] = useState(null);
-    const { businessId, role } = useRole();
+    const { role } = useRole();
 
-    async function verifyKYC(companyId, newStatus) {
+    const verifyKYC = async (companyId, newStatus) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${BACKEND_URL}/business/verify/${companyId}`, {
+
+            const res = await fetch(`${BACKEND_URL}/business/verify/${companyId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -24,21 +81,27 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
                 body: JSON.stringify({ kycStatus: newStatus }),
             });
 
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const result = await response.json();
-            toast.success(`KYC status updated to ${newStatus}!`);
-            return result;
-        } catch (error) {
-            toast.error('KYC verification failed. Please try again.');
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to update KYC status');
+            }
+
+            const data = await res.json();
+            return data;
+        } catch (err) {
+            console.error('KYC update failed:', err.message);
             return null;
         }
-    }
+    };
 
-    async function handleKycToggle(company) {
+
+    const handleKycToggle = async (company) => {
         if (loadingKycIds.has(company.businessId)) return;
+
         const newStatus = company.verificationStatus === 'VERIFIED' ? 'PENDING' : 'VERIFIED';
 
         setLoadingKycIds(prev => new Set(prev).add(company.businessId));
+
         const result = await verifyKYC(company.businessId, newStatus);
 
         if (result) {
@@ -52,168 +115,75 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
         }
 
         setLoadingKycIds(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(company.businessId);
-            return newSet;
+            const copy = new Set(prev);
+            copy.delete(company.businessId);
+            return copy;
         });
-    }
+    };
 
-    async function handleDeleteCompany(companyId) {
-        const confirmDelete = confirm('Are you sure you want to delete this company?');
-        if (!confirmDelete) return;
+
+    const handleDeleteCompany = async (companyId) => {
+        if (!confirm('Delete this company?')) return;
 
         try {
             setDeletingId(companyId);
+
             const token = localStorage.getItem('token');
-            const response = await fetch(`${BACKEND_URL}/business/${companyId}`, {
+
+            const res = await fetch(`${BACKEND_URL}/business/${companyId}`, {
                 method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
 
-            if (!response.ok) throw new Error('Failed to delete company');
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Delete failed');
+            }
 
             setCompanies(prev => prev.filter(c => c.businessId !== companyId));
-            toast.success('Company deleted successfully');
-        } catch (error) {
-            toast.error('Failed to delete company');
+        } catch (err) {
+            console.error('Delete failed:', err.message);
         } finally {
             setDeletingId(null);
         }
-    }
+    };
+
+
+    const Row = useCallback(({ index, style }) => (
+        <CompanyRow
+            company={companies[index]}
+            role={role}
+            setEditingCompany={setEditingCompany}
+            setIsEditing={setIsEditing}
+            handleDeleteCompany={handleDeleteCompany}
+            handleKycToggle={handleKycToggle}
+            loadingKycIds={loadingKycIds}
+            deletingId={deletingId}
+            style={style}
+        />
+    ), [companies, role, loadingKycIds, deletingId]);
 
     return (
-        <div className="flex-1 overflow-auto rounded border border-gray-300 bg-white">
-            <div className="max-w-[800px]">
-                <table className="w-full text-left text-black border-collapse">
-                    <thead>
-                        <tr className="bg-gray-100">
-                            <th className="py-2 px-4 border-b">Id</th>
-                            <th className="py-2 px-4 border-b">Name</th>
-                            <th className="py-2 px-4 border-b">Owner</th>
-                            <th className="py-2 px-4 border-b">Phone</th>
-                            <th className="py-2 px-4 border-b">Email</th>
-                            <th className="py-2 px-4 border-b">Address</th>
-                            <th className="py-2 px-4 border-b">Location</th>
-                            <th className="py-2 px-4 border-b">GST No</th>
-                            <th className="py-2 px-4 border-b">Website</th>
-                            <th className="py-2 px-4 border-b">Social</th>
-                            <th className="py-2 px-4 border-b">Joined</th>
-                            <th className="py-2 px-4 border-b">Subscription</th>
-                            <th className="py-2 px-4 border-b">Business Type</th>
-                            <th className="py-2 px-4 border-b">KYC</th>
-                            {hasPermission(role, PERMISSIONS.VERIFY_KYC) && (
-                                <th className="py-2 px-4 border-b">Verify</th>
-                            )}
-                            {hasPermission(role, PERMISSIONS.EDIT_BUSINESS) && (
-                                <th className="py-2 px-4 border-b">Edit</th>
-                            )}
-                            {hasPermission(role, PERMISSIONS.DELETE_BUSINESS) && (
-                                <th className="py-2 px-4 border-b">Delete</th>
-                            )}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {companies.length === 0 ? (
-                            <tr>
-                                <td colSpan="16" className="text-center py-4 text-black">
-                                    No companies added yet.
-                                </td>
-                            </tr>
-                        ) : (
-                            companies.map(company => (
-                                <tr
-                                    key={company.businessId}
-                                    className="text-black text-sm border-t text-center"
-                                >
-                                    <td className="py-2 px-4">{company.businessId}</td>
-                                    <td className="py-2 px-4">{company.businessName}</td>
-                                    <td className="py-2 px-4">{company.ownerName}</td>
-                                    <td className="py-2 px-4">{company.phoneNumber}</td>
-                                    <td className="py-2 px-4">{company.emailAddress}</td>
-                                    <td className="py-2 px-4">{company.address}</td>
-                                    <td className="py-2 px-4">
-                                        {company.latitude}, {company.longitude}
-                                    </td>
-                                    <td className="py-2 px-4">{company.gstNumber}</td>
-                                    <td className="py-2 px-4">
-                                        {company.websiteLink ? (
-                                            <a
-                                                href={company.websiteLink}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-blue-600 underline"
-                                            >
-                                                Link
-                                            </a>
-                                        ) : (
-                                            '-'
-                                        )}
-                                    </td>
-                                    <td className="py-2 px-4">
-                                        {company.socialLinks?.length > 0 ? (
-                                            company.socialLinks.map((social, idx) => (
-                                                <a
-                                                    key={idx}
-                                                    href={social.link}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-600 underline mr-2"
-                                                    title={social.platform}
-                                                >
-                                                    {social.platform}
-                                                </a>
-                                            ))
-                                        ) : (
-                                            '-'
-                                        )}
-                                    </td>
-
-                                    <td className="py-2 px-4">{company.joinedDate}</td>
-                                    <td className="py-2 px-4">{company.subscriptionType}</td>
-                                    <td className="py-2 px-4">{company.businessType}</td>
-                                    <td className="py-2 px-4">{company.verificationStatus}</td>
-
-                                    {hasPermission(role, PERMISSIONS.VERIFY_KYC) && (
-                                        <td className="py-2 px-4">
-                                            <input
-                                                type="checkbox"
-                                                checked={company.verificationStatus === 'VERIFIED'}
-                                                onChange={() => handleKycToggle(company)}
-                                                disabled={loadingKycIds.has(company.businessId)}
-                                            />
-                                        </td>
-                                    )}
-
-                                    {hasPermission(role, PERMISSIONS.EDIT_BUSINESS) && (
-                                        <td className="py-2 px-4">
-                                            <button
-                                                onClick={() => {
-                                                    setEditingCompany(company);
-                                                    setIsEditing(true);
-                                                }}
-                                                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
-                                            >
-                                                Edit
-                                            </button>
-                                        </td>
-                                    )}
-
-                                    {hasPermission(role, PERMISSIONS.DELETE_BUSINESS) && (
-                                        <td className="py-2 px-4">
-                                            <button
-                                                onClick={() => handleDeleteCompany(company.businessId)}
-                                                disabled={deletingId === company.businessId}
-                                                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
-                                            >
-                                                {deletingId === company.businessId ? 'Deleting...' : 'Delete'}
-                                            </button>
-                                        </td>
-                                    )}
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+        <div className="flex-1 overflow-auto rounded border border-gray-300 bg-white text-xs">
+            <div className="min-w-[1000px]">
+                <div className="grid grid-cols-[repeat(15,minmax(80px,1fr))] font-semibold bg-gray-100 border-b border-gray-300">
+                    {["Id", "Name", "Owner", "Phone", "Email", "Address", "Location", "GST", "Website", "Social", "Joined", "Subscription", "Type", "KYC"].map((h, i) => (
+                        <div key={i} className="py-1 px-2">{h}</div>
+                    ))}
+                    {hasPermission(role, PERMISSIONS.VERIFY_KYC) && <div className="py-1 px-2">Verify</div>}
+                    {hasPermission(role, PERMISSIONS.EDIT_BUSINESS) && <div className="py-1 px-2">Edit</div>}
+                    {hasPermission(role, PERMISSIONS.DELETE_BUSINESS) && <div className="py-1 px-2">Delete</div>}
+                </div>
+                <List
+                    height={500}
+                    itemCount={companies.length}
+                    itemSize={60}
+                    width={'100%'}
+                >
+                    {Row}
+                </List>
             </div>
         </div>
     );

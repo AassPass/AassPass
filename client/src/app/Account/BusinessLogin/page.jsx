@@ -1,10 +1,10 @@
 'use client'
-import { BACKEND_AUTH_URL, BACKEND_URL } from "@/app/Utils/backendUrl";
+import { BACKEND_AUTH_URL } from "@/app/Utils/backendUrl";
 import { useRole } from "@/Context/RoleContext";
-import axios from "axios";
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "react-toastify";
+
 
 export default function Page() {
     const router = useRouter();
@@ -17,22 +17,33 @@ export default function Page() {
         const password = e.target.password.value;
 
         try {
-            const response = await axios.post(
-                `${BACKEND_AUTH_URL}/business/login`,
-                { email, password },
-                { withCredentials: true }
-            );
+            const res = await fetch(`${BACKEND_AUTH_URL}/business/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ email, password }),
+            });
 
-            setBusinessId(response.data.buisnessId);
-            setRole(response.data.role);
-            localStorage.setItem('token', response.data.token);
-            toast.success("Logged in successfully!");
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.message || 'Login failed');
+            }
+
+            const data = await res.json();
+
+            setBusinessId(data.buisnessId);
+            setRole(data.role);
+            localStorage.setItem('token', data.token);
+
             router.push('/Admin/dashboard');
         } catch (err) {
             console.error(err);
-            toast.error("Login failed. Please check your credentials.");
+
         }
     };
+
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -41,24 +52,33 @@ export default function Page() {
         const confirmPassword = e.target.confirmPassword.value;
 
         if (password !== confirmPassword) {
-            toast.error("Passwords do not match.");
+            console.error("Passwords do not match.");
             return;
         }
 
         try {
-            const response = await axios.post(
-                `${BACKEND_AUTH_URL}/business/register`,
-                { email, password },
-                { withCredentials: true }
-            );
+            const res = await fetch(`${BACKEND_AUTH_URL}/business/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ email, password }),
+            });
 
-            toast.success("Signup successful! You can now log in.");
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.message || 'Signup failed');
+            }
+
+
             setIsSignup(false);
         } catch (err) {
             console.error(err);
-            toast.error("Signup failed. Try a different email.");
+
         }
     };
+
 
     return (
         <form

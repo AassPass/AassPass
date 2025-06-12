@@ -1,9 +1,9 @@
 'use client'
 import { BACKEND_AUTH_URL, BACKEND_URL } from "@/app/Utils/backendUrl";
 import { useRole } from "@/Context/RoleContext";
-import axios from "axios";
+
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+
 
 export default function Page() {
     const router = useRouter();
@@ -15,20 +15,29 @@ export default function Page() {
         const password = e.target.password.value;
 
         try {
-            const response = await axios.post(
-                `${BACKEND_AUTH_URL}/admin/login`,
-                { email, password },
-                { withCredentials: true } // important for cookie
-            );
+            const res = await fetch(`${BACKEND_AUTH_URL}/admin/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // for sending/receiving cookies
+                body: JSON.stringify({ email, password }),
+            });
 
-            setRole(response.data.role)
-            // await fetchUser(); // set user in context
-            localStorage.setItem('token', response.data.token);
-            toast.success("Logged in successfully!");
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || 'Login failed');
+            }
+
+            const data = await res.json();
+
+            setRole(data.role);
+            localStorage.setItem('token', data.token); // Optional, remove if using only cookies
+
             router.push('/Admin/dashboard');
         } catch (err) {
-            console.error(err);
-            toast.error("Login failed. Please check your credentials.");
+            console.error('Login error:', err.message);
+            // Optionally display an error message to the user
         }
     };
 

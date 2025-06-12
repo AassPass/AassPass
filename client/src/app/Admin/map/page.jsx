@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import Map from '../Components/Map';
 import { BACKEND_URL } from '@/app/Utils/backendUrl';
 import FilterOptions from './FilterOptions';
+import dynamic from 'next/dynamic';
+const Map = dynamic(() => import('../Components/Map'), { ssr: false });
 
 const Page = () => {
     const [businesses, setBusinesses] = useState([]);
@@ -14,8 +14,13 @@ const Page = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get(`${BACKEND_URL}/get-all-business`);
-                const formatted = res.data.map((business) => ({
+                const res = await fetch(`${BACKEND_URL}/get-all-business`);
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await res.json();
+                const formatted = data.map((business) => ({
                     id: business._id,
                     coordinates: [business.longitude, business.latitude],
                     popupText: business.businessName,

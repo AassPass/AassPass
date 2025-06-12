@@ -1,69 +1,80 @@
 'use client';
 
-import Link from 'next/link';
+import React, { useCallback, memo } from 'react';
 import { useRole } from '@/Context/RoleContext';
 import { PERMISSIONS } from '@/libs/permissions';
 import { hasPermission } from '@/libs/hasPermisson';
 
+function Sidebar({ activeComponent, setActiveComponent }) {
+    const { role } = useRole();
 
-export default function Sidebar() {
-    const { role } = useRole(); // Assumes role is from context like 'super_admin', 'admin', or 'business'
-
-    // Temporary override for testing
-    // const role = 'super_admin';
+    const getMenuItemClass = useCallback(
+        (itemName) => `
+      truncate text-[10px] sm:text-xs md:text-sm rounded-md cursor-pointer
+      hover:bg-blue-100 hover:text-blue-800 transition duration-200 px-2 py-1
+      ${activeComponent === itemName ? 'bg-blue-600 text-white font-semibold shadow' : 'text-gray-700'}
+    `,
+        [activeComponent]
+    );
 
     return (
-        <aside className="bg-gray-800 text-white w-64 min-h-screen fixed p-6">
-            <h2 className="text-2xl font-bold mb-6 capitalize">
-                {role || 'Guest'}
-            </h2>
-
-            <nav className="space-y-3">
-
-                {/* Universal / Common Routes */}
-                <Link href="/dashboard" className="block hover:bg-gray-700 p-2 rounded">
-                    Dashboard
-                </Link>
-
-                {/* Super Admin */}
-                {hasPermission(role, PERMISSIONS.CREATE_ADMIN) && (
-                    <Link href="/Admin/user-master" className="block hover:bg-gray-700 p-2 rounded">
-                        User Master
-                    </Link>
-                )}
+        <aside className="w-full max-w-[1200px] px-2 py-1 md:px-4 md:py-2 bg-white text-black flex flex-wrap md:flex-row justify-between items-center shadow-sm">
+            <nav className="flex flex-wrap gap-1 md:gap-2">
+                {/* {hasPermission(role, PERMISSIONS.CREATE_ADMIN) && (
+                    <>
+                        <button
+                            type="button"
+                            className={getMenuItemClass('dashboard')}
+                            onClick={() => setActiveComponent('dashboard')}
+                        >
+                            Dashboard
+                        </button>
+                        <button
+                            type="button"
+                            className={getMenuItemClass('user-master')}
+                            onClick={() => setActiveComponent('user-master')}
+                        >
+                            User Master
+                        </button>
+                    </>
+                )} */}
 
                 {hasPermission(role, PERMISSIONS.CREATE_BUSINESS) && (
-                    <Link href="/Admin/company-management" className="block hover:bg-gray-700 p-2 rounded">
-                        Company Management
-                    </Link>
+                    <button
+                        type="button"
+                        className={getMenuItemClass('business-master')}
+                        onClick={() => setActiveComponent('business-master')}
+                    >
+                        Business Master
+                    </button>
                 )}
 
-                {hasPermission(role, PERMISSIONS.VERIFY_ADS) && (
-                    <Link href="/Admin/ad-master" className="block hover:bg-gray-700 p-2 rounded">
-                        Ad Master
-                    </Link>
-                )}
+                {/* {hasPermission(role, PERMISSIONS.ADD_ADS) && (
+                    <button
+                        type="button"
+                        className={getMenuItemClass('ad-listing')}
+                        onClick={() => setActiveComponent('ad-listing')}
+                    >
+                        Ad Listing
+                    </button>
+                )} */}
 
-
-
-                {/* Business-specific Routes */}
-                {role === 'business' && (
-                    <>
-                        <Link href="/Company/company-profile" className="block hover:bg-gray-700 p-2 rounded">
-                            Company Profile
-                        </Link>
-                        <Link href="/Company/ad-listing" className="block hover:bg-gray-700 p-2 rounded">
-                            Ad Listing
-                        </Link>
-
-                    </>
-                )}
-
-                {/* Map – let’s show it for all for now */}
-                <Link href="/Admin/map" className="block hover:bg-gray-700 p-2 rounded">
+                {/* <button
+                    type="button"
+                    className={getMenuItemClass('map')}
+                    onClick={() => setActiveComponent('map')}
+                >
                     Map
-                </Link>
+                </button> */}
             </nav>
+
+            <div className="mt-2 md:mt-0">
+                <button className="bg-green-500 px-2 py-1 text-[10px] sm:text-xs rounded-md font-bold text-white hover:bg-green-600 transition">
+                    Ad Credit −5$
+                </button>
+            </div>
         </aside>
     );
 }
+
+export default memo(Sidebar);

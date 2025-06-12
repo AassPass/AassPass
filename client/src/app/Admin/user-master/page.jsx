@@ -1,11 +1,21 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import AddUsers from './Components/AddUsers';
-import UserList from './Components/UserList';
+
+
 import { BACKEND_URL } from '@/app/Utils/backendUrl';
+
+// Dynamically import components with loading fallbacks
+const AddUsers = dynamic(() => import('./Components/AddUsers'), {
+    loading: () => <p className="p-4">Loading Add User Form...</p>,
+    ssr: false,
+});
+
+const UserList = dynamic(() => import('./Components/UserList'), {
+    loading: () => <p className="p-4">Loading User List...</p>,
+    ssr: false,
+});
 
 export default function UserMaster() {
     const [edit, setEdit] = useState(false);
@@ -14,53 +24,60 @@ export default function UserMaster() {
 
     useEffect(() => {
         const fetchUsers = async () => {
-            const token = localStorage.getItem('token'); // 🔐 Fetch token from localStorage
-
+            const token = localStorage.getItem('token');
             if (!token) {
-                toast.error('No authentication token found.');
+                console.error('No authentication token found.');
                 return;
             }
 
             try {
-                const response = await axios.get(`${BACKEND_URL}/admins`, {
+                const response = await fetch(`${BACKEND_URL}/admins`, {
+                    method: 'GET',
                     headers: {
-                        Authorization: `Bearer ${token}`, // ✅ Send token in Authorization header
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
                     },
                 });
-                
-                setUsers(response.data.data);
-                toast.success('Users loaded successfully!');
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const result = await response.json();
+                setUsers(result.data);
             } catch (error) {
-                console.error('Error fetching users:', error);
-                toast.error('Failed to load users.');
+                console.error('Failed to load users.', error);
             }
         };
 
         fetchUsers();
     }, []);
 
+
     return (
-        <div className="p-6 space-y-8">
+        <div className="flex w-full min-h-screen flex-col lg:flex-row gap-4">
+            {/* Add User Form (Left Side) */}
+            <div className="w-full lg:w-1/3 bg-white">
+                <AddUsers
+                    edit={edit}
+                    users={users}
+                    setUsers={setUsers}
+                    setEdit={setEdit}
+                    selectedUser={selectedUser}
+                    setSelectedUser={setSelectedUser}
+                />
+            </div>
 
-
-            {/* Add User Form */}
-            <AddUsers
-                edit={edit}
-                users={users}
-                setUsers={setUsers}
-                setEdit={setEdit}
-                selectedUser={selectedUser}
-                setSelectedUser={setSelectedUser}
-            />
-
-            {/* User List */}
-            <UserList
-                users={users}
-                setUsers={setUsers}
-                edit={edit}
-                setEdit={setEdit}
-                setSelectedUser={setSelectedUser}
-            />
+            {/* User List (Right Side) */}
+            <div className="w-full lg:w-2/3 bg-white">
+                <UserList
+                    users={users}
+                    setUsers={setUsers}
+                    edit={edit}
+                    setEdit={setEdit}
+                    setSelectedUser={setSelectedUser}
+                />
+            </div>
         </div>
     );
 }
