@@ -22,6 +22,7 @@ app.use(express.urlencoded({extended: true}));
 interface UserPayload {
     id: string;
     role: string;
+    businessId: string
 }
 
 interface AdminPayload {
