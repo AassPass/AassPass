@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Map from '@/app/Admin/Components/Map';
 import { BACKEND_USER_URL } from '@/app/Utils/backendUrl';
 import FilterOptions from '@/app/Admin/map/FilterOptions';
@@ -34,42 +33,35 @@ const MapSection = () => {
             try {
                 const { latitude, longitude } = userLocation;
                 console.log(userLocation);
-                const response = await axios.get(`${BACKEND_USER_URL}/businesses`, {
-                    params: {
-                        lat: latitude,
-                        lng: longitude,
-                        radius: RADIUS_KM,
-                    },
-                });
-                console.log(response.data);
 
-                if (userLocation) {
-                    const { latitude, longitude } = userLocation; // assuming userLocation = { lat: 12.9716, long: 77.5946 }
-
-                    response = await axios.get(`${BACKEND_USER_URL}/businesses`, {
-                        params: {
-                            lat: latitude,        // backend expects 'lat'
-                            lng: longitude,  // backend expects 'lng' not 'long'
-                            // radius: RADIUS_KM,
-                        },
-                    });
-                } else {
+                if (!userLocation) {
                     console.log("User location not available, skipping fetch.");
                     return;
                 }
 
-                console.log("Business data:", response.data);
+                const url = new URL(`${BACKEND_USER_URL}/businesses`);
+                url.searchParams.append("lat", latitude);
+                url.searchParams.append("lng", longitude);
+                url.searchParams.append("radius", RADIUS_KM);
 
-                const formatted = response.data.map((business) => ({
-                    id: business._id,
+                const response = await fetch(url.toString());
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                console.log("Business data:", data);
+
+                const formatted = data.data.map((business) => ({
+                    id: business.id,
                     coordinates: [business.longitude, business.latitude],
                     popupText: business.businessName,
                     city: business.city || "",
                     color: "red",
                     websiteLink: business.websiteLink || "",
                 }));
-
 
                 setBusinesses(formatted);
                 setFilteredBusinesses(formatted);
@@ -80,6 +72,7 @@ const MapSection = () => {
         };
 
         fetchData();
+
     }, [userLocation]);
 
 

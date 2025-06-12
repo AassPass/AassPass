@@ -20,7 +20,7 @@ function Sidebar({ activeComponent, setActiveComponent }) {
     return (
         <aside className="w-full max-w-[1200px] px-2 py-1 md:px-4 md:py-2 bg-white text-black flex flex-wrap md:flex-row justify-between items-center shadow-sm">
             <nav className="flex flex-wrap gap-1 md:gap-2">
-                {/* {hasPermission(role, PERMISSIONS.CREATE_ADMIN) && (
+                {hasPermission(role, PERMISSIONS.CREATE_ADMIN) && (
                     <>
                         <button
                             type="button"
@@ -37,7 +37,7 @@ function Sidebar({ activeComponent, setActiveComponent }) {
                             User Master
                         </button>
                     </>
-                )} */}
+                )}
 
                 {hasPermission(role, PERMISSIONS.CREATE_BUSINESS) && (
                     <button
@@ -49,7 +49,7 @@ function Sidebar({ activeComponent, setActiveComponent }) {
                     </button>
                 )}
 
-                {/* {hasPermission(role, PERMISSIONS.ADD_ADS) && (
+                {hasPermission(role, PERMISSIONS.VERIFY_ADS) && (
                     <button
                         type="button"
                         className={getMenuItemClass('ad-listing')}
@@ -57,15 +57,15 @@ function Sidebar({ activeComponent, setActiveComponent }) {
                     >
                         Ad Listing
                     </button>
-                )} */}
+                )}
 
-                {/* <button
+                <button
                     type="button"
                     className={getMenuItemClass('map')}
                     onClick={() => setActiveComponent('map')}
                 >
                     Map
-                </button> */}
+                </button>
             </nav>
 
             <div className="mt-2 md:mt-0">

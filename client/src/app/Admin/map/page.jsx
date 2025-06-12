@@ -20,7 +20,7 @@ const Page = () => {
                 }
 
                 const data = await res.json();
-                const formatted = data.map((business) => ({
+                const formatted = data.data.map((business) => ({
                     id: business._id,
                     coordinates: [business.longitude, business.latitude],
                     popupText: business.businessName,

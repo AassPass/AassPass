@@ -12,9 +12,8 @@ const Profile = dynamic(() => import('./Profile/page'));
 const AdListing = dynamic(() => import('./ad-master/page'));
 const MapContent = dynamic(() => import('./map/page'));
 
-export default function AdminDashboard() {
+export default function page() {
     const [activeComponent, setActiveComponent] = useState('company-management');
-
     const componentMap = {
         dashboard: DashboardContent,
         'user-master': UserMaster,
@@ -33,7 +32,6 @@ export default function AdminDashboard() {
                 activeComponent={activeComponent}
                 setActiveComponent={setActiveComponent}
             />
-
             {/* Dynamic Main Content */}
             <main className="flex-grow p-4">
                 <ActiveComponent />

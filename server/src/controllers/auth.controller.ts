@@ -134,7 +134,7 @@ const UserRegister = async (req: Request, res: Response): Promise<any> => {
         const { email, password, name } = req.body;
 
         if(!email || !password || !name) {
-            return res.status(400).json({ message: "Email and password are required" });
+            return res.status(400).json({ message: "Email, password and name are required" });
         }
 
         const existingUser = await prisma.user.findUnique({

@@ -7,6 +7,7 @@ import ReactDOM from 'react-dom/client';
 const Map = ({ markerData }) => {
     const mapRef = useRef(null);
     const markersRef = useRef([]);
+    console.log(markerData);
 
     useEffect(() => {
         if (!mapRef.current || markerData.length === 0) return;

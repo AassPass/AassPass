@@ -105,6 +105,7 @@ function AddUsers({ edit, setEdit, selectedUser, setSelectedUser, setUsers }) {
     };
 
     const updateUser = async (token) => {
+        // console.log(selectedUser.adminId);
         const res = await fetch(`${BACKEND_URL}/admin/update/${selectedUser.adminId}`, {
             method: 'PUT',
             headers: {

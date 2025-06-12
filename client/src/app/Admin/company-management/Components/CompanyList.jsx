@@ -72,13 +72,13 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
         try {
             const token = localStorage.getItem('token');
 
-            const res = await fetch(`${BACKEND_URL}/business/verify/${companyId}`, {
+            const res = await fetch(`${BACKEND_URL}/business/change-status/${companyId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ kycStatus: newStatus }),
+                body: JSON.stringify({ status: newStatus }),
             });
 
             if (!res.ok) {
@@ -181,6 +181,7 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
                     itemCount={companies.length}
                     itemSize={60}
                     width={'100%'}
+                    className='text-black'
                 >
                     {Row}
                 </List>

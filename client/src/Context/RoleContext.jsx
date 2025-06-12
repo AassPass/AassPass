@@ -7,6 +7,7 @@ const RoleContext = createContext();
 export const RoleProvider = ({ children }) => {
     const [role, setRole] = useState(null);
     const [businessId, setBusinessId] = useState(null);
+    // console.log(role);
 
     // Load from localStorage if available (optional)
     useEffect(() => {

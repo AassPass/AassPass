@@ -11,7 +11,7 @@ export default function Page() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const email = e.target.email.value;
+        const adminId = e.target.adminId.value;
         const password = e.target.password.value;
 
         try {
@@ -21,7 +21,7 @@ export default function Page() {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include', // for sending/receiving cookies
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ adminId, password }),
             });
 
             if (!res.ok) {
@@ -52,13 +52,13 @@ export default function Page() {
                     Login to Your Account
                 </h2>
 
-                <label htmlFor="email" className="block mb-2 font-medium text-gray-700">
-                    Email
+                <label htmlFor="adminId" className="block mb-2 font-medium text-gray-700">
+                    adminId
                 </label>
                 <input
-                    id="email"
-                    name="email"
-                    type="email"
+                    id="adminId"
+                    name="adminId"
+                    type="text"
                     required
                     className="w-full px-4 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="you@example.com"

@@ -19,7 +19,7 @@ SuperAdminRouter.delete("/admin/:adminId", authorize(["SUPER_ADMIN"]), DeleteAdm
 
 // business endpoints
 SuperAdminRouter.patch("/business/change-status/:businessId", authorize(["SUPER_ADMIN"]), ChangeStatus);
-SuperAdminRouter.get("/businesses", authorize(["SUPER_ADMIN"]), GetBusinesses);
+SuperAdminRouter.get("/businesses", authorize(["SUPER_ADMIN", "ADMIN"]), GetBusinesses);
 // SuperAdminRouter.delete("/business/:businessId", authorize(["SUPER_ADMIN"]), DeleteBusiness);
 
 

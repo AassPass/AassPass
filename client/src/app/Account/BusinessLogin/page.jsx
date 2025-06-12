@@ -15,14 +15,15 @@ export default function Page() {
         e.preventDefault();
         const email = e.target.email.value;
         const password = e.target.password.value;
+        
 
         try {
-            const res = await fetch(`${BACKEND_AUTH_URL}/business/login`, {
+            const res = await fetch(`${BACKEND_AUTH_URL}/user/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include',
+                // credentials: 'include',
                 body: JSON.stringify({ email, password }),
             });
 
@@ -50,6 +51,7 @@ export default function Page() {
         const email = e.target.email.value;
         const password = e.target.password.value;
         const confirmPassword = e.target.confirmPassword.value;
+        const name = e.target.name.value;
 
         if (password !== confirmPassword) {
             console.error("Passwords do not match.");
@@ -57,13 +59,13 @@ export default function Page() {
         }
 
         try {
-            const res = await fetch(`${BACKEND_AUTH_URL}/business/register`, {
+            const res = await fetch(`${BACKEND_AUTH_URL}/user/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email, password, name }),
             });
 
             if (!res.ok) {
@@ -111,6 +113,17 @@ export default function Page() {
                 required
                 className="w-full px-4 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter your password"
+            />
+            <label htmlFor="password" className="block mb-2 font-medium text-gray-700">
+                Name
+            </label>
+            <input
+                id="name"
+                name="name"
+                type="text"
+                required
+                className="w-full px-4 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your name"
             />
 
             {isSignup && (
