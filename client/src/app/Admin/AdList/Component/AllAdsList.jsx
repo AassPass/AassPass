@@ -6,49 +6,84 @@ import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
 import axios from 'axios';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+
+import React from 'react';
+
+const STATUS_OPTIONS = ['Verified', 'Rejected', 'Pending'];
+
+const getStatusClasses = status => {
+    switch (status) {
+        case 'Verified':
+            return 'bg-green-100 text-green-700';
+        case 'Rejected':
+            return 'bg-red-100 text-red-700';
+        default:
+            return 'bg-yellow-100 text-yellow-700';
+    }
+};
+
+const getButtonClasses = status => {
+    const base = 'text-xs px-3 py-1 rounded transition duration-200 font-medium';
+    switch (status) {
+        case 'Verified':
+            return `${base} bg-green-200 hover:bg-green-300 text-green-800`;
+        case 'Rejected':
+            return `${base} bg-red-200 hover:bg-red-300 text-red-800`;
+        default:
+            return `${base} bg-yellow-200 hover:bg-yellow-300 text-yellow-800`;
+    }
+};
 
 const AllAdsList = ({ allAds, setAllAds }) => {
     const [loadingIds, setLoadingIds] = useState(new Set());
-    const { role } = useRole()
+    const { role } = useRole();
+    const canVerify = hasPermission(role, PERMISSIONS.VERIFY_AD);
 
-    async function updateVerification(adCode, newStatus) {
+    const updateVerification = async (adCode, newStatus) => {
         try {
-            const response = await axios.patch(`${BACKEND_ADMIN_URL}/verify-ad/${adCode}`, {
-                verificationStatus: newStatus,
+            const res = await fetch(`${BACKEND_ADMIN_URL}/verify-ad/${adCode}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ verificationStatus: newStatus }),
             });
 
-            toast.success(`Ad marked as ${newStatus}`);
-            return response.data;
+            if (!res.ok) {
+                throw new Error('Failed to update verification status');
+            }
+
+            const data = await res.json();
+            return data;
         } catch (err) {
-            toast.error('Failed to update verification status');
+            console.error('Failed to update verification status');
             return null;
         }
-    }
+    };
+
 
     const handleStatusChange = async (ad, newStatus) => {
         if (loadingIds.has(ad.adCode)) return;
 
-        setAllAds(prev =>
-            prev.map(a =>
-                a.adCode === ad.adCode ? { ...a, verificationStatus: newStatus } : a
-            )
-        );
+        const previousStatus = ad.verificationStatus;
         setLoadingIds(prev => new Set(prev).add(ad.adCode));
 
+        setAllAds(prev =>
+            prev.map(a => a.adCode === ad.adCode ? { ...a, verificationStatus: newStatus } : a)
+        );
+
         const result = await updateVerification(ad.adCode, newStatus);
+
         if (!result) {
             setAllAds(prev =>
-                prev.map(a =>
-                    a.adCode === ad.adCode ? { ...a, verificationStatus: ad.verificationStatus } : a
-                )
+                prev.map(a => a.adCode === ad.adCode ? { ...a, verificationStatus: previousStatus } : a)
             );
         }
 
         setLoadingIds(prev => {
-            const set = new Set(prev);
-            set.delete(ad.adCode);
-            return set;
+            const next = new Set(prev);
+            next.delete(ad.adCode);
+            return next;
         });
     };
 
@@ -65,16 +100,13 @@ const AllAdsList = ({ allAds, setAllAds }) => {
                             <th className="py-3 px-4 border-b">End</th>
                             <th className="py-3 px-4 border-b">Active</th>
                             <th className="py-3 px-4 border-b">Verification</th>
-                            {hasPermission(role, PERMISSIONS.VERIFY_AD) && (
-
-                                <th className="py-3 px-4 border-b text-center">Actions</th>
-                            )}
+                            {canVerify && <th className="py-3 px-4 border-b text-center">Actions</th>}
                         </tr>
                     </thead>
                     <tbody>
                         {allAds.length === 0 ? (
                             <tr>
-                                <td colSpan="8" className="text-center py-4 text-black">
+                                <td colSpan={canVerify ? 8 : 7} className="text-center py-4 text-black">
                                     No ads found.
                                 </td>
                             </tr>
@@ -96,31 +128,19 @@ const AllAdsList = ({ allAds, setAllAds }) => {
                                     </td>
                                     <td className="py-2 px-4">
                                         <span
-                                            className={`px-2 py-1 rounded-full text-xs font-medium
-                                                ${ad.verificationStatus === 'Verified'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : ad.verificationStatus === 'Rejected'
-                                                        ? 'bg-red-100 text-red-700'
-                                                        : 'bg-yellow-100 text-yellow-700'
-                                                }`}
+                                            className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClasses(ad.verificationStatus)}`}
                                         >
                                             {ad.verificationStatus}
                                         </span>
                                     </td>
-                                    {hasPermission(role, PERMISSIONS.VERIFY_AD) && (
+                                    {canVerify && (
                                         <td className="py-2 px-4 flex justify-center gap-1">
-                                            {['Verified', 'Rejected', 'Pending'].map(status => (
+                                            {STATUS_OPTIONS.map(status => (
                                                 <button
                                                     key={status}
                                                     disabled={loadingIds.has(ad.adCode)}
                                                     onClick={() => handleStatusChange(ad, status)}
-                                                    className={`text-xs px-3 py-1 rounded transition duration-200 font-medium
-                    ${status === 'Verified'
-                                                            ? 'bg-green-200 hover:bg-green-300 text-green-800'
-                                                            : status === 'Rejected'
-                                                                ? 'bg-red-200 hover:bg-red-300 text-red-800'
-                                                                : 'bg-yellow-200 hover:bg-yellow-300 text-yellow-800'}
-                    disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                    className={`${getButtonClasses(status)} disabled:opacity-50 disabled:cursor-not-allowed`}
                                                 >
                                                     {status}
                                                 </button>
@@ -137,4 +157,5 @@ const AllAdsList = ({ allAds, setAllAds }) => {
     );
 };
 
-export default AllAdsList;
+// ✅ Wrap in React.memo for performance optimization
+export default React.memo(AllAdsList);

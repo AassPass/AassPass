@@ -1,7 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+
 import { RoleProvider } from "@/Context/RoleContext";
 
 const geistSans = Geist({
@@ -28,7 +27,7 @@ export default function RootLayout({ children }) {
         <RoleProvider>
 
           {children}
-          <ToastContainer position="top-right" autoClose={3000} style={{ zIndex: 9999, position: 'fixed' }} />
+
         </RoleProvider>
       </body>
     </html>

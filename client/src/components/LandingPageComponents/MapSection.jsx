@@ -13,7 +13,7 @@ const MapSection = () => {
     const [userLocation, setUserLocation] = useState(null);
     const RADIUS_KM = 10;
 
-    // Get user location
+    // Get user location once on mount
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -26,11 +26,22 @@ const MapSection = () => {
         );
     }, []);
 
-    // Fetch business data using location
+    // Fetch businesses whenever userLocation changes
     useEffect(() => {
+        if (!userLocation) return; // skip if no location
+
         const fetchData = async () => {
             try {
-                let response;
+                const { latitude, longitude } = userLocation;
+                console.log(userLocation);
+                const response = await axios.get(`${BACKEND_USER_URL}/businesses`, {
+                    params: {
+                        lat: latitude,
+                        lng: longitude,
+                        radius: RADIUS_KM,
+                    },
+                });
+                console.log(response.data);
 
                 if (userLocation) {
                     const { latitude, longitude } = userLocation; // assuming userLocation = { lat: 12.9716, long: 77.5946 }
@@ -51,56 +62,44 @@ const MapSection = () => {
 
                 const formatted = response.data.map((business) => ({
                     id: business._id,
+
                     coordinates: [business.longitude, business.latitude],
                     popupText: business.businessName,
-                    city: business.city || '',
-                    color: 'red',
+                    city: business.city || "",
+                    color: "red",
+                    websiteLink: business.websiteLink || "",
                 }));
+
 
                 setBusinesses(formatted);
                 setFilteredBusinesses(formatted);
-
-            } catch (err) {
-                console.error('Error fetching business data:', err);
-
-                const demoData = [
-                    { id: 1, coordinates: [77.5946, 12.9716], popupText: 'Bangalore', city: 'Bangalore', color: 'red' },
-                    { id: 2, coordinates: [72.8777, 19.0760], popupText: 'Mumbai', city: 'Mumbai', color: 'blue' },
-                    { id: 3, coordinates: [88.3639, 22.5726], popupText: 'Kolkata', city: 'Kolkata', color: 'green' },
-                    { id: 4, coordinates: [78.4867, 17.3850], popupText: 'Hyderabad', city: 'Hyderabad', color: 'purple' },
-                    { id: 5, coordinates: [77.1025, 28.7041], popupText: 'Delhi', city: 'Delhi', color: 'orange' },
-                ];
-
-                setBusinesses(demoData);
-                setFilteredBusinesses(demoData);
+            } catch (error) {
+                console.error('Error fetching business data:', error);
+                // Optionally set fallback data here
             }
         };
 
         fetchData();
     }, [userLocation]);
 
-    const handleCityChange = (city) => {
-        setSelectedCity(city);
-        if (city === '') {
-            setFilteredBusinesses(businesses);
-        } else {
-            const filtered = businesses.filter(
-                (b) => b.city.toLowerCase() === city.toLowerCase()
-            );
-            setFilteredBusinesses(filtered);
-        }
-    };
 
-    const uniqueCities = [...new Set(businesses.map((b) => b.city).filter(Boolean))];
+
 
     return (
         <div className="w-full text-black">
-            {/* <FilterOptions
-                cities={uniqueCities}
-                selectedCity={selectedCity}
-                onChange={handleCityChange}
-            /> */}
-            <Map markerData={filteredBusinesses} />
+            {/* Uncomment to enable city filtering */}
+            {/* <div>
+
+                <FilterOptions
+                    cities={uniqueCities}
+                    selectedCity={selectedCity}
+                    onChange={handleCityChange}
+                />
+            </div> */}
+            <div>
+
+                <Map markerData={businesses} />
+            </div>
         </div>
     );
 };

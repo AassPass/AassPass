@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import axios from 'axios';
+import { useEffect, useState, useCallback } from 'react';
+
 import { BACKEND_BUSINESS_URL } from '@/app/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
 
+// ✅ Define categories outside to avoid re-creation on every render
 const categories = [
     'DEAL',
     'EVENT',
@@ -34,15 +33,14 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
     const [form, setForm] = useState(initialAddData);
     const [previewImages, setPreviewImages] = useState([]);
 
-    // Handle edit mode
+    // ✅ Controlled edit mode with cleanup
     useEffect(() => {
         if (isAdEditing && editingAd) {
             setForm({
                 ...editingAd,
                 extra: editingAd.extra || {},
-                images: [], // reset new uploads
+                images: [],
             });
-            // Clear previews
             setPreviewImages([]);
         } else {
             setForm(initialAddData);
@@ -50,143 +48,132 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
         }
     }, [isAdEditing, editingAd]);
 
-    // Cleanup previews on unmount
     useEffect(() => {
-        return () => {
-            previewImages.forEach((url) => URL.revokeObjectURL(url));
-        };
+        return () => previewImages.forEach((url) => URL.revokeObjectURL(url));
     }, [previewImages]);
 
-    const handleChange = (e) => {
+    const handleChange = useCallback((e) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
-    };
+    }, []);
 
-    const handleExtraChange = (e) => {
+    const handleExtraChange = useCallback((e) => {
         const { name, value } = e.target;
         setForm((prev) => ({
             ...prev,
             extra: { ...prev.extra, [name]: value },
         }));
-    };
+    }, []);
 
     const handleImageUpload = (e) => {
-        const newFiles = Array.from(e.target.files);
-        const combinedFiles = [...form.images, ...newFiles].slice(0, 3); // Limit total to 3
+        const files = Array.from(e.target.files).slice(0, 3);
+        const newPreviews = files.map((file) => URL.createObjectURL(file));
 
-        const newPreviews = combinedFiles.map((file) => URL.createObjectURL(file));
-
-        setForm((prev) => ({ ...prev, images: combinedFiles }));
+        setForm((prev) => ({ ...prev, images: files }));
         setPreviewImages(newPreviews);
     };
-
-
     const handleSubmit = async (status) => {
         try {
             const token = localStorage.getItem('token');
             const formData = new FormData();
 
-            formData.append('adCode', form.adCode);
-            formData.append('title', form.title);
-            formData.append('category', form.category);
-            formData.append('startDate', form.startDate);
-            formData.append('endDate', form.endDate);
-            formData.append('status', status);
-            formData.append('extra', JSON.stringify(form.extra));
+            const { adCode, title, category, startDate, endDate, images, extra } = form;
+            [adCode, title, category, startDate, endDate, JSON.stringify(extra)].forEach((val, i) =>
+                formData.append(['adCode', 'title', 'category', 'startDate', 'endDate', 'extra'][i], val)
+            );
 
-            form.images.forEach((file) => {
-                formData.append('images', file);
-            });
+            formData.append('status', status);
+            images.forEach((img) => formData.append('images', img));
 
             const endpoint = isAdEditing
-                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/ads/${form.adCode}`
+                ? `${BACKEND_BUSINESS_URL}/ads/${form.adCode}`
                 : `${BACKEND_BUSINESS_URL}/${businessId}/new-ad`;
 
-            const method = isAdEditing ? 'put' : 'post';
+            const method = isAdEditing ? 'PUT' : 'POST';
 
-            const response = await axios({
+            const res = await fetch(endpoint, {
                 method,
-                url: endpoint,
-                data: formData,
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data',
+                    // Note: Do NOT set 'Content-Type' manually when using FormData. The browser will set it correctly.
                 },
+                body: formData,
             });
 
-            if (response.status === 200) {
-                const updatedAd = response.data;
+            if (!res.ok) throw new Error('Failed to submit ad');
 
-                if (isAdEditing) {
-                    setAds((prevAds) =>
-                        prevAds.map((ad) => (ad.adCode === updatedAd.adCode ? updatedAd : ad))
-                    );
-                } else {
-                    setAds((prevAds) => [updatedAd, ...prevAds]);
-                }
+            const updatedAd = await res.json();
 
-                toast.success(
-                    `Ad ${isAdEditing ? 'updated' : status === 'draft' ? 'saved as draft' : 'submitted'} successfully!`
-                );
+            setAds((prev) =>
+                isAdEditing
+                    ? prev.map((ad) => (ad.adCode === updatedAd.adCode ? updatedAd : ad))
+                    : [updatedAd, ...prev]
+            );
 
-                setForm(initialAddData);
-                setPreviewImages([]);
-                setIsAdEditing(false);
-            }
-        } catch (error) {
-            console.error('Ad submission error:', error);
-            toast.error('Failed to submit ad. Please try again.');
+            console.success(`Ad ${isAdEditing ? 'updated' : status === 'draft' ? 'saved as draft' : 'submitted'} successfully!`);
+
+            setForm(initialAddData);
+            setPreviewImages([]);
+            setIsAdEditing(false);
+        } catch (err) {
+            console.error('Ad submission error:', err);
         }
     };
 
     const renderExtraFields = () => {
-        switch (form.category) {
+        const { category, extra } = form;
+
+        const commonInput = (name, placeholder) => (
+            <Input name={name} placeholder={placeholder} onChange={handleExtraChange} value={extra[name] || ''} />
+        );
+
+        switch (category) {
             case 'EVENT':
                 return (
                     <>
-                        <Input name="location" placeholder="Location" onChange={handleExtraChange} value={form.extra.location || ''} />
-                        <Input name="time" placeholder="Time (e.g., 7 PM)" onChange={handleExtraChange} value={form.extra.time || ''} />
-                        <Input name="rsvp" placeholder="RSVP or Ticket Link" onChange={handleExtraChange} value={form.extra.rsvp || ''} />
+                        {commonInput('location', 'Location')}
+                        {commonInput('time', 'Time (e.g., 7 PM)')}
+                        {commonInput('rsvp', 'RSVP or Ticket Link')}
                     </>
                 );
             case 'Services':
                 return (
                     <>
-                        <Input name="serviceType" placeholder="Service Type" onChange={handleExtraChange} value={form.extra.serviceType || ''} />
-                        <Input name="contact" placeholder="Contact Info" onChange={handleExtraChange} value={form.extra.contact || ''} />
-                        <Input name="radius" placeholder="Service Radius" onChange={handleExtraChange} value={form.extra.radius || ''} />
+                        {commonInput('serviceType', 'Service Type')}
+                        {commonInput('contact', 'Contact Info')}
+                        {commonInput('radius', 'Service Radius')}
                     </>
                 );
             case 'Products for Sale':
                 return (
                     <>
-                        <Input name="price" placeholder="Price" onChange={handleExtraChange} value={form.extra.price || ''} />
-                        <Input name="deliveryOption" placeholder="Pickup/Delivery Option" onChange={handleExtraChange} value={form.extra.deliveryOption || ''} />
+                        {commonInput('price', 'Price')}
+                        {commonInput('deliveryOption', 'Pickup/Delivery Option')}
                     </>
                 );
             case 'Job Openings':
                 return (
                     <>
-                        <Input name="salary" placeholder="Salary" onChange={handleExtraChange} value={form.extra.salary || ''} />
-                        <Input name="hours" placeholder="Working Hours" onChange={handleExtraChange} value={form.extra.hours || ''} />
-                        <Input name="location" placeholder="Location" onChange={handleExtraChange} value={form.extra.location || ''} />
+                        {commonInput('salary', 'Salary')}
+                        {commonInput('hours', 'Working Hours')}
+                        {commonInput('location', 'Location')}
                     </>
                 );
             case 'Rentals & Properties':
                 return (
                     <>
-                        <Input name="area" placeholder="Area" onChange={handleExtraChange} value={form.extra.area || ''} />
-                        <Input name="rent" placeholder="Rent" onChange={handleExtraChange} value={form.extra.rent || ''} />
-                        <Input name="amenities" placeholder="Amenities" onChange={handleExtraChange} value={form.extra.amenities || ''} />
-                        <Input name="contact" placeholder="Contact Info" onChange={handleExtraChange} value={form.extra.contact || ''} />
+                        {commonInput('area', 'Area')}
+                        {commonInput('rent', 'Rent')}
+                        {commonInput('amenities', 'Amenities')}
+                        {commonInput('contact', 'Contact Info')}
                     </>
                 );
             case 'Contests & Giveaways':
                 return (
                     <>
-                        <Input name="rules" placeholder="Rules" onChange={handleExtraChange} value={form.extra.rules || ''} />
-                        <Input name="endDate" placeholder="End Date" onChange={handleExtraChange} value={form.extra.endDate || ''} />
-                        <Input name="eligibility" placeholder="Eligibility" onChange={handleExtraChange} value={form.extra.eligibility || ''} />
+                        {commonInput('rules', 'Rules')}
+                        {commonInput('endDate', 'End Date')}
+                        {commonInput('eligibility', 'Eligibility')}
                     </>
                 );
             default:
@@ -199,14 +186,7 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
             <h2 className="text-2xl font-bold border-b pb-2">🗂️ Create New Ad Listing</h2>
 
             <div className="space-y-4">
-                <Input
-                    label="Title"
-                    name="title"
-                    value={form.title}
-                    onChange={handleChange}
-                    maxLength={100}
-                    placeholder="e.g., 50% Off at Aroma Café"
-                />
+                <Input label="Title" name="title" value={form.title} onChange={handleChange} maxLength={100} placeholder="e.g., 50% Off at Aroma Café" />
 
                 <div>
                     <label className="block text-sm font-medium mb-1">Category</label>
@@ -218,9 +198,7 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
                     >
                         <option value="">Select Category</option>
                         {categories.map((cat) => (
-                            <option key={cat} value={cat}>
-                                {cat}
-                            </option>
+                            <option key={cat} value={cat}>{cat}</option>
                         ))}
                     </select>
                 </div>
@@ -279,6 +257,7 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
     );
 }
 
+// ✅ Reusable Input component
 const Input = ({ label, ...props }) => (
     <div>
         {label && <label className="block text-sm font-medium mb-1">{label}</label>}

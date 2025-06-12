@@ -1,10 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import axios from 'axios';
+import { useEffect, useState, useCallback, useMemo, useTransition, memo } from 'react';
+
 import { BACKEND_ADMIN_URL } from '@/app/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
+import { useRef } from 'react';
+
+export function useRafDebounce(callback) {
+    const frame = useRef(null);
+
+    return (...args) => {
+        if (frame.current) cancelAnimationFrame(frame.current);
+        frame.current = requestAnimationFrame(() => {
+            callback(...args);
+        });
+    };
+}
 const businessTypeMap = {
     'Retail Store': 'RETAIL_STORE',
     'Restaurant / Café': 'RESTAURANT_CAFE',
@@ -22,96 +33,158 @@ const businessTypeMap = {
     'Pet Services': 'PET_SERVICES',
     'NGO / Community Org.': 'NGO_COMMUNITY',
     'Shop / Store / Office': 'SHOP_STORE_OFFICE',
-    'Other': 'OTHER'
+    'Other': 'OTHER',
 };
 
+const inputClass = 'w-full px-2 py-1 text-xs rounded border border-gray-300 text-black h-8';
+const labelClass = 'block font-medium text-gray-700 text-xs';
 
-export default function AddBusinessForm({ editingCompany, isEditing, setIsEditing, companies, setCompanies }) {
+const initialFormData = {
+    businessId: '',
+    businessName: '',
+    ownerName: '',
+    phoneNumber: '',
+    emailAddress: '',
+    address: '',
+    subscriptionType: '',
+    gstNumber: '',
+    latitude: '',
+    longitude: '',
+    websiteLink: '',
+    businessType: '',
+    socialLinks: [{ platform: '', link: '' }],
+};
+
+const SocialLinkInput = memo(({ index, link, onChange, onRemove, canRemove }) => (
+    <div className="flex space-x-1 mb-1">
+        <input
+            type="text"
+            placeholder="Platform"
+            value={link.platform}
+            onChange={e => onChange(index, 'platform', e.target.value)}
+            className={`${inputClass} w-[80px]`}
+        />
+        <input
+            type="url"
+            placeholder="Link"
+            value={link.link}
+            onChange={e => onChange(index, 'link', e.target.value)}
+            className={`${inputClass} w-[80px]`}
+        />
+        <button
+            type="button"
+            onClick={() => onRemove(index)}
+            disabled={!canRemove}
+            className="text-red-600 font-bold px-1 text-xs"
+        >
+            ×
+        </button>
+    </div>
+));
+
+export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing, companies, setCompanies }) {
     const { businessId: contextBusinessId } = useRole();
-
-    const initialFormData = {
-        businessId: '',
-        businessName: '',
-        ownerName: '',
-        phoneNumber: '',
-        emailAddress: '',
-        address: '',
-
-        subscriptionType: '',
-        gstNumber: '',
-        latitude: '',
-        longitude: '',
-        websiteLink: '',
-        businessType: '',
-        socialLinks: [{ platform: '', link: '' }],
-    };
-
     const [formData, setFormData] = useState(initialFormData);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const subscriptionTypes = ['Free', 'Basic', 'Standard', 'Premium', 'Enterprise'];
-    const businessTypes = [
-        'Retail Store',
-        'Restaurant / Café',
-        'Salon / Spa',
-        'Gym / Fitness Center',
-        'Medical / Health Store',
-        'Service Provider',
-        'Freelancer / Consultant',
-        'Event Organizer',
-        'Education / Coaching',
-        'Home-based Business',
-        'Real Estate / Rentals',
-        'Courier / Delivery',
-        'Automobile Services',
-        'Pet Services',
-        'NGO / Community Org.',
-        'Shop / Store / Office',
-    ];
+    const businessTypes = Object.keys(businessTypeMap);
 
     useEffect(() => {
-        if (isEditing && editingCompany) {
-            setFormData({
-                ...editingCompany,
-                socialLinks: editingCompany.socialMediaLinks || [{ platform: '', link: '' }],
-            });
-        } else {
-            setFormData({
-                ...initialFormData,
-
-            });
-        }
+        startTransition(() => {
+            if (isEditing && editingCompany) {
+                setFormData({
+                    ...editingCompany,
+                    socialLinks: editingCompany.socialMediaLinks || [{ platform: '', link: '' }],
+                });
+            } else {
+                setFormData({ ...initialFormData });
+            }
+        });
     }, [isEditing, editingCompany, contextBusinessId]);
 
-    function handleChange(e) {
+    const debouncedHandleChange = useRafDebounce((name, value) => {
+        setFormData(prev => {
+            if (prev[name] === value) return prev;
+            return { ...prev, [name]: value };
+        });
+    });
+
+    const handleChange = useCallback((e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    }
+        debouncedHandleChange(name, value);
+    }, [debouncedHandleChange]);
 
-    function handleSocialLinkChange(index, field, value) {
-        const updatedLinks = [...formData.socialLinks];
-        updatedLinks[index][field] = value;
-        setFormData(prev => ({ ...prev, socialLinks: updatedLinks }));
-    }
+    const debouncedSocialChange = useRafDebounce((index, field, value) => {
+        setFormData(prev => {
+            const updatedLinks = [...prev.socialLinks];
+            updatedLinks[index][field] = value;
+            return { ...prev, socialLinks: updatedLinks };
+        });
+    });
 
-    const addSocialLink = () => {
+    const handleSocialLinkChange = useCallback((index, field, value) => {
+        debouncedSocialChange(index, field, value);
+    }, [debouncedSocialChange]);
+    const addSocialLink = useCallback(() => {
         setFormData(prev => ({
             ...prev,
             socialLinks: [...prev.socialLinks, { platform: '', link: '' }]
         }));
-    };
+    }, []);
 
-    const removeSocialLink = (index) => {
-        const updatedLinks = [...formData.socialLinks];
-        updatedLinks.splice(index, 1);
-        setFormData(prev => ({ ...prev, socialLinks: updatedLinks }));
-    };
+    const removeSocialLink = useCallback((index) => {
+        setFormData(prev => {
+            const updatedLinks = [...prev.socialLinks];
+            updatedLinks.splice(index, 1);
+            return { ...prev, socialLinks: updatedLinks };
+        });
+    }, []);
 
-    async function handleSubmit(e) {
+    const handleUseLocation = useCallback(() => {
+        navigator.geolocation?.getCurrentPosition(
+            async pos => {
+
+                setFormData(prev => ({
+                    ...prev,
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude,
+                }));
+
+            },
+            async () => {
+
+                console.error('Location access denied');
+            }
+        );
+    }, []);
+
+    const isFormValid =
+        formData.businessName &&
+        formData.phoneNumber &&
+        formData.businessType &&
+        formData.latitude &&
+        formData.longitude;
+
+    const socialLinkElements = useMemo(() => {
+        const canRemove = formData.socialLinks.length > 1;
+        return formData.socialLinks.map((link, index) => (
+            <SocialLinkInput
+                key={index}
+                index={index}
+                link={link}
+                onChange={handleSocialLinkChange}
+                onRemove={removeSocialLink}
+                canRemove={canRemove}
+            />
+        ));
+    }, [formData.socialLinks, handleSocialLinkChange, removeSocialLink]);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!formData.businessName || !formData.businessType || !formData.phoneNumber || !formData.latitude || !formData.longitude) {
-            toast.error('Business Name, Phone Number, and Business Type are required');
+        if (!isFormValid) {
+            console.error('Business Name, Phone, Type, Latitude and Longitude required');
             return;
         }
 
@@ -123,29 +196,25 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
         };
 
         setIsSubmitting(true);
-
         try {
             const token = localStorage.getItem('token');
             const url = isEditing
                 ? `${BACKEND_ADMIN_URL}/update-business/${editingCompany.businessId}`
                 : `${BACKEND_ADMIN_URL}/business`;
+            const method = isEditing ? 'PUT' : 'POST';
 
-            const method = isEditing ? 'put' : 'post';
-
-            const response = await axios({
+            const response = await fetch(url, {
                 method,
-                url,
-                data: newBusiness,
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
+                body: JSON.stringify(newBusiness),
             });
 
-            if (response.status === 200 || response.status === 201) {
-                toast.success(isEditing ? 'Business updated successfully!' : 'Business added successfully!');
-
-                const returnedCompany = response.data.data || newBusiness;
+            if (response.ok) {
+                const responseData = await response.json();
+                const returnedCompany = responseData.data || newBusiness;
 
                 if (isEditing) {
                     setCompanies(prev =>
@@ -159,253 +228,122 @@ export default function AddBusinessForm({ editingCompany, isEditing, setIsEditin
                     setFormData(initialFormData);
                 }
             } else {
-                toast.error('Something went wrong. Please try again.');
+                console.error('Something went wrong. Status:', response.status);
             }
         } catch (error) {
-            console.error(error);
-            toast.error('Error submitting business');
+            console.error('Error submitting:', error);
         } finally {
             setIsSubmitting(false);
         }
-    }
+    };
 
 
     return (
-        <form
-            onSubmit={handleSubmit}
-            className="bg-white p-6 rounded-lg shadow space-y-6 max-w-4xl mx-auto"
-        >
-            <h2 className="text-2xl font-bold text-black">{isEditing ? 'Edit Business' : 'Add Business'}</h2>
+        <form onSubmit={handleSubmit} className="bg-white p-3 rounded shadow space-y-3 max-w-[1000px] w-full text-xs">
+            <h2 className="text-sm font-semibold text-black">{isEditing ? 'Edit Business' : 'Add Business'}</h2>
 
-            {/* Row 1: Business ID and Name */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label className="block font-medium text-black">Business ID</label>
-                    <input
-                        type="text"
-                        value={formData.businessId || 'Auto-generated'}
-                        disabled
-                        className="w-full bg-gray-100 text-black px-3 py-2 rounded border border-gray-300"
-                    />
-                </div>
-                <div>
-                    <label className="block font-medium text-black">
-                        Business Name <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        name="businessName"
-                        value={formData.businessName}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
-                    />
-                </div>
-            </div>
-
-            {/* Owner & Phone */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label className="block font-medium text-black">Owner Name</label>
-                    <input
-                        type="text"
-                        name="ownerName"
-                        value={formData.ownerName}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
-                    />
-                </div>
-                <div>
-                    <label className="block font-medium text-black">
-                        Phone Number <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                        type="tel"
-                        name="phoneNumber"
-                        value={formData.phoneNumber}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
-                    />
-                </div>
-            </div>
-
-            {/* Email & Address */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label className="block font-medium text-black">Email Address</label>
-                    <input
-                        type="email"
-                        name="emailAddress"
-                        value={formData.emailAddress}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
-                    />
-                </div>
-                <div>
-                    <label className="block font-medium text-black">Address</label>
-                    <input
-                        type="text"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
-                    />
-                </div>
-            </div>
-
-            {/* Latitude, Longitude, Verification */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {!isEditing && (
                     <div>
-                        <label className="block font-medium text-black">
-                            Latitude <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                            type="number"
-                            step="any"
-                            name="latitude"
-                            value={formData.latitude}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-3 py-2 rounded border border-gray-300 text-black"
-                        />
+                        <label className={labelClass}>Business ID</label>
+                        <input type="text" value="Auto-generated" disabled className={`${inputClass} bg-gray-100`} />
                     </div>
-                    <div>
-                        <label className="block font-medium text-black">
-                            Longitude <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                            type="number"
-                            step="any"
-                            name="longitude"
-                            value={formData.longitude}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-3 py-2 rounded border border-gray-300 text-black"
-                        />
-                    </div>
-                </div>
-
-            </div>
-
-            {/* Subscription, GST */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                )}
                 <div>
-                    <label className="block font-medium text-black">Subscription Type</label>
-                    <select
-                        name="subscriptionType"
-                        value={formData.subscriptionType}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
-                    >
-                        <option value="">Select subscription type</option>
-                        {subscriptionTypes.map((type, index) => (
-                            <option key={index} value={type}>
-                                {type}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div>
-                    <label className="block font-medium text-black">GST/Business Reg No</label>
-                    <input
-                        type="text"
-                        name="gstNumber"
-                        value={formData.gstNumber}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
-                    />
+                    <label className={labelClass}>Business Name *</label>
+                    <input type="text" name="businessName" value={formData.businessName} onChange={handleChange} className={inputClass} />
                 </div>
             </div>
 
-            {/* Website & Social Links */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
-                    <label className="block font-medium text-black">Website Link</label>
-                    <input
-                        type="url"
-                        name="websiteLink"
-                        value={formData.websiteLink}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 rounded border border-gray-300 text-black"
-                    />
+                    <label className={labelClass}>Owner Name</label>
+                    <input type="text" name="ownerName" value={formData.ownerName} onChange={handleChange} className={inputClass} />
                 </div>
                 <div>
-                    <label className="block font-medium text-black mb-2">Social Links</label>
-                    {formData.socialLinks.map((link, index) => (
-                        <div key={index} className="flex space-x-2 mb-2">
-                            <input
-                                type="text"
-                                placeholder="Platform"
-                                value={link.platform}
-                                onChange={e => handleSocialLinkChange(index, 'platform', e.target.value)}
-                                className="flex-1 px-3 py-2 rounded border border-gray-300 text-black w-[100px]"
-                            />
-                            <input
-                                type="url"
-                                placeholder="Link"
-                                value={link.link}
-                                onChange={e => handleSocialLinkChange(index, 'link', e.target.value)}
-                                className="flex-1 px-3 py-2 rounded border border-gray-300 text-black w-[100px]"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => removeSocialLink(index)}
-                                disabled={formData.socialLinks.length === 1}
-                                className="text-red-600 font-bold px-3"
-                            >
-                                &times;
-                            </button>
-                        </div>
-                    ))}
+                    <label className={labelClass}>Phone *</label>
+                    <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} className={inputClass} />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div>
+                    <label className={labelClass}>Email</label>
+                    <input type="email" name="emailAddress" value={formData.emailAddress} onChange={handleChange} className={inputClass} />
+                </div>
+                <div>
+                    <label className={labelClass}>Address</label>
+                    <input type="text" name="address" value={formData.address} onChange={handleChange} className={inputClass} />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+                <div>
+                    <label className={labelClass}>Latitude *</label>
+                    <input type="number" name="latitude" value={formData.latitude} onChange={handleChange} className={inputClass} />
+                </div>
+                <div>
+                    <label className={labelClass}>Longitude *</label>
+                    <input type="number" name="longitude" value={formData.longitude} onChange={handleChange} className={inputClass} />
+                </div>
+                <div>
+                    <label className={`${labelClass} invisible`}>Use Location</label>
                     <button
                         type="button"
-                        onClick={addSocialLink}
-                        className="text-blue-600 hover:underline text-sm mt-2"
+                        className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-0 h-8 rounded"
+                        onClick={handleUseLocation}
                     >
-                        + Add another social link
+                        Use My Location
                     </button>
                 </div>
             </div>
 
-            {/* Business Type */}
-            <div>
-                <label className="block font-medium text-black">
-                    Business Type <span className="text-red-600">*</span>
-                </label>
-                <select
-                    name="businessType"
-                    value={formData.businessType}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 rounded border border-gray-300 text-black"
-                >
-                    <option value="">Select business type</option>
-                    {businessTypes.map((type, index) => (
-                        <option key={index} value={type}>
-                            {index + 1}. {type}
-                        </option>
-                    ))}
-                </select>
+            <div className="grid grid-cols-2 gap-2">
+                <div>
+                    <label className={labelClass}>Subscription</label>
+                    <select name="subscriptionType" value={formData.subscriptionType} onChange={handleChange} className={inputClass}>
+                        <option value="">Select</option>
+                        {subscriptionTypes.map((type, idx) => (
+                            <option key={idx} value={type}>{type}</option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label className={labelClass}>GST No</label>
+                    <input type="text" name="gstNumber" value={formData.gstNumber} onChange={handleChange} className={inputClass} />
+                </div>
             </div>
 
-            {/* Submit Buttons */}
-            <div className="pt-4 flex space-x-4">
-                <button
-                    type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
-                    disabled={isSubmitting}
-                >
-                    {isSubmitting ? 'Saving...' : 'Save Business'}
+            <div className="grid grid-cols-2 gap-2">
+                <div>
+                    <label className={labelClass}>Website</label>
+                    <input type="url" name="websiteLink" value={formData.websiteLink} onChange={handleChange} className={inputClass} />
+                </div>
+                <div>
+                    <label className={labelClass}>Business Type *</label>
+                    <select name="businessType" value={formData.businessType} onChange={handleChange} className={inputClass}>
+                        <option value="">Select</option>
+                        {businessTypes.map((type, index) => (
+                            <option key={index} value={type}>{type}</option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label className={labelClass}>Social Links</label>
+                    {socialLinkElements}
+                    <button type="button" onClick={addSocialLink} className="text-blue-500 hover:underline text-xs">
+                        + Add
+                    </button>
+                </div>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+                <button type="submit" disabled={isSubmitting || !isFormValid} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs">
+                    {isSubmitting ? 'Saving...' : 'Save'}
                 </button>
                 {isEditing && (
-                    <button
-                        type="button"
-                        onClick={() => setIsEditing(false)}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded"
-                    >
-                        Cancel Editing
+                    <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs">
+                        Cancel
                     </button>
                 )}
             </div>
