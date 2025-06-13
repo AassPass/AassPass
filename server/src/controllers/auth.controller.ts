@@ -2,14 +2,16 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { prisma } from "../utils/prisma";
 import jwt from "jsonwebtoken";
-import { Role, UserRole, VerificationStatus } from "@prisma/client";
+import { Role, UserRole } from "@prisma/client";
 import { randomUUID } from 'crypto';
 import { config } from "dotenv";
+import { sendResetPasswordEmail, sendVerificationEmail } from "../services/email.service";
+import otpStorage from "../utils/otpStorage";
 
 
 config();
 
-const jwtSecret = process.env.JWT_SECRET;
+const jwtSecret = process.env.JWT_SECRET as string;
 
 const AdminRegister = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -75,8 +77,8 @@ const AdminLogin = async (req: Request, res: Response): Promise<any> => {
         }
 
         const jwtToken = jwt.sign(
-            { id: admin.id, role: admin.role },
-            jwtSecret as string,
+            { admdinId: admin.adminId, id: admin.id, role: admin.role },
+            jwtSecret,
             { expiresIn: "1d" }
         );
 
@@ -88,44 +90,6 @@ const AdminLogin = async (req: Request, res: Response): Promise<any> => {
     } catch (err) {
         console.error("Error during Super Admin login:", err);
         res.status(500).json({ message: "Internal server error" });
-    }
-}
-
-
-const VerifyEmail = async (req: Request, res: Response): Promise<any> => {
-    try {
-        const { token } = req.body;
-    
-        if (!token) {
-            return res.status(400).json({ message: "Verification token is required." });
-        }
-    
-        const decoded = jwt.verify(token, jwtSecret as string) as { id: string, email: string };
-    
-        if(!decoded){
-            return res.status(400).json({ message: "Invalid verification token."});
-        }
-
-        const user = await prisma.user.findUnique({
-            where: {email: decoded.email},
-        });
-
-        if(user?.emailVerified) {
-            return res.status(400).json({ message: "Email is already verified."});
-        }
-
-        const updatedUser = await prisma.user.update({
-            where: {email: decoded.email},
-            data: {
-                emailVerified: true,
-            }
-        });
-
-        res.status(200).json({ message: "Email verified successfully"});
-
-    } catch (error) {
-        console.error("Error during email verification:", error);
-        return res.status(500).json({ message: "Internal server error"});
     }
 }
 
@@ -154,6 +118,14 @@ const UserRegister = async (req: Request, res: Response): Promise<any> => {
             }
         });
 
+        const verificationToken = jwt.sign(
+            { id: user.id, email },
+            jwtSecret,
+            { expiresIn: "1d" }
+        );
+
+        await sendVerificationEmail(email, verificationToken);
+
         res.status(201).json({ message: "User registered successfully", userId: user.id});
 
     } catch (error) {
@@ -176,6 +148,10 @@ const UserLogin = async (req: Request, res: Response): Promise<any> => {
 
         if(!user){
             return res.status(404).json({ message: "User not found" });
+        }
+
+        if(!(user.emailVerified)){
+            return res.status(409).json({ message: "Verify your email first. Check your Inbox or spam folder."});
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -202,5 +178,99 @@ const UserLogin = async (req: Request, res: Response): Promise<any> => {
     }
 }
 
+const VerifyEmail = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { token } = req.body;
+    
+        if (!token) {
+            return res.status(400).json({ message: "Verification token is required." });
+        }
+    
+        const decoded = jwt.verify(token, jwtSecret) as { id: string, email: string };
+    
+        if(!decoded){
+            return res.status(400).json({ message: "Invalid verification token."});
+        }
+
+        const user = await prisma.user.findUnique({
+            where: {id: decoded.id},
+        });
+
+        if(!user){
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if(user.emailVerified) {
+            return res.status(400).json({ message: "Email is already verified."});
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: {email: decoded.email},
+            data: {
+                emailVerified: true,
+            }
+        });
+
+        res.status(200).json({ message: "Email verified successfully"});
+
+    } catch (error) {
+        console.error("Error during email verification:", error);
+        return res.status(500).json({ message: "Internal server error"});
+    }
+}
+
+const handleSendOTP = async (req: Request, res: Response): Promise<any> => {
+    try{
+        const {email} = req.body;
+        if (!email) return res.status(400).json({ message: "Email is required" });
+
+        const user = await prisma.user.findUnique({
+            where: {email}
+        });
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        otpStorage.set(email, { otp, expiresAt: Date.now() + 10 * 60 * 1000});
+
+        await sendResetPasswordEmail(email, otp);
+        res.status(200).json({ message: "OTP sent to your email" });
+    } catch(error) {
+        console.error("Error sending OTP:", error);
+        res.status(500).json({ message: "Server error", error });
+    }
+}
+
+const handleRestPassword = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        if (!email || !otp || !newPassword)
+            return res.status(400).json({ message: "All fields are required" });
+
+        const storedOtp = otpStorage.get(email);
+        if (!storedOtp || storedOtp.otp !== otp || storedOtp.expiresAt < Date.now()) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { email }
+        });
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const password = await bcrypt.hash(newPassword, 10);
+
+        await prisma.user.update({
+            where: { email },
+            data: { password }
+        })
+
+        otpStorage.delete(email); // Remove OTP after successful password reset
+        res.status(200).json({ message: "Password reset successfully" });
+    } catch (error) {
+        console.error("Error resetting password:", error);
+        res.status(500).json({ message: "Server error", error });
+    }
+}
+
 // export { AdminRegister, AdminLogin, BusinessRegister, BusinessLogin, VerifyEmail };
-export { AdminRegister, AdminLogin, VerifyEmail, UserRegister, UserLogin };
+export { AdminRegister, AdminLogin, VerifyEmail, UserRegister, UserLogin, handleSendOTP, handleRestPassword };

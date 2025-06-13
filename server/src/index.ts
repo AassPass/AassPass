@@ -28,6 +28,7 @@ interface UserPayload {
 interface AdminPayload {
     id: string;
     role: string;
+    adminId: string;
 }
 
 declare module "express" {

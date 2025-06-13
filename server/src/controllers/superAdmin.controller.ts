@@ -5,6 +5,7 @@ import { prisma } from "../utils/prisma";
 import { VerificationStatus, SubscriptionType, BusinessType } from '@prisma/client';
 import { generatePassword } from "../utils/lib";
 import { randomUUID } from 'crypto';
+import { sendIDPasswordEmail } from "../services/email.service";
 
 
 
@@ -50,6 +51,8 @@ const CreateAdmin = async (req: Request, res: Response): Promise<any> => {
         updatedAt: true,
       }
     });
+
+    await sendIDPasswordEmail(email, password);
 
     return res.status(201).json({
       message: 'Admin created successfully',
@@ -138,6 +141,13 @@ const GetBusinesses = async (req: Request, res: Response): Promise<any> => {
         take,
         include: {
           socialLinks: true,
+          registeredBy: {
+            select: {
+              adminId: true,
+              name: true,
+              email: true
+            }
+          }
         },
       }),
       prisma.business.count({

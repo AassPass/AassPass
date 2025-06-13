@@ -3,6 +3,7 @@ import { prisma } from "../utils/prisma";
 import { VerificationStatus, SubscriptionType, BusinessType } from '@prisma/client';
 import { businessTypeMap, generatePassword } from "../utils/lib";
 import bcrypt from "bcrypt";
+import { sendIDPasswordEmail } from "../services/email.service";
 
 
 
@@ -21,6 +22,8 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
       latitude,
       longitude
     } = req.body;
+
+    const adminId = req.admin?.id;
 
     // console.log('RegisterBusiness Request Body:', req.body);
     // Validate required fields
@@ -69,13 +72,14 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
             link: link.link
           })) || [],
         },
+        createdById: adminId,
       },
       include: {
         socialLinks: true
       }
     });
 
-    
+    await sendIDPasswordEmail(emailAddress, password);
 
     return res.status(201).json({ message: 'Business registered successfully', business: newBusiness, generatedPassword: password });
   } catch (error: any) {
@@ -83,7 +87,6 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
-
 
 const UpdateBusiness = async (req: Request, res: Response): Promise<any> => {
   try {

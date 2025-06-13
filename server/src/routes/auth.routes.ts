@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { AdminLogin, AdminRegister, UserLogin, UserRegister, VerifyEmail } from "../controllers/auth.controller";
+import { AdminLogin, AdminRegister, handleRestPassword, handleSendOTP, UserLogin, UserRegister, VerifyEmail } from "../controllers/auth.controller";
 
 const AuthRouter = Router();
 
@@ -9,11 +9,12 @@ AuthRouter.post("/verify-email", VerifyEmail);
 AuthRouter.post("/admin/register", AdminRegister);
 AuthRouter.post("/admin/login", AdminLogin);
 
-// business auth routes
-// AuthRouter.post("/business/register", BusinessRegister);
-// AuthRouter.post("/business/login", BusinessLogin);
 
+// user auth routes
 AuthRouter.post("/user/register", UserRegister);
 AuthRouter.post("/user/login", UserLogin);
+AuthRouter.post("/user/verify-email", VerifyEmail);
+AuthRouter.post("/user/send-otp", handleSendOTP);
+AuthRouter.post("/user/reset-password", handleRestPassword);
 
 export default AuthRouter;
