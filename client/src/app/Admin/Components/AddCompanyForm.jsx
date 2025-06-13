@@ -56,20 +56,20 @@ const initialFormData = {
 };
 
 const SocialLinkInput = memo(({ index, link, onChange, onRemove, canRemove }) => (
-    <div className="flex flex-wrap space-x-1 mb-1 items-center">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1 mb-1">
         <input
             type="text"
             placeholder="Platform"
             value={link.platform}
             onChange={e => onChange(index, 'platform', e.target.value)}
-            className={`${inputClass} w-[90px]`}
+            className="w-full sm:w-[120px] px-2 py-1 text-xs rounded border border-gray-300 text-black"
         />
         <input
             type="url"
             placeholder="Link"
             value={link.link}
             onChange={e => onChange(index, 'link', e.target.value)}
-            className={`${inputClass} flex-grow min-w-[150px]`}
+            className="w-full flex-grow min-w-[180px] px-2 py-1 text-xs rounded border border-gray-300 text-black"
         />
         <button
             type="button"
@@ -81,6 +81,7 @@ const SocialLinkInput = memo(({ index, link, onChange, onRemove, canRemove }) =>
         </button>
     </div>
 ));
+
 
 export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing, companies, setCompanies }) {
     const { businessId: contextBusinessId } = useRole();
@@ -96,7 +97,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
             if (isEditing && editingCompany) {
                 setFormData({
                     ...editingCompany,
-                    socialLinks: editingCompany.socialMediaLinks || [{ platform: '', link: '' }],
+                    socialLinks: editingCompany.socialLinks || [{ platform: '', link: '' }],
                 });
             } else {
                 setFormData({ ...initialFormData });
@@ -153,7 +154,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
                 }));
             },
             () => {
-                console.error('Location access denied');
+                console.error('Location permission denied');
             }
         );
     }, []);

@@ -1,43 +1,51 @@
-"use client";
+'use client';
 
-import React from "react";
+import React from 'react';
 
 const Banner = () => {
-    const content = [
-        "Shop A - 20% OFF!",
-        "Shop B - New Arrivals!",
-        "Shop C - Buy 1 Get 1 Free!",
-        "Visit us now!",
-    ];
+  const content = [
+    'Shop A - 20% OFF!',
+    'Shop B - New Arrivals!',
+    'Shop C - Buy 1 Get 1 Free!',
+    'Visit us now!',
+  ];
 
-    return (
-        <div className="overflow-hidden whitespace-nowrap bg-yellow-100 py-0">
-            <div className="banner-scroll inline-block">
-                {[...content, ...content, ...content].map((item, idx) => (
-                    <span key={idx} className="inline-block px-4 text-base text-gray-800 font-medium">
-                        {item}
-                    </span>
-                ))}
-            </div>
+  const repeated = [...content, ...content]; // for seamless loop
 
-            <style jsx>{`
-        .banner-scroll {
-          display: inline-block;
-          white-space: nowrap;
-          animation: scroll-banner 25s linear infinite;
-        }
+  return (
+    <div
+      className="relative overflow-hidden bg-yellow-100 py-2"
+      role="marquee"
+      aria-label="Latest offers and shop deals"
+    >
+      <div className="banner-scroll inline-flex">
+        {repeated.map((text, idx) => (
+          <span
+            key={idx}
+            className="px-4 text-sm md:text-base text-gray-800 font-medium whitespace-nowrap"
+          >
+            {text}
+          </span>
+        ))}
+      </div>
 
-        @keyframes scroll-banner {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
-        }
-      `}</style>
-        </div>
-    );
+      <style jsx>{`
+                .banner-scroll {
+                    animation: scroll-banner 30s linear infinite;
+                    min-width: max-content;
+                }
+
+                @keyframes scroll-banner {
+                    0% {
+                        transform: translateX(100%);
+                    }
+                    100% {
+                        transform: translateX(-100%);
+                    }
+                }
+            `}</style>
+    </div>
+  );
 };
 
 export default Banner;

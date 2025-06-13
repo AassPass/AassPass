@@ -17,6 +17,49 @@ export default function CompanyManagement() {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(5);
 
+    const dummyCompanies = [
+        {
+            id: '1',
+            companyName: 'Alpha Inc',
+            ownerName: 'John Doe',
+            phoneNumber: '9876543210',
+            email: 'alpha@example.com',
+            address: '123 Main St',
+            location: 'Mumbai',
+            gstNumber: '27ABCDE1234F1Z5',
+            website: 'https://alphainc.com',
+            socialLinks: [
+                { platform: 'instagram', link: 'https://instagram.com/alpha' },
+                { platform: 'facebook', link: 'https://facebook.com/alpha' },
+            ],
+            createdAt: new Date().toISOString(),
+            subscription: 'premium',
+            businessType: 'Retail Store',
+            kycVerified: true,
+            status: 'approved',
+        },
+        {
+            id: '2',
+            companyName: 'Beta Foods',
+            ownerName: 'Jane Smith',
+            phoneNumber: '9876501234',
+            email: 'beta@example.com',
+            address: '456 Hill Rd',
+            location: 'Delhi',
+            gstNumber: '07ABCDE5678F2Z6',
+            website: 'https://betafoods.com',
+            socialLinks: [
+                { platform: 'twitter', link: 'https://twitter.com/beta' },
+            ],
+            createdAt: new Date().toISOString(),
+            subscription: 'basic',
+            businessType: 'Restaurant / Café',
+            kycVerified: false,
+            status: 'pending',
+        },
+    ];
+
+
     const fetchBusinesses = async () => {
         const token = localStorage.getItem('token');
 

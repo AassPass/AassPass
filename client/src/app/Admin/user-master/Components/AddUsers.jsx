@@ -34,7 +34,7 @@ const InputField = ({ id, name, type, label, value, onChange, onKeyDown, error, 
 );
 
 function AddUsers({ edit, setEdit, selectedUser, setSelectedUser, setUsers }) {
-   
+
     const [formData, setFormData] = useState({
         name: '',
         mobile: '',
@@ -155,7 +155,7 @@ function AddUsers({ edit, setEdit, selectedUser, setSelectedUser, setUsers }) {
 
     return (
         <form onSubmit={handleSubmit} noValidate>
-            <fieldset className="bg-white md:p-3 rounded shadow space-y-3 w-full max-w-2xl mx-auto text-xs">
+            <fieldset className="bg-white p-3 rounded shadow space-y-3 w-full max-w-2xl mx-auto text-xs">
                 <h2 className="text-sm font-semibold text-black">{edit ? 'Edit Admin' : 'Add Admin'}</h2>
 
                 <InputField

@@ -1,16 +1,20 @@
 'use client'
-import { BACKEND_AUTH_URL, BACKEND_URL } from "@/app/Utils/backendUrl";
-import { useRole } from "@/Context/RoleContext";
 
+import { BACKEND_AUTH_URL } from "@/app/Utils/backendUrl";
+import { useRole } from "@/Context/RoleContext";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 
 export default function Page() {
     const router = useRouter();
     const { setRole } = useRole();
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setLoading(true);
+
         const adminId = e.target.adminId.value;
         const password = e.target.password.value;
 
@@ -20,7 +24,7 @@ export default function Page() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include', // for sending/receiving cookies
+                credentials: 'include',
                 body: JSON.stringify({ adminId, password }),
             });
 
@@ -30,14 +34,14 @@ export default function Page() {
             }
 
             const data = await res.json();
-
             setRole(data.role);
-            localStorage.setItem('token', data.token); // Optional, remove if using only cookies
+            localStorage.setItem('token', data.token);
 
             router.push('/Admin');
         } catch (err) {
-            console.error('Login error:', err.message);
-            // Optionally display an error message to the user
+            alert(err.message || "Login failed");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -77,9 +81,33 @@ export default function Page() {
 
                 <button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition-colors"
+                    disabled={loading}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition-colors flex items-center justify-center"
                 >
-                    Login
+                    {loading ? (
+                        <svg
+                            className="animate-spin h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                            ></circle>
+                            <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v8z"
+                            ></path>
+                        </svg>
+                    ) : (
+                        'Login'
+                    )}
                 </button>
             </form>
         </div>
