@@ -55,7 +55,7 @@ export default function UserMaster() {
 
 
     return (
-        <div className="flex w-full min-h-screen flex-col lg:flex-row gap-4">
+        <div className="flex flex-col md:flex-row justify-between gap-3 md:px-4 md:py-6 w-full max-w-[1200px] mx-auto">
             {/* Add User Form (Left Side) */}
             <div className="w-full lg:w-1/3 bg-white">
                 <AddUsers

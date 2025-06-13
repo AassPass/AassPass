@@ -5,7 +5,8 @@ import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 const RoleContext = createContext();
 
 export const RoleProvider = ({ children }) => {
-    const [role, setRole] = useState(null);
+    const [role, setRole] = useState("SUPER_ADMIN");
+    const [adminId, setAdminId] = useState(null);
     const [businessId, setBusinessId] = useState(null);
     // console.log(role);
 
@@ -22,12 +23,13 @@ export const RoleProvider = ({ children }) => {
     useEffect(() => {
         if (role) localStorage.setItem('role', role);
         if (businessId) localStorage.setItem('businessId', businessId);
-    }, [role, businessId]);
+        if (adminId) localStorage.setItem('adminId', adminId);
+    }, [role, businessId, adminId]);
 
     // Memoize the context value to avoid unnecessary re-renders
     const value = useMemo(
-        () => ({ role, setRole, businessId, setBusinessId }),
-        [role, businessId]
+        () => ({ role, setRole, businessId, setBusinessId, adminId, setAdminId }),
+        [role, businessId, adminId]
     );
 
     return (

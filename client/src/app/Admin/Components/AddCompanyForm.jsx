@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo, useTransition, memo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useTransition, memo, useRef } from 'react';
 
 import { BACKEND_ADMIN_URL } from '@/app/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
-import { useRef } from 'react';
 
 export function useRafDebounce(callback) {
     const frame = useRef(null);
@@ -16,6 +15,7 @@ export function useRafDebounce(callback) {
         });
     };
 }
+
 const businessTypeMap = {
     'Retail Store': 'RETAIL_STORE',
     'Restaurant / Café': 'RESTAURANT_CAFE',
@@ -56,26 +56,26 @@ const initialFormData = {
 };
 
 const SocialLinkInput = memo(({ index, link, onChange, onRemove, canRemove }) => (
-    <div className="flex space-x-1 mb-1">
+    <div className="flex flex-wrap space-x-1 mb-1 items-center">
         <input
             type="text"
             placeholder="Platform"
             value={link.platform}
             onChange={e => onChange(index, 'platform', e.target.value)}
-            className={`${inputClass} w-[80px]`}
+            className={`${inputClass} w-[90px]`}
         />
         <input
             type="url"
             placeholder="Link"
             value={link.link}
             onChange={e => onChange(index, 'link', e.target.value)}
-            className={`${inputClass} w-[80px]`}
+            className={`${inputClass} flex-grow min-w-[150px]`}
         />
         <button
             type="button"
             onClick={() => onRemove(index)}
             disabled={!canRemove}
-            className="text-red-600 font-bold px-1 text-xs"
+            className="text-red-600 font-bold px-2 text-xs disabled:opacity-40"
         >
             ×
         </button>
@@ -127,6 +127,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
     const handleSocialLinkChange = useCallback((index, field, value) => {
         debouncedSocialChange(index, field, value);
     }, [debouncedSocialChange]);
+
     const addSocialLink = useCallback(() => {
         setFormData(prev => ({
             ...prev,
@@ -144,17 +145,14 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
 
     const handleUseLocation = useCallback(() => {
         navigator.geolocation?.getCurrentPosition(
-            async pos => {
-
+            pos => {
                 setFormData(prev => ({
                     ...prev,
                     latitude: pos.coords.latitude,
                     longitude: pos.coords.longitude,
                 }));
-
             },
-            async () => {
-
+            () => {
                 console.error('Location access denied');
             }
         );
@@ -237,9 +235,11 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
         }
     };
 
-
     return (
-        <form onSubmit={handleSubmit} className="bg-white p-3 rounded shadow space-y-3 max-w-[1000px] w-full text-xs">
+        <form
+            onSubmit={handleSubmit}
+            className="bg-white p-3 rounded shadow space-y-3 w-full max-w-2xl mx-auto text-xs"
+        >
             <h2 className="text-sm font-semibold text-black">{isEditing ? 'Edit Business' : 'Add Business'}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -290,7 +290,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
                     <label className={`${labelClass} invisible`}>Use Location</label>
                     <button
                         type="button"
-                        className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-0 h-8 rounded"
+                        className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-0 h-8 rounded w-full"
                         onClick={handleUseLocation}
                     >
                         Use My Location
@@ -298,7 +298,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
                     <label className={labelClass}>Subscription</label>
                     <select name="subscriptionType" value={formData.subscriptionType} onChange={handleChange} className={inputClass}>
@@ -314,12 +314,14 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
                     <label className={labelClass}>Website</label>
                     <input type="url" name="websiteLink" value={formData.websiteLink} onChange={handleChange} className={inputClass} />
                 </div>
-                <div>
+
+                {/* Social links span full width on desktop */}
+                <div className="md:col-span-1">
                     <label className={labelClass}>Business Type *</label>
                     <select name="businessType" value={formData.businessType} onChange={handleChange} className={inputClass}>
                         <option value="">Select</option>
@@ -328,21 +330,31 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
                         ))}
                     </select>
                 </div>
-                <div>
-                    <label className={labelClass}>Social Links</label>
-                    {socialLinkElements}
-                    <button type="button" onClick={addSocialLink} className="text-blue-500 hover:underline text-xs">
-                        + Add
-                    </button>
-                </div>
             </div>
 
-            <div className="flex gap-2 pt-2">
-                <button type="submit" disabled={isSubmitting || !isFormValid} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs">
+            {/* Social Links span full width */}
+            <div className="md:col-span-2">
+                <label className={labelClass}>Social Links</label>
+                {socialLinkElements}
+                <button type="button" onClick={addSocialLink} className="text-blue-500 hover:underline text-xs mt-1">
+                    + Add
+                </button>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-2 pt-2">
+                <button
+                    type="submit"
+                    disabled={isSubmitting || !isFormValid}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs w-full md:w-auto"
+                >
                     {isSubmitting ? 'Saving...' : 'Save'}
                 </button>
                 {isEditing && (
-                    <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs">
+                    <button
+                        type="button"
+                        onClick={() => setIsEditing(false)}
+                        className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs w-full md:w-auto"
+                    >
                         Cancel
                     </button>
                 )}

@@ -54,8 +54,7 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
     );
 
     return (
-        <div className="max-w-6xl mx-auto bg-white p-4 mt-4 rounded-lg shadow text-black">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">User List</h2>
+        <div className="max-w-6xl mx-auto bg-white  md:p-4 rounded-lg shadow text-black">
 
             <div className="overflow-x-auto">
                 <table className="min-w-full table-auto border-collapse text-xs">

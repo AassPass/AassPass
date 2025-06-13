@@ -5,7 +5,6 @@ import AddCompanyForm from '../Components/AddCompanyForm';
 import CompanyList from './Components/CompanyList';
 import CompanyFilter from './Components/CompanyFilter';
 
-
 import { BACKEND_URL } from '@/app/Utils/backendUrl';
 
 export default function CompanyManagement() {
@@ -48,15 +47,12 @@ export default function CompanyManagement() {
 
     useEffect(() => {
         fetchBusinesses();
-    }, []); // Only once on load
+    }, []);
 
     return (
-        <div className="flex w-full max-w-[1200px] overflow-hidden">
-
-
-
-
-            <div className="flex-1 w-1/2">
+        <div className="flex flex-col md:flex-row justify-between gap-6 px-4 py-6 w-full max-w-[1200px] mx-auto">
+            {/* Add Company Form */}
+            <div className="w-full md:w-1/2">
                 <AddCompanyForm
                     companies={companies}
                     setCompanies={setCompanies}
@@ -66,7 +62,9 @@ export default function CompanyManagement() {
                     setEditingCompany={setEditingCompany}
                 />
             </div>
-            <div className='flex-1 w-1/2' >
+
+            {/* Company List */}
+            <div className="w-full md:w-1/2">
                 <CompanyList
                     companies={companies}
                     setIsEditing={setIsEditing}

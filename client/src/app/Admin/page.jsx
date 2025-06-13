@@ -26,14 +26,14 @@ export default function page() {
     const ActiveComponent = componentMap[activeComponent] || CompanyManagement;
 
     return (
-        <div className="bg-white font-sans antialiased min-h-screen flex flex-col">
+        <div className="bg-white font-sans flex flex-col">
             {/* Sidebar Navigation */}
             <Sidebar
                 activeComponent={activeComponent}
                 setActiveComponent={setActiveComponent}
             />
             {/* Dynamic Main Content */}
-            <main className="flex-grow p-4">
+            <main className="p-4">
                 <ActiveComponent />
             </main>
         </div>
