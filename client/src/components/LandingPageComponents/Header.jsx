@@ -17,8 +17,8 @@ const Header = () => {
                     </ul>
                 </nav>
             </div>
-            <div className='md:gap-2 flex' >
-                <Button text="Sign up" color="#2ecc71" />
+            <div className='md:gap-2 flex' >            
+                <Button text="Sign up" color="#2ecc71"/>
                 <Button text="Log in" color="#265049cc7z" />
             </div>
         </div>

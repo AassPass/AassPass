@@ -88,7 +88,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isPending, startTransition] = useTransition();
 
-    const subscriptionTypes = ['Free', 'Basic', 'Standard', 'Premium', 'Enterprise'];
+    const subscriptionTypes = ['STANDARD', 'PREMIUM'];
     const businessTypes = Object.keys(businessTypeMap);
 
     useEffect(() => {

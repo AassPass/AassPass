@@ -3,7 +3,7 @@ import { prisma } from "../utils/prisma";
 import { VerificationStatus, SubscriptionType, BusinessType } from '@prisma/client';
 import { businessTypeMap, generatePassword } from "../utils/lib";
 import bcrypt from "bcrypt";
-import { sendIDPasswordEmail } from "../services/email.service";
+import { sendIDPasswordEmail, sendVerificationEmail } from "../services/email.service";
 
 
 
@@ -39,15 +39,13 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
         name: ownerName,
         email: emailAddress,
         mobile: phoneNumber,
-        password: hashedPassword
+        password: hashedPassword,
       }
     });
     
 
     // Generate a unique businessId
     const businessId = `BUS-${Date.now()}`;
-    const prismaBusinessType = businessTypeMap[businessType as keyof typeof businessTypeMap] || undefined;
-
 
     // Create the business
     const newBusiness = await prisma.business.create({
@@ -61,7 +59,7 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
         address,
         gstNumber,
         websiteLink,
-        businessType: prismaBusinessType as BusinessType,
+        businessType,
         verificationStatus: VerificationStatus.PENDING,
         subscriptionType: SubscriptionType.STANDARD,
         latitude: parseFloat(latitude),
@@ -80,6 +78,7 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
     });
 
     await sendIDPasswordEmail(emailAddress, password);
+    // await sendVerificationEmail(email);
 
     return res.status(201).json({ message: 'Business registered successfully', business: newBusiness, generatedPassword: password });
   } catch (error: any) {

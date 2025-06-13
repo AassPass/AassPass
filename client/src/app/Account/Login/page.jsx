@@ -34,7 +34,7 @@ export default function Page() {
             setRole(data.role);
             localStorage.setItem('token', data.token); // Optional, remove if using only cookies
 
-            router.push('/Admin/dashboard');
+            router.push('/Admin');
         } catch (err) {
             console.error('Login error:', err.message);
             // Optionally display an error message to the user
