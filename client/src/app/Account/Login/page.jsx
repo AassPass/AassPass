@@ -42,18 +42,17 @@ export default function Page() {
     };
 
     return (
-        <>
-
+        <div className="flex h-screen justify-center items-center">
             <form
                 onSubmit={handleLogin}
-                className="max-w-md mx-auto mt-20 p-8 bg-white rounded shadow-md text-black"
+                className="p-8 bg-white rounded shadow-md text-black"
             >
                 <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
-                    Login to Your Account
+                    Admin Login
                 </h2>
 
                 <label htmlFor="adminId" className="block mb-2 font-medium text-gray-700">
-                    adminId
+                    Admin ID
                 </label>
                 <input
                     id="adminId"
@@ -61,7 +60,7 @@ export default function Page() {
                     type="text"
                     required
                     className="w-full px-4 py-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="you@example.com"
+                    placeholder="ADM-000AAA"
                 />
 
                 <label htmlFor="password" className="block mb-2 font-medium text-gray-700">
@@ -83,6 +82,6 @@ export default function Page() {
                     Login
                 </button>
             </form>
-        </>
+        </div>
     );
 }

@@ -50,7 +50,8 @@ function VerifyEmailPage() { // Renamed for clarity, but 'page' is fine too
     }, [token, router]); // Add router to dependency array as it's used inside
 
     return (
-        <div style={{ textAlign: "center", marginTop: "50px" }}>
+        <div className="h-screen flex flex-col gap-6 justify-center items-center">
+            <p className="font-bold text-3xl">AasPass</p>
             <h2>{message}</h2>
         </div>
     );

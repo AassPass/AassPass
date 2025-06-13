@@ -4,9 +4,9 @@ import { prisma } from "../utils/prisma";
 import jwt from "jsonwebtoken";
 import { Role, UserRole } from "@prisma/client";
 import { randomUUID } from 'crypto';
-import { config } from "dotenv";
 import { sendResetPasswordEmail, sendVerificationEmail } from "../services/email.service";
 import otpStorage from "../utils/otpStorage";
+import { config } from "dotenv";
 
 
 config();

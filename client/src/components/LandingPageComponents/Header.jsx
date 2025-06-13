@@ -1,5 +1,6 @@
 import React from 'react'
 import { Button } from './Button'
+import Link from 'next/link'
 
 const Header = () => {
     return (
@@ -17,9 +18,10 @@ const Header = () => {
                     </ul>
                 </nav>
             </div>
-            <div className='md:gap-2 flex' >            
-                <Button text="Sign up" color="#2ecc71"/>
-                <Button text="Log in" color="#265049cc7z" />
+            <div className='md:gap-2 flex' >          
+            <Link href={"/Account/user-login"} passHref>
+                <Button text="Log in" color="#24b56d" />
+            </Link>
             </div>
         </div>
     )

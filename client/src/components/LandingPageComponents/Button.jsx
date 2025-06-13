@@ -7,7 +7,7 @@ export const Button = ({ text = "Click Me", color = "#3498db", textColor = "#fff
             className="
                 px-4 py-2              /* base padding */
                 sm:px-5 sm:py-2.5      /* small screens */
-                md:px-6 md:py-3        /* medium and up */
+                md:px-5 md:py-2       /* medium and up */
                 text-xs sm:text-sm md:text-base
                 rounded-full 
                 font-semibold 

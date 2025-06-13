@@ -12,6 +12,35 @@ config();
 const jwtSecret = process.env.JWT_SECRET;
 
 
+export const GetUserInfo = async (req: Request, res: Response): Promise<any> => {
+  try{
+    const id = req.user?.id;
+    // console.log(id);
+
+    const user = await prisma.user.findUnique({
+      where: {id},
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        mobile: true,
+        emailVerified: true,
+        role: true
+      }
+    });
+
+    if(!user){
+      return res.status(404).json({message: "No user found"});
+    }
+
+    res.status(200).json({message: "User retrieved successfully", user});
+
+  } catch(error) {
+    console.error("Error fetching user info:", error);
+    res.status(500).json({message: "Internal Server Error"});
+  }
+}
+
 
 export const GetBusinesses = async (req: Request, res: Response): Promise<any> => {
   try {

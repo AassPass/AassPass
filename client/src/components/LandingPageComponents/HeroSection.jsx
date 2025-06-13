@@ -3,7 +3,7 @@ import OfferBanner from './OfferBanner';
 
 const HeroSection = () => {
     return (
-        <div className='flex overflow-hidden flex-col gap-8 -mt-10 justify-center items-center text-center h-screen w-full p-4'>
+        <div className='flex overflow-hidden flex-col gap-8 justify-center items-center text-center h-screen w-full'>
             <h2 className='text-3xl lg:text-5xl md:text-2xl'>AassPass - Discover What's <br /> Happening Around You!</h2>
             <p className='text-md md:text-lg lg:text-xl' >Find local offers,trending events,and explore your city like never before.</p>
             {/* Search Bar */}

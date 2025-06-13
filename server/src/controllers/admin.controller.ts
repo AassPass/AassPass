@@ -4,7 +4,13 @@ import { VerificationStatus, SubscriptionType, BusinessType } from '@prisma/clie
 import { businessTypeMap, generatePassword } from "../utils/lib";
 import bcrypt from "bcrypt";
 import { sendIDPasswordEmail, sendVerificationEmail } from "../services/email.service";
+import jwt from "jsonwebtoken";
+import { config } from "dotenv";
 
+
+config();
+
+const jwtSecret = process.env.JWT_SECRET as string;
 
 
 const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
@@ -30,10 +36,10 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
     if (!businessName || !ownerName || !phoneNumber || !emailAddress || !address || !gstNumber || !businessType) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
-
+    
     const password = generatePassword();
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    
     const owner = await prisma.user.create({
       data: {
         name: ownerName,
@@ -43,7 +49,14 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
       }
     });
     
-
+    const verificationToken = jwt.sign(
+        { id: owner.id, email: emailAddress },
+        jwtSecret,
+        { expiresIn: "1d" }
+    );
+    
+    await sendVerificationEmail(emailAddress, verificationToken);
+    
     // Generate a unique businessId
     const businessId = `BUS-${Date.now()}`;
 
@@ -78,7 +91,6 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
     });
 
     await sendIDPasswordEmail(emailAddress, password);
-    // await sendVerificationEmail(email);
 
     return res.status(201).json({ message: 'Business registered successfully', business: newBusiness, generatedPassword: password });
   } catch (error: any) {
