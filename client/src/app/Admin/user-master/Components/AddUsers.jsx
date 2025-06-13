@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
 import { BACKEND_URL } from '@/app/Utils/backendUrl';
+import { useRole } from '@/Context/RoleContext';
 
 const inputBaseClass =
     'w-full border px-2 py-1 rounded-sm focus:outline-none focus:ring-1 text-sm text-black';
@@ -33,6 +34,7 @@ const InputField = ({ id, name, type, label, value, onChange, onKeyDown, error, 
 );
 
 function AddUsers({ edit, setEdit, selectedUser, setSelectedUser, setUsers }) {
+   
     const [formData, setFormData] = useState({
         name: '',
         mobile: '',
@@ -153,8 +155,8 @@ function AddUsers({ edit, setEdit, selectedUser, setSelectedUser, setUsers }) {
 
     return (
         <form onSubmit={handleSubmit} noValidate>
-            <fieldset className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <legend className="sr-only">User Information</legend>
+            <fieldset className="bg-white md:p-3 rounded shadow space-y-3 w-full max-w-2xl mx-auto text-xs">
+                <h2 className="text-sm font-semibold text-black">{edit ? 'Edit Admin' : 'Add Admin'}</h2>
 
                 <InputField
                     id="name"
