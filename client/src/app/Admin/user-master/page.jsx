@@ -22,40 +22,40 @@ export default function UserMaster() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [users, setUsers] = useState([]);
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                console.error('No authentication token found.');
-                return;
-            }
+    // useEffect(() => {
+    //     const fetchUsers = async () => {
+    //         const token = localStorage.getItem('token');
+    //         if (!token) {
+    //             console.error('No authentication token found.');
+    //             return;
+    //         }
 
-            try {
-                const response = await fetch(`${BACKEND_URL}/admins`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+    //         try {
+    //             const response = await fetch(`${BACKEND_URL}/admins`, {
+    //                 method: 'GET',
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //             });
 
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+    //             if (!response.ok) {
+    //                 throw new Error('Network response was not ok');
+    //             }
 
-                const result = await response.json();
-                setUsers(result.data);
-            } catch (error) {
-                console.error('Failed to load users.', error);
-            }
-        };
+    //             const result = await response.json();
+    //             setUsers(result.data);
+    //         } catch (error) {
+    //             console.error('Failed to load users.', error);
+    //         }
+    //     };
 
-        fetchUsers();
-    }, []);
+    //     fetchUsers();
+    // }, []);
 
 
     return (
-        <div className="flex flex-col md:flex-row justify-between gap-3 md:px-4 md:py-6 w-full max-w-[1200px] mx-auto">
+        <div className="flex flex-col md:flex-row  gap-3 h-screen px-4 md:py-6 w-full max-w-[1200px] mx-auto">
             {/* Add User Form (Left Side) */}
             <div className="w-full lg:w-1/3 bg-white">
                 <AddUsers

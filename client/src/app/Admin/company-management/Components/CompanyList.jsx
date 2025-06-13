@@ -16,91 +16,6 @@ const DeferredLink = ({ children, ...props }) => {
     return mounted ? <a {...props}>{children}</a> : <span className="text-gray-400">...</span>;
 };
 
-const CompanyRow = React.memo(({
-    company,
-    role,
-    setEditingCompany,
-    setIsEditing,
-    handleDeleteCompany,
-    handleKycToggle,
-    loadingKycIds,
-    deletingId,
-    style,
-}) => {
-    const handleEdit = () => {
-        setEditingCompany(company);
-        setIsEditing(true);
-    };
-
-    const handleDelete = () => handleDeleteCompany(company.businessId);
-
-    return (
-        <div
-            style={style}
-            className="grid grid-cols-[repeat(18,_minmax(120px,_1fr))] border-t border-gray-200 text-xs"
-        >
-            <div className="py-1 px-2 truncate">{company.businessId}</div>
-            <div className="py-1 px-2 truncate">{company.businessName}</div>
-            <div className="py-1 px-2 truncate">{company.ownerName}</div>
-            <div className="py-1 px-2 truncate">{company.phoneNumber}</div>
-            <div className="py-1 px-2 truncate">{company.emailAddress}</div>
-            <div className="py-1 px-2 truncate">{company.address}</div>
-            <div className="py-1 px-2 truncate">{`${company.latitude}, ${company.longitude}`}</div>
-            <div className="py-1 px-2 truncate">{company.gstNumber}</div>
-            <div className="py-1 px-2 truncate">
-                {company.websiteLink ? (
-                    <DeferredLink href={company.websiteLink} target="_blank" className="text-blue-600 underline">Link</DeferredLink>
-                ) : '-'}
-            </div>
-            <div className="py-1 px-2 truncate">
-                {company.socialLinks?.length ? (
-                    company.socialLinks.map((s, i) => (
-                        <DeferredLink key={i} href={s.link} target="_blank" className="text-blue-600 underline mr-1">
-                            {s.platform}
-                        </DeferredLink>
-                    ))
-                ) : '-'}
-            </div>
-            <div className="py-1 px-2 truncate">{company.joinedDate}</div>
-            <div className="py-1 px-2 truncate">{company.subscriptionType}</div>
-            <div className="py-1 px-2 truncate">{company.businessType}</div>
-            <div className="py-1 px-2 truncate">{company.verificationStatus}</div>
-
-            {hasPermission(role, PERMISSIONS.VERIFY_KYC) && (
-                <div className="py-1 px-2">
-                    <input
-                        type="checkbox"
-                        checked={company.verificationStatus === 'VERIFIED'}
-                        onChange={() => handleKycToggle(company)}
-                        disabled={loadingKycIds.has(company.businessId)}
-                    />
-                </div>
-            )}
-            {hasPermission(role, PERMISSIONS.EDIT_BUSINESS) && (
-                <div className="py-1 px-2">
-                    <button
-                        onClick={handleEdit}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded text-xs"
-                    >
-                        Edit
-                    </button>
-                </div>
-            )}
-            {hasPermission(role, PERMISSIONS.DELETE_BUSINESS) && (
-                <div className="py-1 px-2">
-                    <button
-                        onClick={handleDelete}
-                        disabled={deletingId === company.businessId}
-                        className="bg-red-600 hover:bg-red-700 text-white px-2 py-0.5 rounded text-xs"
-                    >
-                        {deletingId === company.businessId ? '...' : 'Delete'}
-                    </button>
-                </div>
-            )}
-        </div>
-    );
-});
-
 const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing }) => {
     const [loadingKycIds, setLoadingKycIds] = useState(new Set());
     const [deletingId, setDeletingId] = useState(null);
@@ -179,65 +94,137 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
         }
     };
 
-    const Row = useCallback(({ index, style }) => (
-        <CompanyRow
-            company={companies[index]}
-            role={role}
-            setEditingCompany={setEditingCompany}
-            setIsEditing={setIsEditing}
-            handleDeleteCompany={handleDeleteCompany}
-            handleKycToggle={handleKycToggle}
-            loadingKycIds={loadingKycIds}
-            deletingId={deletingId}
-            style={style}
-        />
-    ), [companies, role, loadingKycIds, deletingId]);
+    const columnCount = 14 +
+        (hasPermission(role, PERMISSIONS.VERIFY_KYC) ? 1 : 0) +
+        (hasPermission(role, PERMISSIONS.EDIT_BUSINESS) ? 1 : 0) +
+        (hasPermission(role, PERMISSIONS.DELETE_BUSINESS) ? 1 : 0);
+
+    const Row = useCallback(({ index, style }) => {
+        const company = companies[index];
+        return (
+            <div
+                key={company.businessId}
+                style={style}
+                className="grid text-xs text-black border-b border-gray-100"
+                style={{
+                    ...style,
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${columnCount}, minmax(120px, 1fr))`,
+                }}
+            >
+                <div className="py-1 px-2 truncate">{company.businessId}</div>
+                <div className="py-1 px-2 truncate">{company.businessName}</div>
+                <div className="py-1 px-2 truncate">{company.ownerName}</div>
+                <div className="py-1 px-2 truncate">{company.phoneNumber}</div>
+                <div className="py-1 px-2 truncate">{company.emailAddress}</div>
+                <div className="py-1 px-2 truncate">{company.address}</div>
+                <div className="py-1 px-2 truncate">{`${company.latitude}, ${company.longitude}`}</div>
+                <div className="py-1 px-2 truncate">{company.gstNumber}</div>
+                <div className="py-1 px-2 truncate">
+                    {company.websiteLink ? (
+                        <DeferredLink href={company.websiteLink} target="_blank" className="text-blue-600 underline">Link</DeferredLink>
+                    ) : '-'}
+                </div>
+                <div className="py-1 px-2 truncate">
+                    {company.socialLinks?.length ? (
+                        company.socialLinks.map((s, i) => (
+                            <DeferredLink key={i} href={s.link} target="_blank" className="text-blue-600 underline mr-1">
+                                {s.platform}
+                            </DeferredLink>
+                        ))
+                    ) : '-'}
+                </div>
+                <div className="py-1 px-2 truncate">{company.joinedDate}</div>
+                <div className="py-1 px-2 truncate">{company.subscriptionType}</div>
+                <div className="py-1 px-2 truncate">{company.businessType}</div>
+                <div className="py-1 px-2 truncate">{company.verificationStatus}</div>
+
+                {hasPermission(role, PERMISSIONS.VERIFY_KYC) && (
+                    <div className="py-1 px-2">
+                        <input
+                            type="checkbox"
+                            checked={company.verificationStatus === 'VERIFIED'}
+                            onChange={() => handleKycToggle(company)}
+                            disabled={loadingKycIds.has(company.businessId)}
+                        />
+                    </div>
+                )}
+                {hasPermission(role, PERMISSIONS.EDIT_BUSINESS) && (
+                    <div className="py-1 px-2">
+                        <button
+                            onClick={() => {
+                                setEditingCompany(company);
+                                setIsEditing(true);
+                            }}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded text-xs"
+                        >
+                            Edit
+                        </button>
+                    </div>
+                )}
+                {hasPermission(role, PERMISSIONS.DELETE_BUSINESS) && (
+                    <div className="py-1 px-2">
+                        <button
+                            onClick={() => handleDeleteCompany(company.businessId)}
+                            disabled={deletingId === company.businessId}
+                            className="bg-red-600 hover:bg-red-700 text-white px-2 py-0.5 rounded text-xs"
+                        >
+                            {deletingId === company.businessId ? '...' : 'Delete'}
+                        </button>
+                    </div>
+                )}
+            </div>
+        );
+    }, [companies, role, loadingKycIds, deletingId]);
 
     return (
-        <div className="flex-1 rounded border border-gray-300 bg-white text-xs">
-            <div className="w-full overflow-x-auto text-black">
-                <div className="min-w-max">
-                    {/* Header Row */}
-                    <div className="flex text-sm font-semibold border-b border-gray-300 bg-gray-50">
-                        <div className="py-1 px-2 w-[120px] shrink-0">Id</div>
-                        <div className="py-1 px-2 w-[120px] shrink-0">Name</div>
-                        <div className="py-1 px-2 w-[120px] shrink-0">Owner</div>
-                        <div className="py-1 px-2 w-[120px] shrink-0">Phone</div>
-                        <div className="py-1 px-2 w-[150px] shrink-0">Email</div>
-                        <div className="py-1 px-2 w-[150px] shrink-0">Address</div>
-                        <div className="py-1 px-2 w-[120px] shrink-0">Location</div>
-                        <div className="py-1 px-2 w-[120px] shrink-0">GST</div>
-                        <div className="py-1 px-2 w-[120px] shrink-0">Website</div>
-                        <div className="py-1 px-2 w-[150px] shrink-0">Social</div>
-                        <div className="py-1 px-2 w-[120px] shrink-0">Joined</div>
-                        <div className="py-1 px-2 w-[120px] shrink-0">Subscription</div>
-                        <div className="py-1 px-2 w-[120px] shrink-0">Type</div>
-                        <div className="py-1 px-2 w-[100px] shrink-0">KYC</div>
+        <div className="flex-1 rounded border border-gray-300 bg-white text-xs overflow-hidden">
+            <div className="relative overflow-auto max-w-full" style={{ height: 540 }}>
+                <div className="min-w-max" style={{ height: '100%' }}>
+                    {/* Sticky Header */}
+                    <div className="grid text-sm font-semibold border-b border-gray-300 bg-white sticky top-0 z-10 shadow text-black"
+                        style={{
+                            display: 'grid',
+                            gridTemplateColumns: `repeat(${columnCount}, minmax(120px, 1fr))`,
+                        }}
+                    >
+                        <div className="py-1 px-2 truncate">Id</div>
+                        <div className="py-1 px-2 truncate">Name</div>
+                        <div className="py-1 px-2 truncate">Owner</div>
+                        <div className="py-1 px-2 truncate">Phone</div>
+                        <div className="py-1 px-2 truncate">Email</div>
+                        <div className="py-1 px-2 truncate">Address</div>
+                        <div className="py-1 px-2 truncate">Location</div>
+                        <div className="py-1 px-2 truncate">GST</div>
+                        <div className="py-1 px-2 truncate">Website</div>
+                        <div className="py-1 px-2 truncate">Social</div>
+                        <div className="py-1 px-2 truncate">Joined</div>
+                        <div className="py-1 px-2 truncate">Subscription</div>
+                        <div className="py-1 px-2 truncate">Type</div>
+                        <div className="py-1 px-2 truncate">KYC</div>
                         {hasPermission(role, PERMISSIONS.VERIFY_KYC) && (
-                            <div className="py-1 px-2 w-[100px] shrink-0">Verify</div>
+                            <div className="py-1 px-2 truncate">Verify</div>
                         )}
                         {hasPermission(role, PERMISSIONS.EDIT_BUSINESS) && (
-                            <div className="py-1 px-2 w-[80px] shrink-0">Edit</div>
+                            <div className="py-1 px-2 truncate">Edit</div>
                         )}
                         {hasPermission(role, PERMISSIONS.DELETE_BUSINESS) && (
-                            <div className="py-1 px-2 w-[80px] shrink-0">Delete</div>
+                            <div className="py-1 px-2 truncate">Delete</div>
                         )}
                     </div>
 
                     {/* Virtualized List */}
                     <List
-                        height={500}
+                        height={480}
                         itemCount={companies.length}
                         itemSize={60}
                         width="100%"
-                        className="text-black"
                     >
                         {Row}
                     </List>
                 </div>
             </div>
         </div>
-
     );
 };
 
