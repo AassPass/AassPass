@@ -22,36 +22,36 @@ export default function UserMaster() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [users, setUsers] = useState([]);
 
-    // useEffect(() => {
-    //     const fetchUsers = async () => {
-    //         const token = localStorage.getItem('token');
-    //         if (!token) {
-    //             console.error('No authentication token found.');
-    //             return;
-    //         }
+    useEffect(() => {
+        const fetchUsers = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('No authentication token found.');
+                return;
+            }
 
-    //         try {
-    //             const response = await fetch(`${BACKEND_URL}/admins`, {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                     Authorization: `Bearer ${token}`,
-    //                 },
-    //             });
+            try {
+                const response = await fetch(`${BACKEND_URL}/admins`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
-    //             if (!response.ok) {
-    //                 throw new Error('Network response was not ok');
-    //             }
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
 
-    //             const result = await response.json();
-    //             setUsers(result.data);
-    //         } catch (error) {
-    //             console.error('Failed to load users.', error);
-    //         }
-    //     };
+                const result = await response.json();
+                setUsers(result.data);
+            } catch (error) {
+                console.error('Failed to load users.', error);
+            }
+        };
 
-    //     fetchUsers();
-    // }, []);
+        fetchUsers();
+    }, []);
 
 
     return (

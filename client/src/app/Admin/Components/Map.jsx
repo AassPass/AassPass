@@ -3,6 +3,8 @@
 import React, { useEffect, useRef } from 'react';
 import { MAPBOX_TOKEN } from '@/app/Utils/backendUrl';
 import ReactDOM from 'react-dom/client';
+import mapboxglModule from 'mapbox-gl';
+
 
 const Map = ({ markerData }) => {
     const mapRef = useRef(null);
@@ -13,12 +15,12 @@ const Map = ({ markerData }) => {
         if (!mapRef.current || markerData.length === 0) return;
 
         const loadMap = async () => {
-            const mapboxgl = await import('mapbox-gl');
+            // const mapboxgl = await import('mapbox-gl');
             const MapboxGeocoder = (await import('@mapbox/mapbox-gl-geocoder')).default;
             await import('mapbox-gl/dist/mapbox-gl.css');
 
             const { default: PopupContent } = await import('./PopupContent');
-
+            const mapboxgl = mapboxglModule.default || mapboxglModule;
             mapboxgl.accessToken = MAPBOX_TOKEN;
 
             const map = new mapboxgl.Map({
