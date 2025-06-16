@@ -1,22 +1,13 @@
 'use client';
 
-import React, { memo, useCallback } from 'react';
+import React, { memo } from 'react';
 import { useRole } from '@/Context/RoleContext';
 import { PERMISSIONS } from '@/libs/permissions';
 import { hasPermission } from '@/libs/hasPermisson';
+import colors from '@/libs/colors';
 
 const Sidebar = ({ activeComponent, setActiveComponent }) => {
     const { role } = useRole();
-
-    const getMenuItemClass = useCallback(
-        (item) => `
-            capitalize px-4 py-2 rounded-md text-sm font-medium transition
-            ${activeComponent === item
-                ? 'bg-blue-600 text-white shadow'
-                : 'text-gray-700 hover:bg-blue-100 hover:text-blue-800'}
-        `,
-        [activeComponent]
-    );
 
     const menuItems = [];
 
@@ -33,27 +24,37 @@ const Sidebar = ({ activeComponent, setActiveComponent }) => {
     }
 
     return (
-        <div
-            className="w-full"
-        >
-            <nav className="flex flex-row md:flex-col w-full gap-3">
+        <div className="flex md:flex-col md:flex-nowrap justify-start md:justify-between items-center gap-2 w-full">
+            {/* Navigation Menu */}
+            <nav className="flex flex-row md:flex-col gap-2 items-center w-full md:w-auto">
                 {menuItems.map(({ name, label }) => (
                     <button
                         key={name}
-                        className={getMenuItemClass(name)}
                         onClick={() => setActiveComponent(name)}
+                        className="px-3 md:px-5 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap  md:w-auto"
+                        style={{
+                            backgroundColor: activeComponent === name ? colors.primary : colors.background,
+                            color: activeComponent === name ? '#fff' : colors.text,
+                        }}
                     >
                         {label}
                     </button>
                 ))}
             </nav>
 
-            <div className="ml-auto md:ml-0 mt-0 md:mt-6 w-full md:w-auto">
-                <button className="bg-green-500 hover:bg-green-600 text-white font-semibold text-xs px-4 py-2 rounded w-full md:w-auto">
+            {/* Ad Credit Button */}
+            <div className="md:mt-6 w-full md:w-auto">
+                <button
+                    className="font-semibold text-xs md:text-sm px-3 md:px-5 py-1.5 md:py-2 rounded text-white whitespace-nowrap w-full md:w-auto"
+                    style={{
+                        backgroundColor: colors.secondaryText,
+                    }}
+                >
                     Ad Credit −5$
                 </button>
             </div>
         </div>
+
 
     );
 };

@@ -26,20 +26,22 @@ export default function Page() {
     const ActiveComponent = componentMap[activeComponent] || CompanyManagement;
 
     return (
-        <div className="flex min-h-screen overflow-hidden">
-            <aside className="w-full md:w-[240px] md:sticky top-0 bg-white border-r shadow-md p-4 h-screen">
-                <Sidebar
-                    activeComponent={activeComponent}
-                    setActiveComponent={setActiveComponent}
-                />
+        <div className="flex flex-col md:flex-row min-h-screen">
+            {/* Sidebar for mobile (top header) */}
+            <div className="block md:hidden w-full sticky top-0 z-20 bg-white border-b shadow-md p-4">
+                <Sidebar activeComponent={activeComponent} setActiveComponent={setActiveComponent} />
+            </div>
+
+            {/* Sidebar for desktop (fixed on left) */}
+            <aside className="hidden md:block md:w-60 h-screen sticky top-0 bg-white border-r shadow-md p-4">
+                <Sidebar activeComponent={activeComponent} setActiveComponent={setActiveComponent} />
             </aside>
 
+            {/* Main Content */}
             <main className="flex-1 p-4 overflow-y-auto">
                 <ActiveComponent />
             </main>
         </div>
-
-
 
     );
 }
