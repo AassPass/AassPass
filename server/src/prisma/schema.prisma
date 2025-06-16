@@ -116,6 +116,15 @@ enum AdStage {
   SAVED
 }
 
+model AdImage {
+  id     String @id @default(uuid())
+  url    String
+  adId   String
+  ad     Ads    @relation(fields: [adId], references: [id])
+
+  @@index([adId])
+}
+
 model Ads {
   id                 String             @id @default(uuid())
   adId               String             @unique
@@ -124,11 +133,12 @@ model Ads {
   verificationStatus VerificationStatus @default(PENDING)
   visibleFrom        DateTime
   visibleTo          DateTime
-  imageUrl           String
   stage              AdStage
   reset              Boolean            @default(false)
   businessId         String
   business           Business           @relation(fields: [businessId], references: [id])
+
+  images             AdImage[]
 }
 
 enum UserRole {

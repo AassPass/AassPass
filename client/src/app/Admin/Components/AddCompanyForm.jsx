@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useMemo, useTransition, memo, useRef 
 
 import { BACKEND_ADMIN_URL } from '@/app/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
+import { saveBusiness } from '@/services/business';
 
 export function useRafDebounce(callback) {
     const frame = useRef(null);
@@ -197,44 +198,26 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
         setIsSubmitting(true);
         try {
             const token = localStorage.getItem('token');
-            const url = isEditing
-                ? `${BACKEND_ADMIN_URL}/update-business/${editingCompany.businessId}`
-                : `${BACKEND_ADMIN_URL}/business`;
-            const method = isEditing ? 'PUT' : 'POST';
+            const savedBusiness = await saveBusiness(newBusiness, isEditing, token);
 
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(newBusiness),
-            });
-
-            if (response.ok) {
-                const responseData = await response.json();
-                const returnedCompany = responseData.data || newBusiness;
-
-                if (isEditing) {
-                    setCompanies(prev =>
-                        prev.map(company =>
-                            company.businessId === editingCompany.businessId ? returnedCompany : company
-                        )
-                    );
-                    setIsEditing(false);
-                } else {
-                    setCompanies(prev => [returnedCompany, ...prev]);
-                    setFormData(initialFormData);
-                }
+            if (isEditing) {
+                setCompanies(prev =>
+                    prev.map(company =>
+                        company.businessId === editingCompany.businessId ? savedBusiness : company
+                    )
+                );
+                setIsEditing(false);
             } else {
-                console.error('Something went wrong. Status:', response.status);
+                setCompanies(prev => [savedBusiness, ...prev]);
+                setFormData(initialFormData);
             }
         } catch (error) {
-            console.error('Error submitting:', error);
+            console.error('Error submitting:', error.message);
         } finally {
             setIsSubmitting(false);
         }
     };
+
 
     return (
         <form

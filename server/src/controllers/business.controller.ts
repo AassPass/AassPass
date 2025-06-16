@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
 import { prisma } from "../utils/prisma";
+import { uploadImage } from "../services/imageStore";
+import fs from "fs";
+import path from "path";
+import { promisify } from "util";
+const unlinkAsync = promisify(fs.unlink);
+
 
 const generateAdCode = (businessId: string) => {
   const now = new Date();
@@ -9,15 +15,21 @@ const generateAdCode = (businessId: string) => {
 
 export const CreateAd = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { title, category, visibleFrom, visibleTo, imageUrl, stage, reset = false } = req.body;
-    const businessId  = req.user?.businessId;
-    
-    if (!title || !category || !visibleFrom || !visibleTo || !imageUrl || !stage)
+    const { title, category, visibleFrom, visibleTo, stage, reset = false } = req.body;
+    const businessId = req.user?.businessId;
+    const files = req.files as Express.Multer.File[];
+
+    // console.log(req.user);
+    if (!title || !category || !visibleFrom || !visibleTo || !stage)
       return res.status(400).json({ message: "Missing required fields" });
+
+    if (!files || files.length === 0)
+      return res.status(400).json({ message: "At least one image is required" });
 
     const business = await prisma.business.findUnique({ where: { businessId } });
     if (!business) return res.status(404).json({ message: "Business not found" });
 
+    // Create the ad
     const ad = await prisma.ads.create({
       data: {
         adId: generateAdCode(businessId as string),
@@ -25,12 +37,26 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
         category,
         visibleFrom: new Date(visibleFrom),
         visibleTo: new Date(visibleTo),
-        imageUrl,
         stage,
         reset,
-        businessId: businessId as string,
+        businessId: business.id,
       },
     });
+
+    // Upload each image to Cloudinary and save to DB
+    const imageEntries = [];
+
+    for (const file of files) {
+      const tempPath = path.join(__dirname, "../../tmp", file.originalname);
+      fs.writeFileSync(tempPath, file.buffer);
+
+      const imageUrl = await uploadImage(tempPath); // uploads to Cloudinary
+      imageEntries.push({ url: imageUrl, adId: ad.id });
+
+      await unlinkAsync(tempPath); // delete temp file
+    }
+
+    await prisma.adImage.createMany({ data: imageEntries });
 
     res.status(201).json({ message: "Ad created", ad });
   } catch (error) {
@@ -38,6 +64,7 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 export const UpdateAd = async (req: Request, res: Response): Promise<any> => {
   try{

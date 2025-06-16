@@ -2,11 +2,9 @@
 
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
-
-
 import { BACKEND_URL } from '@/app/Utils/backendUrl';
 
-// Dynamically import components with loading fallbacks
+// Lazy loading
 const AddUsers = dynamic(() => import('./Components/AddUsers'), {
     loading: () => <p className="p-4">Loading Add User Form...</p>,
     ssr: false,
@@ -53,11 +51,10 @@ export default function UserMaster() {
         fetchUsers();
     }, []);
 
-
     return (
-        <div className="flex flex-col md:flex-row  gap-3 h-screen px-4 md:py-6 w-full max-w-[1200px] mx-auto">
-            {/* Add User Form (Left Side) */}
-            <div className="w-full lg:w-1/3 bg-white">
+        <div className="flex flex-col gap-6 px-4 py-6 w-full max-w-7xl mx-auto">
+            {/* Add User Form */}
+            <div className="w-full bg-white rounded-lg shadow-md p-4">
                 <AddUsers
                     edit={edit}
                     users={users}
@@ -68,8 +65,8 @@ export default function UserMaster() {
                 />
             </div>
 
-            {/* User List (Right Side) */}
-            <div className="w-full lg:w-2/3 bg-white">
+            {/* User List */}
+            <div className="w-full bg-white rounded-lg shadow-md p-4">
                 <UserList
                     users={users}
                     setUsers={setUsers}

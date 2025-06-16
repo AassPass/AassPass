@@ -5,7 +5,7 @@ import { BACKEND_URL } from "@/app/Utils/backendUrl";
 import FilterOptions from "./FilterOptions";
 import dynamic from "next/dynamic";
 const Map = dynamic(
-  () => import("../../../components/LandingPageComponents/Map"),
+  () => import("../../../components/LandingPageComponents/mapComponents/Map"),
   { ssr: false }
 );
 

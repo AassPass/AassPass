@@ -1,37 +1,30 @@
 "use client";
-import { BACKEND_AUTH_URL } from "@/app/Utils/backendUrl";
-import { useRole } from "@/Context/RoleContext";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRole } from "@/Context/RoleContext";
+import colors from "@/libs/colors";
+import { loginUser, signupUser } from "@/services/auth"
 
 export default function Page() {
   const router = useRouter();
   const { setRole, setBusinessId } = useRole();
+
   const [isSignup, setIsSignup] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    const email = e.target.email.value.trim();
+    const password = e.target.password.value.trim();
 
+    if (!email || !password) return toast.error("Please fill all fields");
+
+    setLoading(true);
     try {
-      const res = await fetch(`${BACKEND_AUTH_URL}/user/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Login failed");
-      }
-
-      const data = await res.json();
+      const data = await loginUser({ email, password });
 
       setBusinessId(data.buisnessId);
       setRole(data.role);
@@ -39,59 +32,56 @@ export default function Page() {
 
       router.push("/");
     } catch (err) {
-      console.error(err);
+      toast.error(err.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
-    const confirmPassword = e.target.confirmPassword.value;
-    const name = e.target.name.value;
+    const name = e.target.name.value.trim();
+    const email = e.target.email.value.trim();
+    const password = e.target.password.value.trim();
+    const confirmPassword = e.target.confirmPassword.value.trim();
 
-    if (password !== confirmPassword) {
-      console.error("Passwords do not match.");
-      return;
+    if (!name || !email || !password || !confirmPassword) {
+      return toast.error("Please fill all fields");
     }
 
+    if (password !== confirmPassword) {
+      return toast.error("Passwords do not match");
+    }
+
+    setLoading(true);
     try {
-      const res = await fetch(`${BACKEND_AUTH_URL}/user/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password, name }),
-      });
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Signup failed");
-      }
-
+      await signupUser({ email, password, name });
       setIsSignup(false);
     } catch (err) {
-      console.error(err);
+      console.error(err.message || "Signup failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex h-screen justify-center items-center">
+    <div className="flex h-screen justify-center items-center bg-gray-100 relative">
+
       <form
         onSubmit={isSignup ? handleSignup : handleLogin}
-        className="p-8 bg-white rounded shadow-md text-black"
+        className="w-full max-w-md p-8 rounded shadow-md"
+        style={{ backgroundColor: colors.background, color: colors.text }}
       >
-        <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
+        <h2
+          className="text-2xl font-semibold mb-6 text-center"
+          style={{ color: colors.primary }}
+        >
           {isSignup ? "Create an Account" : "Login"}
         </h2>
 
         {isSignup && (
           <>
-            <label
-              htmlFor="password"
-              className="block mb-2 font-medium text-gray-700"
-            >
+            <label htmlFor="name" className="block mb-2 font-medium">
               Name
             </label>
             <input
@@ -99,13 +89,14 @@ export default function Page() {
               name="name"
               type="text"
               required
-              className="w-full px-4 py-2 mb-2 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-200"
+              className="w-full px-4 py-2 mb-2 rounded focus:outline-none focus:ring-2"
+              style={{ backgroundColor: colors.inputBackground, color: colors.text }}
               placeholder="Enter your name"
             />
           </>
         )}
 
-        <label htmlFor="email" className="block mb-2 font-medium text-gray-700">
+        <label htmlFor="email" className="block mb-2 font-medium">
           Email
         </label>
         <input
@@ -113,14 +104,12 @@ export default function Page() {
           name="email"
           type="email"
           required
-          className="w-full px-4 py-2 mb-2 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-200"
+          className="w-full px-4 py-2 mb-2 rounded focus:outline-none focus:ring-2"
+          style={{ backgroundColor: colors.inputBackground, color: colors.text }}
           placeholder="you@example.com"
         />
 
-        <label
-          htmlFor="password"
-          className="block mb-2 font-medium text-gray-700"
-        >
+        <label htmlFor="password" className="block mb-2 font-medium">
           Password
         </label>
         <input
@@ -128,16 +117,14 @@ export default function Page() {
           name="password"
           type="password"
           required
-          className="w-full px-4 py-2 mb-2 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-200"
+          className="w-full px-4 py-2 mb-2 rounded focus:outline-none focus:ring-2"
+          style={{ backgroundColor: colors.inputBackground, color: colors.text }}
           placeholder="Enter your password"
         />
 
         {isSignup && (
           <>
-            <label
-              htmlFor="confirmPassword"
-              className="block mb-2 font-medium text-gray-700"
-            >
+            <label htmlFor="confirmPassword" className="block mb-2 font-medium">
               Confirm Password
             </label>
             <input
@@ -145,7 +132,8 @@ export default function Page() {
               name="confirmPassword"
               type="password"
               required
-              className="w-full px-4 py-2 mb-3 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-200"
+              className="w-full px-4 py-2 mb-3 rounded focus:outline-none focus:ring-2"
+              style={{ backgroundColor: colors.inputBackground, color: colors.text }}
               placeholder="Re-enter your password"
             />
           </>
@@ -153,28 +141,34 @@ export default function Page() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition-colors"
+          disabled={loading}
+          className="w-full font-semibold py-2 rounded transition-colors disabled:opacity-60"
+          style={{
+            backgroundColor: colors.primary,
+            color: colors.buttonText,
+          }}
         >
-          {isSignup ? "Sign Up" : "Login"}
+          {loading ? "Please wait..." : isSignup ? "Sign Up" : "Login"}
         </button>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
+        <p className="mt-4 text-center text-sm">
           {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
           <span
-            className="text-blue-600 cursor-pointer hover:underline"
+            className="cursor-pointer hover:underline"
+            style={{ color: colors.link }}
             onClick={() => setIsSignup(!isSignup)}
           >
             {isSignup ? "Login here" : "Sign up here"}
           </span>
         </p>
-        <p className="mt-4 text-center text-sm text-gray-600">
+        <p className="mt-4 text-center text-sm">
           <Link
-            href={"/Account/forget-password"}
-            className="text-blue-600 cursor-pointer hover:underline"
+            href="/Account/forget-password"
+            className="hover:underline"
+            style={{ color: colors.link }}
           >
-            Foreget Password
+            Forgot Password?
           </Link>
-          ?
         </p>
       </form>
     </div>

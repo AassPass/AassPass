@@ -1,18 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Map from "@/components/LandingPageComponents/Map";
+import Map from "@/components/LandingPageComponents/mapComponents/Map";
 import { BACKEND_USER_URL } from "@/app/Utils/backendUrl";
-// import FilterOptions from '@/app/Admin/map/FilterOptions';
+import FilterOptions from "@/app/Admin/map/FilterOptions";
 
 const MapSection = () => {
   const [businesses, setBusinesses] = useState([]);
-  // const [filteredBusinesses, setFilteredBusinesses] = useState([]);
+  const [filteredBusinesses, setFilteredBusinesses] = useState([]);
   // const [selectedCity, setSelectedCity] = useState('');
   const [userLocation, setUserLocation] = useState(null);
   const RADIUS_KM = 20;
 
-  // Get user location once on mount
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -25,19 +24,12 @@ const MapSection = () => {
     );
   }, []);
 
-  // Fetch businesses whenever userLocation changes
   useEffect(() => {
-    if (!userLocation) return; // skip if no location
+    if (!userLocation) return;
 
     const fetchData = async () => {
       try {
         const { latitude, longitude } = userLocation;
-        console.log(userLocation);
-
-        if (!userLocation) {
-          console.log("User location not available, skipping fetch.");
-          return;
-        }
 
         const url = new URL(`${BACKEND_USER_URL}/businesses`);
         url.searchParams.append("lat", latitude);
@@ -45,30 +37,26 @@ const MapSection = () => {
         url.searchParams.append("radius", RADIUS_KM);
 
         const response = await fetch(url.toString());
-
-        if (!response.ok) {
+        if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
-        }
 
         const data = await response.json();
+        console.log(data);
 
-        console.log("Business data:", data);
+        // const formatted = data.data.map((business) => ({
+        //   id: business.id,
+        //   coordinates: [business.longitude, business.latitude],
+        //   businessType: business.businessType,
+        //   popupText: business.businessName,
+        //   city: business.city || "",
+        //   color: "red",
+        //   websiteLink: business.websiteLink || "",
+        // }));
 
-        const formatted = data.data.map((business) => ({
-          id: business.id,
-          businessType: business.businessType,
-          coordinates: [business.longitude, business.latitude],
-          popupText: business.businessName,
-          city: business.city || "",
-          color: "red",
-          websiteLink: business.websiteLink || "",
-        }));
-
-        setBusinesses(formatted);
-        // setFilteredBusinesses(formatted);
+        setBusinesses(data.data);
+        setFilteredBusinesses(data.data);
       } catch (error) {
         console.error("Error fetching business data:", error);
-        // Optionally set fallback data here
       }
     };
 
@@ -76,20 +64,21 @@ const MapSection = () => {
   }, [userLocation]);
 
   return (
-    <div className="w-full text-black">
-      {/* Uncomment to enable city filtering */}
-      {/* <div>
-
-                <FilterOptions
+    <section className="w-full flex justify-center items-center py-6 bg-gray-50 text-black">
+      <div className="w-[60vw] h-[80vh]">
+        {/* FilterOptions can be re-enabled here */}
+        {/* <FilterOptions
                     cities={uniqueCities}
                     selectedCity={selectedCity}
                     onChange={handleCityChange}
-                />
-            </div> */}
-      <div>
-        <Map markerData={businesses} userLocation={userLocation} />
+                /> */}
+
+        {/* <div className="w-full h-[60vh] sm:h-[70vh] lg:h-[75vh] rounded-xl overflow-hidden shadow-md border border-gray-200 bg-white"> */}
+        <div className="w-full h-full">
+          <Map markerData={filteredBusinesses} userLocation={userLocation} />
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

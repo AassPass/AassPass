@@ -54,33 +54,50 @@ export const GetBusinesses = async (req: Request, res: Response): Promise<any> =
     const longitude = parseFloat(lng as string);
     const radiusInMeters = parseFloat(radius as string) * 1000;
 
-    const businesses = await prisma.$queryRaw`
-      SELECT *
+    // Step 1: Get nearby business IDs using raw SQL
+    const nearbyBusinessIds: { id: string }[] = await prisma.$queryRaw`
+      SELECT "id"
       FROM "Business"
       WHERE "latitude" IS NOT NULL AND "longitude" IS NOT NULL AND
-          ST_DWithin(
-            geography(ST_MakePoint("longitude", "latitude")),
-            geography(ST_MakePoint(CAST(${longitude} AS double precision), CAST(${latitude} AS double precision))),
-            ${radiusInMeters}
-          )
+            ST_DWithin(
+              geography(ST_MakePoint("longitude", "latitude")),
+              geography(ST_MakePoint(CAST(${longitude} AS double precision), CAST(${latitude} AS double precision))),
+              ${radiusInMeters}
+            )
     `;
 
+    const ids = nearbyBusinessIds.map((b) => b.id);
+    if (ids.length === 0) {
+      return res.status(200).json({ message: "No businesses found nearby", data: [] });
+    }
+
+    // Step 2: Fetch businesses and up to 3 ads per business
+    const businesses = await prisma.business.findMany({
+      where: { id: { in: ids } },
+      include: {
+        ads: {
+          orderBy: { visibleFrom: 'desc' },
+          take: 3,
+        },
+      },
+    });
 
     res.status(200).json({
       message: "Nearby businesses retrieved successfully",
       data: businesses,
     });
+
   } catch (error) {
     console.error("Error fetching businesses:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
+
 export const CreateBusiness = async (req: Request, res: Response): Promise<any> => {
   try{
     const {
       businessName,
-      ownerName,
       phoneNumber,
       emailAddress,
       address,
@@ -100,22 +117,17 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
 
     // console.log('RegisterBusiness Request Body:', req.body);
     // Validate required fields
-    if (!businessName || !ownerName || !phoneNumber || !emailAddress || !address || !gstNumber || !businessType) {
+    if (!businessName || !phoneNumber || !emailAddress || !address || !gstNumber || !businessType || !latitude || !longitude) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const password = generatePassword();
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const owner = await prisma.user.create({
-      data: {
-        name: ownerName,
-        email: emailAddress,
-        mobile: phoneNumber,
-        password: hashedPassword
-      }
+    const owner = await prisma.user.findUnique({
+      where: {id: user?.id}
     });
-    
+
+    if(!owner){
+      return res.status(404).json({message: "No user found. Token is probably wrong. Please again log in"});
+    }
 
     // Generate a unique businessId
     const businessId = `BUS-${Date.now()}`;
@@ -127,8 +139,8 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
       data: {
         businessId,
         businessName,
-        ownerName,
-        ownerId: owner.id,
+        ownerName: owner.name,
+        ownerId: user.id,
         phoneNumber,
         emailAddress,
         address,

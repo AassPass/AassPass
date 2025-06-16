@@ -1,24 +1,12 @@
-'use client';
+// No 'use client' here
 
-import dynamic from 'next/dynamic';
+import Banner from '@/components/LandingPageComponents/Banner';
+import HeroSection from '@/components/LandingPageComponents/HeroSection';
+import Header from '@/components/LandingPageComponents/Header';
+import MapSection from '@/components/LandingPageComponents/MapSection';
+import Info from '@/components/LandingPageComponents/Info';
 import { memo } from 'react';
-
-// Lazy-load non-critical components to reduce initial load
-const Banner = dynamic(() => import('@/components/LandingPageComponents/Banner'), {
-  ssr: false,
-});
-const FeatureSection = dynamic(() => import('@/components/LandingPageComponents/HeroSection'), {
-  ssr: false,
-});
-const Header = dynamic(() => import('@/components/LandingPageComponents/Header'), {
-  ssr: false,
-});
-const MapSection = dynamic(() => import('@/components/LandingPageComponents/MapSection'), {
-  ssr: false,
-});
-const Info = dynamic(() => import('@/components/LandingPageComponents/Info'), {
-  ssr: false,
-});
+import Faq from '@/components/LandingPageComponents/Faq';
 
 function Home() {
   return (
@@ -26,9 +14,10 @@ function Home() {
       <Banner />
       <main className="flex flex-col items-center">
         <Header />
-        <FeatureSection />
+        <HeroSection />
         <MapSection />
         <Info />
+        <Faq />
       </main>
     </div>
   );

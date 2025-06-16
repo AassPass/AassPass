@@ -1,41 +1,41 @@
-const labelToEnumKeyMap = {
-  "Retail Store": "RETAIL_STORE",
-  "Restaurant / Café": "RESTAURANT_CAFE",
-  "Salon / Spa": "SALON_SPA",
-  "Gym / Fitness Center": "GYM_FITNESS",
-  "Medical / Health Store": "MEDICAL_HEALTH",
-  "Service Provider": "SERVICE_PROVIDER",
-  "Freelancer / Consultant": "FREELANCER_CONSULTANT",
-  "Event Organizer": "EVENT_ORGANIZER",
-  "Education / Coaching": "EDUCATION_COACHING",
-  "Home-based Business": "HOME_BASED",
-  "Real Estate / Rentals": "REAL_ESTATE_RENTALS",
-  "Courier / Delivery": "COURIER_DELIVERY",
-  "Automobile Services": "AUTOMOBILE_SERVICES",
-  "Pet Services": "PET_SERVICES",
-  "NGO / Community Org.": "NGO_COMMUNITY",
-  "Shop/Store/Office": "SHOP_STORE_OFFICE",
-  "Other": "OTHER",
-};
+// const labelToEnumKeyMap = {
+//   "Retail Store": "RETAIL_STORE",
+//   "Restaurant / Café": "RESTAURANT_CAFE",
+//   "Salon / Spa": "SALON_SPA",
+//   "Gym / Fitness Center": "GYM_FITNESS",
+//   "Medical / Health Store": "MEDICAL_HEALTH",
+//   "Service Provider": "SERVICE_PROVIDER",
+//   "Freelancer / Consultant": "FREELANCER_CONSULTANT",
+//   "Event Organizer": "EVENT_ORGANIZER",
+//   "Education / Coaching": "EDUCATION_COACHING",
+//   "Home-based Business": "HOME_BASED",
+//   "Real Estate / Rentals": "REAL_ESTATE_RENTALS",
+//   "Courier / Delivery": "COURIER_DELIVERY",
+//   "Automobile Services": "AUTOMOBILE_SERVICES",
+//   "Pet Services": "PET_SERVICES",
+//   "NGO / Community Org.": "NGO_COMMUNITY",
+//   "Shop/Store/Office": "SHOP_STORE_OFFICE",
+//   "Other": "OTHER",
+// };
 
 const bgColorMap = {
-  RETAIL_STORE: "#FFF4E5",
-  RESTAURANT_CAFE: "#FFEAEA",
-  SALON_SPA: "#F9F0FF",
-  GYM_FITNESS: "#E5F4F4",
-  MEDICAL_HEALTH: "#E5F6FF",
-  SERVICE_PROVIDER: "#F2F2F2",
-  FREELANCER_CONSULTANT: "#FFFCE5",
-  EVENT_ORGANIZER: "#FDEBF9",
-  EDUCATION_COACHING: "#EEF9F1",
-  HOME_BASED: "#FFF0F0",
-  REAL_ESTATE_RENTALS: "#EAF4FF",
-  COURIER_DELIVERY: "#FFF8E5",
-  AUTOMOBILE_SERVICES: "#F4F4F4",
-  PET_SERVICES: "#FFF0FA",
-  NGO_COMMUNITY: "#E7F7F2",
-  SHOP_STORE_OFFICE: "#F5F5FF",
-  OTHER: "#F0F0F0",
+  RETAIL_STORE: "#FFB347",         // bolder orange
+  RESTAURANT_CAFE: "#FF6B6B",      // bolder red-pink
+  SALON_SPA: "#C084FC",            // bolder violet
+  GYM_FITNESS: "#38B2AC",          // teal
+  MEDICAL_HEALTH: "#63B3ED",       // bolder sky blue
+  SERVICE_PROVIDER: "#A0AEC0",     // medium gray
+  FREELANCER_CONSULTANT: "#F6E05E",// rich yellow
+  EVENT_ORGANIZER: "#F687B3",      // vibrant pink
+  EDUCATION_COACHING: "#68D391",   // stronger green
+  HOME_BASED: "#FC8181",           // light red
+  REAL_ESTATE_RENTALS: "#63B3ED",  // sky blue
+  COURIER_DELIVERY: "#ECC94B",     // deeper yellow
+  AUTOMOBILE_SERVICES: "#CBD5E0",  // medium-light gray
+  PET_SERVICES: "#FBB6CE",         // deeper pastel pink
+  NGO_COMMUNITY: "#81E6D9",        // aqua
+  SHOP_STORE_OFFICE: "#A3BFFA",    // bolder lavender-blue
+  OTHER: "#CBD5E0",                // soft gray-blue
 };
 
 const iconMap = {
@@ -58,24 +58,10 @@ const iconMap = {
   OTHER: '/icons/others.svg',
 };
 
-// export function createCustomImageMarker(businessTypeLabel) {
-//   const enumKey = labelToEnumKeyMap[businessTypeLabel] || "OTHER";
-//   const iconSrc = iconMap[enumKey];
-
-//   const el = document.createElement("div");
-//   el.className = "custom-image-marker";
-//   el.innerHTML = `
-//     <div class="marker-image-wrapper" style="padding: 6px;">
-//       <img src="${iconSrc}" alt="${businessTypeLabel}" style="width: 100%; height: 100%; object-fit: contain;" />
-//     </div>
-//   `;
-//   return el;
-// }
-
 export function createCustomImageMarker(businessTypeLabel) {
-  const enumKey = labelToEnumKeyMap[businessTypeLabel] || "OTHER";
-  const iconSrc = iconMap[enumKey];
-  const bgColor = bgColorMap[enumKey] || "#F0F0F0";
+  // const enumKey = labelToEnumKeyMap[businessTypeLabel] || "OTHER";
+  const iconSrc = iconMap[businessTypeLabel];
+  const bgColor = bgColorMap[businessTypeLabel] || "#F0F0F0";
 
   const el = document.createElement("div");
   el.className = "custom-image-marker";

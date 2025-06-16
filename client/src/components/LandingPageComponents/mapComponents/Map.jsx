@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 import { MAPBOX_TOKEN } from "@/app/Utils/backendUrl";
 import ReactDOM from "react-dom/client";
 import mapboxglModule from "mapbox-gl";
-import { createCustomImageMarker } from "./mapComponents/CustomImageMarker";
+import { createCustomImageMarker } from "./CustomImageMarker";
 
 const Map = ({ markerData, userLocation }) => {
   const mapRef = useRef(null);
@@ -20,18 +20,19 @@ const Map = ({ markerData, userLocation }) => {
         .default;
       await import("mapbox-gl/dist/mapbox-gl.css");
 
-      const { default: PopupContent } = await import(
-        "./PopupContent"
-      );
+      const { default: PopupContent } = await import("./PopupContent");
       const mapboxgl = mapboxglModule.default || mapboxglModule;
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
       const map = new mapboxgl.Map({
         container: mapRef.current,
         style: "mapbox://styles/mapbox/streets-v11",
-        center: userLocation ? [userLocation.longitude, userLocation.latitude] : [78.9629, 20.5937],
-        zoom: userLocation? 12: 4.5,
+        center: userLocation
+          ? [userLocation.longitude, userLocation.latitude]
+          : [78.9629, 20.5937],
+        zoom: userLocation ? 12 : 4.5,
       });
+
 
       map.addControl(new mapboxgl.NavigationControl(), "top-right");
       map.addControl(new mapboxgl.FullscreenControl(), "top-right");
@@ -55,24 +56,23 @@ const Map = ({ markerData, userLocation }) => {
 
       const addMarkers = () => {
         markersRef.current = markerData.map(
-          ({ coordinates, popupText, websiteLink, businessType }) => {
+          (business) => {
             const popupNode = document.createElement("div");
             ReactDOM.createRoot(popupNode).render(
               <PopupContent
-                name={popupText}
-                coordinates={coordinates}
-                websiteLink={websiteLink}
+                business={business}
               />
             );
 
-            const popup = new mapboxgl.Popup({ offset: 25 }).setDOMContent(
-              popupNode
-            );
+            const popup = new mapboxgl.Popup({
+              offset: 25,
+              maxWidth: "240px",
+            }).setDOMContent(popupNode);
 
-            const el = createCustomImageMarker(businessType);
+            const el = createCustomImageMarker(business.businessType);
 
             const marker = new mapboxgl.Marker(el)
-              .setLngLat(coordinates)
+              .setLngLat([business.longitude, business.latitude])
               .setPopup(popup)
               .addTo(map);
 
@@ -88,9 +88,9 @@ const Map = ({ markerData, userLocation }) => {
 
       const handleZoom = () => {
         const zoom = map.getZoom();
-        if (zoom < 7) {
+        if (zoom < 9) {
           removeMarkers();
-        } else if (zoom >= 7 && markersRef.current.length === 0) {
+        } else if (zoom >= 9 && markersRef.current.length === 0) {
           addMarkers();
         }
       };
@@ -109,7 +109,7 @@ const Map = ({ markerData, userLocation }) => {
   }, [markerData, userLocation]);
 
   return (
-    <div className="h-screen w-full">
+    <div className="h-full w-full">
       <div ref={mapRef} className="h-full w-full" />
     </div>
   );
