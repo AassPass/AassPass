@@ -16,10 +16,10 @@ function Home() {
       <main className="flex flex-col items-center">
         <Header />
         <HeroSection />
-        {/* <MapSection /> */}
+        <MapSection />
         {/* <Info /> */}
-        <Faq />
         <EventListing />
+        <Faq />
       </main>
     </div>
   );

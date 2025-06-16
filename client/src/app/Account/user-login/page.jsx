@@ -6,7 +6,7 @@ import Link from "next/link";
 
 import { useRole } from "@/Context/RoleContext";
 import colors from "@/libs/colors";
-import { loginUser, signupUser } from "@/services/auth"
+import { loginUser, signupUser } from "@/services/auth";
 
 export default function Page() {
   const router = useRouter();
@@ -20,19 +20,19 @@ export default function Page() {
     const email = e.target.email.value.trim();
     const password = e.target.password.value.trim();
 
-    if (!email || !password) return toast.error("Please fill all fields");
+    if (!email || !password) return;
 
     setLoading(true);
     try {
       const data = await loginUser({ email, password });
 
-      setBusinessId(data.buisnessId);
+      setBusinessId(data.businessId);
       setRole(data.role);
       localStorage.setItem("token", data.token);
 
       router.push("/");
     } catch (err) {
-      toast.error(err.message || "Login failed");
+      console.error(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -45,13 +45,8 @@ export default function Page() {
     const password = e.target.password.value.trim();
     const confirmPassword = e.target.confirmPassword.value.trim();
 
-    if (!name || !email || !password || !confirmPassword) {
-      return toast.error("Please fill all fields");
-    }
-
-    if (password !== confirmPassword) {
-      return toast.error("Passwords do not match");
-    }
+    if (!name || !email || !password || !confirmPassword) return;
+    if (password !== confirmPassword) return;
 
     setLoading(true);
     try {
@@ -66,7 +61,6 @@ export default function Page() {
 
   return (
     <div className="flex h-screen justify-center items-center bg-gray-100 relative">
-
       <form
         onSubmit={isSignup ? handleSignup : handleLogin}
         className="w-full max-w-md p-8 rounded shadow-md"
@@ -81,9 +75,7 @@ export default function Page() {
 
         {isSignup && (
           <>
-            <label htmlFor="name" className="block mb-2 font-medium">
-              Name
-            </label>
+            <label htmlFor="name" className="block mb-2 font-medium">Name</label>
             <input
               id="name"
               name="name"
@@ -96,9 +88,7 @@ export default function Page() {
           </>
         )}
 
-        <label htmlFor="email" className="block mb-2 font-medium">
-          Email
-        </label>
+        <label htmlFor="email" className="block mb-2 font-medium">Email</label>
         <input
           id="email"
           name="email"
@@ -109,9 +99,7 @@ export default function Page() {
           placeholder="you@example.com"
         />
 
-        <label htmlFor="password" className="block mb-2 font-medium">
-          Password
-        </label>
+        <label htmlFor="password" className="block mb-2 font-medium">Password</label>
         <input
           id="password"
           name="password"
@@ -124,9 +112,7 @@ export default function Page() {
 
         {isSignup && (
           <>
-            <label htmlFor="confirmPassword" className="block mb-2 font-medium">
-              Confirm Password
-            </label>
+            <label htmlFor="confirmPassword" className="block mb-2 font-medium">Confirm Password</label>
             <input
               id="confirmPassword"
               name="confirmPassword"

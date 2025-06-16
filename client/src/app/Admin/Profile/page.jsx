@@ -12,7 +12,7 @@ const page = () => {
                         src="https://placehold.co/1200x400/808080/FFFFFF?text=Company+Banner"
                         alt="Company Banner"
                         className="w-full h-full object-cover "
-                        onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/1200x400/808080/FFFFFF?text=Error+Loading+Banner"; }}
+                        // onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/1200x400/808080/FFFFFF?text=Error+Loading+Banner"; }}
                     />
                 </div>
 
@@ -24,7 +24,7 @@ const page = () => {
                             src="https://placehold.co/128x128/3B82F6/FFFFFF?text=BP" // BP for Business Profile
                             alt="Profile"
                             className="w-full h-full object-cover"
-                            onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/128x128/3B82F6/FFFFFF?text=Error"; }}
+                            // onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/128x128/3B82F6/FFFFFF?text=Error"; }}
                         />
                     </div>
 

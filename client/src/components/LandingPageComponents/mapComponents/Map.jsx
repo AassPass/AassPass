@@ -5,6 +5,11 @@ import { MAPBOX_TOKEN } from "@/app/Utils/backendUrl";
 import ReactDOM from "react-dom/client";
 import mapboxglModule from "mapbox-gl";
 import { createCustomImageMarker } from "./CustomImageMarker";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import "mapbox-gl/dist/mapbox-gl.css";
+import PopupContent from "./PopupContent";
+
+
 
 const Map = ({ markerData, userLocation }) => {
   const mapRef = useRef(null);
@@ -16,11 +21,6 @@ const Map = ({ markerData, userLocation }) => {
 
     const loadMap = async () => {
       // const mapboxgl = await import('mapbox-gl');
-      const MapboxGeocoder = (await import("@mapbox/mapbox-gl-geocoder"))
-        .default;
-      await import("mapbox-gl/dist/mapbox-gl.css");
-
-      const { default: PopupContent } = await import("./PopupContent");
       const mapboxgl = mapboxglModule.default || mapboxglModule;
       mapboxgl.accessToken = MAPBOX_TOKEN;
 

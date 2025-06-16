@@ -1,57 +1,35 @@
-"use client";
+import { BACKEND_AUTH_URL } from "@/app/Utils/backendUrl";
 
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { verifyEmail } from "@/services/auth";
-import colors from "@/libs/colors";
+export async function loginUser({ email, password }) {
+  const res = await fetch(`${BACKEND_AUTH_URL}/user/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
 
-export default function VerifyEmailPage() {
-    const [message, setMessage] = useState("Verifying your email...");
-    const [isError, setIsError] = useState(false);
+  if (!res.ok) {
+    const errData = await res.json();
+    throw new Error(errData.message || "Login failed");
+  }
 
-    const searchParams = useSearchParams();
-    const router = useRouter();
+  return res.json();
+}
 
-    const token = searchParams.get("token");
+export async function signupUser({ name, email, password }) {
+  const res = await fetch(`${BACKEND_AUTH_URL}/user/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name, email, password }),
+  });
 
-    useEffect(() => {
-        if (!token) {
-            setMessage("Verification token not found in URL.");
-            setIsError(true);
-            return;
-        }
+  if (!res.ok) {
+    const errData = await res.json();
+    throw new Error(errData.message || "Signup failed");
+  }
 
-        const verify = async () => {
-            try {
-                const msg = await verifyEmail(token);
-                setMessage(msg);
-                setIsError(false);
-                setTimeout(() => {
-                    router.push("/");
-                }, 2000);
-            } catch (err) {
-                setMessage(err.message);
-                setIsError(true);
-            }
-        };
-
-        verify();
-    }, [token, router]);
-
-    return (
-        <div
-            className="h-screen flex flex-col gap-6 justify-center items-center"
-            style={{ backgroundColor: colors.background }}
-        >
-            <p className="font-bold text-3xl" style={{ color: colors.primary }}>
-                AasPass
-            </p>
-            <h2
-                className="text-center text-lg font-medium"
-                style={{ color: isError ? colors.error : colors.success }}
-            >
-                {message}
-            </h2>
-        </div>
-    );
+  return res.json();
 }
