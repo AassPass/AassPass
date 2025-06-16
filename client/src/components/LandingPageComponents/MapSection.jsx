@@ -1,87 +1,84 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import Map from '@/app/Admin/Components/Map';
-import { BACKEND_USER_URL } from '@/app/Utils/backendUrl';
-import FilterOptions from '@/app/Admin/map/FilterOptions';
+import React, { useEffect, useState } from "react";
+import Map from "@/components/LandingPageComponents/Map";
+import { BACKEND_USER_URL } from "@/app/Utils/backendUrl";
+// import FilterOptions from '@/app/Admin/map/FilterOptions';
 
 const MapSection = () => {
-    const [businesses, setBusinesses] = useState([]);
-    const [filteredBusinesses, setFilteredBusinesses] = useState([]);
-    const [selectedCity, setSelectedCity] = useState('');
-    const [userLocation, setUserLocation] = useState(null);
-    const RADIUS_KM = 10;
+  const [businesses, setBusinesses] = useState([]);
+  // const [filteredBusinesses, setFilteredBusinesses] = useState([]);
+  // const [selectedCity, setSelectedCity] = useState('');
+  const [userLocation, setUserLocation] = useState(null);
+  const RADIUS_KM = 20;
 
-    // Get user location once on mount
-    useEffect(() => {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                setUserLocation({ latitude, longitude });
-            },
-            (err) => {
-                console.error('Failed to get location:', err);
-            }
-        );
-    }, []);
+  // Get user location once on mount
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ latitude, longitude });
+      },
+      (err) => {
+        console.error("Failed to get location:", err);
+      }
+    );
+  }, []);
 
-    // Fetch businesses whenever userLocation changes
-    useEffect(() => {
-        if (!userLocation) return; // skip if no location
+  // Fetch businesses whenever userLocation changes
+  useEffect(() => {
+    if (!userLocation) return; // skip if no location
 
-        const fetchData = async () => {
-            try {
-                const { latitude, longitude } = userLocation;
-                console.log(userLocation);
+    const fetchData = async () => {
+      try {
+        const { latitude, longitude } = userLocation;
+        console.log(userLocation);
 
-                if (!userLocation) {
-                    console.log("User location not available, skipping fetch.");
-                    return;
-                }
+        if (!userLocation) {
+          console.log("User location not available, skipping fetch.");
+          return;
+        }
 
-                const url = new URL(`${BACKEND_USER_URL}/businesses`);
-                url.searchParams.append("lat", latitude);
-                url.searchParams.append("lng", longitude);
-                url.searchParams.append("radius", RADIUS_KM);
+        const url = new URL(`${BACKEND_USER_URL}/businesses`);
+        url.searchParams.append("lat", latitude);
+        url.searchParams.append("lng", longitude);
+        url.searchParams.append("radius", RADIUS_KM);
 
-                const response = await fetch(url.toString());
+        const response = await fetch(url.toString());
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-                const data = await response.json();
+        const data = await response.json();
 
-                console.log("Business data:", data);
+        console.log("Business data:", data);
 
-                const formatted = data.data.map((business) => ({
-                    id: business.id,
-                    coordinates: [business.longitude, business.latitude],
-                    popupText: business.businessName,
-                    city: business.city || "",
-                    color: "red",
-                    websiteLink: business.websiteLink || "",
-                }));
+        const formatted = data.data.map((business) => ({
+          id: business.id,
+          businessType: business.businessType,
+          coordinates: [business.longitude, business.latitude],
+          popupText: business.businessName,
+          city: business.city || "",
+          color: "red",
+          websiteLink: business.websiteLink || "",
+        }));
 
-                setBusinesses(formatted);
-                setFilteredBusinesses(formatted);
-            } catch (error) {
-                console.error('Error fetching business data:', error);
-                // Optionally set fallback data here
-            }
-        };
+        setBusinesses(formatted);
+        // setFilteredBusinesses(formatted);
+      } catch (error) {
+        console.error("Error fetching business data:", error);
+        // Optionally set fallback data here
+      }
+    };
 
-        fetchData();
+    fetchData();
+  }, [userLocation]);
 
-    }, [userLocation]);
-
-
-
-
-    return (
-        <div className="w-full text-black">
-            {/* Uncomment to enable city filtering */}
-            {/* <div>
+  return (
+    <div className="w-full text-black">
+      {/* Uncomment to enable city filtering */}
+      {/* <div>
 
                 <FilterOptions
                     cities={uniqueCities}
@@ -89,12 +86,11 @@ const MapSection = () => {
                     onChange={handleCityChange}
                 />
             </div> */}
-            <div>
-
-                <Map markerData={businesses} />
-            </div>
-        </div>
-    );
+      <div>
+        <Map markerData={businesses} userLocation={userLocation} />
+      </div>
+    </div>
+  );
 };
 
 export default MapSection;
