@@ -1,41 +1,79 @@
 'use client';
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from './Button';
+import Link from 'next/link';
+import Image from 'next/image';
+import HeaderClientActions from './Components/HeaderClientActions';
+import colors from '@/libs/colors';
 
-const Header = () => {
-    const router = useRouter();
+const navLinks = [
+    { href: '/', label: 'Home' },
+    { href: '/lokaly-map', label: 'Lokaly Map' },
+    { href: '/Account/user-login', label: 'Register Your Business' },
+    { href: '/ads-plan', label: 'Ads Plan' },
+    { href: '/about-us', label: 'About Us' },
+    { href: '/#faq', label: 'FAQ' }
+];
 
+export default function Header() {
     return (
-        <div className="p-4 md:p-4 lg:px-8 flex justify-between items-center w-full">
-            <div className="flex gap-4 md:gap-10 items-center justify-center">
-                <div className="text-lg font-bold">Asspass</div>
+        <header
+            className="w-full shadow z-50 relative"
+            role="banner"
+            style={{ backgroundColor: colors.background, color: colors.text }}
+        >
+            <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex justify-between items-center py-4">
+                {/* Left: Logo + Brand */}
+                <div className="flex items-center gap-2">
+                    <Link
+                        href="/"
+                        aria-label="Aasspass Home"
+                        className="block w-[60px] h-[60px] relative"
+                    >
+                        <Image
+                            src="/logo.png"
+                            alt="Asspass Logo"
+                            fill
+                            style={{ objectFit: 'contain' }}
+                            priority
+                            sizes="(max-width: 768px) 300px, 240px"
+                        />
+                    </Link>
+                    <div className="flex flex-col">
+                        <h1 className="text-xl font-extrabold" style={{ color: colors.primary }}>
+                            Asspass
+                        </h1>
+                        <p className="text-sm -mt-2" style={{ color: colors.secondaryText }}>
+                            search kra kiya
+                        </p>
+                    </div>
+                </div>
 
-                <nav>
-                    <ul className="flex gap-4 text-sm md:text-md lg:text-lg font-semibold">
-                        <li className="cursor-pointer">MAP</li>
-                        <li className="cursor-pointer">Deals</li>
-                        <li className="cursor-pointer">About us</li>
-                        <li className="cursor-pointer">Contact us</li>
-                    </ul>
-                </nav>
-            </div>
+                {/* Right: Navigation + Login */}
+                <div className="flex items-center gap-6">
+                    <nav
+                        className="hidden md:flex gap-6 text-sm lg:text-base font-light"
+                        aria-label="Main navigation"
+                    >
+                        {navLinks.map(({ href, label }) => (
+                            <Link
+                                key={href}
+                                href={href}
+                                className="group relative"
+                                style={{ color: colors.primary }}
+                            >
+                                {label}
+                                <span
+                                    className="absolute left-0 -bottom-1 h-[3px] w-0 bg-current transition-all duration-300 group-hover:w-full"
+                                    style={{ backgroundColor: colors.secondaryText }}
+                                ></span>
+                            </Link>
+                        ))}
+                    </nav>
 
-            <div className="md:gap-2 flex">
-                <Button
-                    text="Sign up"
-                    color="#2ecc71"
-                    onClick={() => router.push('/Account/user-login')}
-                />
-                <Button
-                    text="Log in"
-                    color="#265049"
-                    onClick={() => router.push('/Account/user-login')}
-                />
+
+                    <HeaderClientActions navLinks={navLinks} />
+                </div>
             </div>
-        </div>
+        </header>
     );
-};
-
-export default Header;
+}

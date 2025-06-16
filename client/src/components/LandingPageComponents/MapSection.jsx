@@ -12,7 +12,6 @@ const MapSection = () => {
     const [userLocation, setUserLocation] = useState(null);
     const RADIUS_KM = 10;
 
-    // Get user location once on mount
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -25,75 +24,57 @@ const MapSection = () => {
         );
     }, []);
 
-    // Fetch businesses whenever userLocation changes
     useEffect(() => {
-        if (!userLocation) return; // skip if no location
+        if (!userLocation) return;
 
         const fetchData = async () => {
             try {
                 const { latitude, longitude } = userLocation;
-                console.log(userLocation);
-
-                if (!userLocation) {
-                    console.log("User location not available, skipping fetch.");
-                    return;
-                }
 
                 const url = new URL(`${BACKEND_USER_URL}/businesses`);
-                url.searchParams.append("lat", latitude);
-                url.searchParams.append("lng", longitude);
-                url.searchParams.append("radius", RADIUS_KM);
+                url.searchParams.append('lat', latitude);
+                url.searchParams.append('lng', longitude);
+                url.searchParams.append('radius', RADIUS_KM);
 
                 const response = await fetch(url.toString());
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
                 const data = await response.json();
-
-                console.log("Business data:", data);
 
                 const formatted = data.data.map((business) => ({
                     id: business.id,
                     coordinates: [business.longitude, business.latitude],
                     popupText: business.businessName,
-                    city: business.city || "",
-                    color: "red",
-                    websiteLink: business.websiteLink || "",
+                    city: business.city || '',
+                    color: 'red',
+                    websiteLink: business.websiteLink || '',
                 }));
 
                 setBusinesses(formatted);
                 setFilteredBusinesses(formatted);
             } catch (error) {
                 console.error('Error fetching business data:', error);
-                // Optionally set fallback data here
             }
         };
 
         fetchData();
-
     }, [userLocation]);
 
-
-
-
     return (
-        <div className="w-full text-black">
-            {/* Uncomment to enable city filtering */}
-            {/* <div>
-
-                <FilterOptions
+        <section className="w-full px-4 md:px-10 lg:px-32 py-6 bg-gray-50 text-black">
+            <div className="w-full">
+                {/* FilterOptions can be re-enabled here */}
+                {/* <FilterOptions
                     cities={uniqueCities}
                     selectedCity={selectedCity}
                     onChange={handleCityChange}
-                />
-            </div> */}
-            <div>
+                /> */}
 
-                <Map markerData={businesses} />
+                <div className="w-full h-[60vh] sm:h-[70vh] lg:h-[75vh] rounded-xl overflow-hidden shadow-md border border-gray-200 bg-white">
+                    <Map markerData={filteredBusinesses} />
+                </div>
             </div>
-        </div>
+        </section>
     );
 };
 

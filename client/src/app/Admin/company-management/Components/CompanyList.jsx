@@ -104,7 +104,7 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
         return (
             <div
                 key={company.businessId}
-                style={style}
+
                 className="grid text-xs text-black border-b border-gray-100"
                 style={{
                     ...style,
@@ -179,7 +179,8 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
 
     return (
         <div className="flex-1 rounded border border-gray-300 bg-white text-xs overflow-hidden">
-            <div className="relative overflow-auto max-w-full" style={{ height: 540 }}>
+            <div className="relative overflow-x-auto overflow-y-hidden" style={{ height: 540 }}>
+
                 <div className="min-w-max" style={{ height: '100%' }}>
                     {/* Sticky Header */}
                     <div className="grid text-sm font-semibold border-b border-gray-300 bg-white sticky top-0 z-10 shadow text-black"
