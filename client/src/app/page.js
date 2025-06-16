@@ -7,6 +7,7 @@ import MapSection from '@/components/LandingPageComponents/MapSection';
 import Info from '@/components/LandingPageComponents/Info';
 import { memo } from 'react';
 import Faq from '@/components/LandingPageComponents/Faq';
+import EventListing from '@/components/LandingPageComponents/EventListing';
 
 function Home() {
   return (
@@ -15,9 +16,10 @@ function Home() {
       <main className="flex flex-col items-center">
         <Header />
         <HeroSection />
-        <MapSection />
-        <Info />
+        {/* <MapSection /> */}
+        {/* <Info /> */}
         <Faq />
+        <EventListing />
       </main>
     </div>
   );

@@ -222,7 +222,8 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
     return (
         <form
             onSubmit={handleSubmit}
-            className="bg-white p-3 rounded shadow space-y-3 w-full max-w-2xl mx-auto text-xs"
+            className="bg-white p-3 rounded shadow space-y-3 w-full mx-auto text-xs"
+
         >
             <h2 className="text-sm font-semibold text-black">{isEditing ? 'Edit Business' : 'Add Business'}</h2>
 
