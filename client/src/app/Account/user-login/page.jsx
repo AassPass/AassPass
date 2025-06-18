@@ -60,7 +60,7 @@ export default function Page() {
   };
 
   return (
-    <div className="flex h-screen justify-center items-center bg-gray-100 relative">
+    <div className="flex  h-screen justify-center px-4 items-center bg-gray-100 relative">
       <form
         onSubmit={isSignup ? handleSignup : handleLogin}
         className="w-full max-w-md p-8 rounded shadow-md"
@@ -81,8 +81,8 @@ export default function Page() {
               name="name"
               type="text"
               required
-              className="w-full px-4 py-2 mb-2 rounded focus:outline-none focus:ring-2"
-              style={{ backgroundColor: colors.inputBackground, color: colors.text }}
+              className="w-full px-4 py-2 mb-2 rounded border focus:outline-none focus:ring-2"
+
               placeholder="Enter your name"
             />
           </>
@@ -94,8 +94,8 @@ export default function Page() {
           name="email"
           type="email"
           required
-          className="w-full px-4 py-2 mb-2 rounded focus:outline-none focus:ring-2"
-          style={{ backgroundColor: colors.inputBackground, color: colors.text }}
+          className="w-full px-4 py-2 mb-2 rounded border focus:outline-none focus:ring-2"
+
           placeholder="you@example.com"
         />
 
@@ -105,8 +105,8 @@ export default function Page() {
           name="password"
           type="password"
           required
-          className="w-full px-4 py-2 mb-2 rounded focus:outline-none focus:ring-2"
-          style={{ backgroundColor: colors.inputBackground, color: colors.text }}
+          className="w-full px-4 py-2 mb-2 rounded border focus:outline-none focus:ring-2"
+
           placeholder="Enter your password"
         />
 
@@ -118,8 +118,8 @@ export default function Page() {
               name="confirmPassword"
               type="password"
               required
-              className="w-full px-4 py-2 mb-3 rounded focus:outline-none focus:ring-2"
-              style={{ backgroundColor: colors.inputBackground, color: colors.text }}
+              className="w-full px-4 py-2 mb-3 border rounded focus:outline-none focus:ring-2"
+
               placeholder="Re-enter your password"
             />
           </>
@@ -131,7 +131,7 @@ export default function Page() {
           className="w-full font-semibold py-2 rounded transition-colors disabled:opacity-60"
           style={{
             backgroundColor: colors.primary,
-            color: colors.buttonText,
+
           }}
         >
           {loading ? "Please wait..." : isSignup ? "Sign Up" : "Login"}
@@ -141,7 +141,7 @@ export default function Page() {
           {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
           <span
             className="cursor-pointer hover:underline"
-            style={{ color: colors.link }}
+            style={{ color: colors.primaryText }}
             onClick={() => setIsSignup(!isSignup)}
           >
             {isSignup ? "Login here" : "Sign up here"}
