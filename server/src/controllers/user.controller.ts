@@ -78,9 +78,13 @@ export const GetBusinesses = async (req: Request, res: Response): Promise<any> =
         ads: {
           orderBy: { visibleFrom: 'desc' },
           take: 3,
+          include: {
+            images: true,
+          },
         },
       },
     });
+
 
     res.status(200).json({
       message: "Nearby businesses retrieved successfully",

@@ -51,7 +51,7 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
                 role="row"
                 aria-rowindex={index + 2}
                 style={style}
-                className={`grid grid-cols-6 sm:grid-cols-6 md:grid-cols-6 text-sm items-center px-4 border-b ${isEven ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition`}
+                className={`grid grid-cols-[40px_1fr_2fr_1.5fr_100px_110px] text-sm items-center px-4 border-b ${isEven ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition`}
                 tabIndex={0}
             >
                 <div className="py-3 truncate">{index + 1}</div>
@@ -87,6 +87,7 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
             </div>
         );
     };
+
 
     return (
         <div className="w-full max-w-7xl mx-auto p-4 md:p-6 "

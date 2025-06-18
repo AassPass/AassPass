@@ -19,57 +19,7 @@ const UserList = dynamic(() => import('./Components/UserList'), {
 export default function UserMaster() {
     const [edit, setEdit] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [users, setUsers] = useState([
-        {
-            adminId: 'USR001',
-            name: 'Alice Johnson',
-            email: 'alice.johnson@example.com',
-            mobile: '9876543210',
-            isActive: true
-        },
-        {
-            adminId: 'USR002',
-            name: 'Bob Smith',
-            email: 'bob.smith@example.com',
-            mobile: '9123456789',
-            isActive: false
-        },
-        {
-            adminId: 'USR003',
-            name: 'Charlie Davis',
-            email: 'charlie.davis@example.com',
-            mobile: '9988776655',
-            isActive: true
-        },
-        {
-            adminId: 'USR004',
-            name: 'Diana Moore',
-            email: 'diana.moore@example.com',
-            mobile: '9012345678',
-            isActive: false
-        },
-        {
-            adminId: 'USR005',
-            name: 'Ethan Clark',
-            email: 'ethan.clark@example.com',
-            mobile: '9900112233',
-            isActive: true
-        },
-        {
-            adminId: 'USR006',
-            name: 'Fiona Patel',
-            email: 'fiona.patel@example.com',
-            mobile: '9898989898',
-            isActive: true
-        },
-        {
-            adminId: 'USR007',
-            name: 'George Kapoor',
-            email: 'george.kapoor@example.com',
-            mobile: '9871234560',
-            isActive: false
-        }
-    ]);
+    const [users, setUsers] = useState([]);
 
 
     useEffect(() => {
@@ -89,11 +39,9 @@ export default function UserMaster() {
                     },
                 });
 
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-
+                
                 const result = await response.json();
+                console.log(result);
                 setUsers(result.data);
             } catch (error) {
                 console.error('Failed to load users.', error);

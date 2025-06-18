@@ -41,17 +41,7 @@ const MapSection = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
 
         const data = await response.json();
-        console.log(data);
-
-        // const formatted = data.data.map((business) => ({
-        //   id: business.id,
-        //   coordinates: [business.longitude, business.latitude],
-        //   businessType: business.businessType,
-        //   popupText: business.businessName,
-        //   city: business.city || "",
-        //   color: "red",
-        //   websiteLink: business.websiteLink || "",
-        // }));
+        // console.log("data", data);
 
         setBusinesses(data.data);
         setFilteredBusinesses(data.data);
@@ -64,16 +54,8 @@ const MapSection = () => {
   }, [userLocation]);
 
   return (
-    <section className="w-full flex justify-center items-center py-6 bg-gray-50 text-black">
-      <div className="w-[60vw] h-[80vh]">
-        {/* FilterOptions can be re-enabled here */}
-        {/* <FilterOptions
-                    cities={uniqueCities}
-                    selectedCity={selectedCity}
-                    onChange={handleCityChange}
-                /> */}
-
-        {/* <div className="w-full h-[60vh] sm:h-[70vh] lg:h-[75vh] rounded-xl overflow-hidden shadow-md border border-gray-200 bg-white"> */}
+    <section className="w-full flex justify-center items-center py-6 bg-gray-50 text-black" id="lokaly-map">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:w-[60vw] h-[50vh] lg:h-[80vh]">
         <div className="w-full h-full">
           <Map markerData={filteredBusinesses} userLocation={userLocation} />
         </div>

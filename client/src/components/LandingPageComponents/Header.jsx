@@ -7,7 +7,7 @@ import colors from '@/libs/colors';
 
 const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/lokaly-map', label: 'Lokaly Map' },
+    { href: '/#lokaly-map', label: 'Lokaly Map' },
     { href: '/Account/user-login', label: 'Register Your Business' },
     { href: '/ads-plan', label: 'Ads Plan' },
     { href: '/about-us', label: 'About Us' },
@@ -17,7 +17,7 @@ const navLinks = [
 export default function Header() {
     return (
         <header
-            className="w-full shadow z-50 relative"
+            className="w-full shadow z-50 sticky top-0"
             role="banner"
             style={{ backgroundColor: colors.background, color: colors.text }}
         >

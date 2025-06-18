@@ -14,7 +14,7 @@ import PopupContent from "./PopupContent";
 const Map = ({ markerData, userLocation }) => {
   const mapRef = useRef(null);
   const markersRef = useRef([]);
-  console.log(markerData);
+  // console.log(markerData);
 
   useEffect(() => {
     if (!mapRef.current || markerData.length === 0) return;
@@ -45,14 +45,14 @@ const Map = ({ markerData, userLocation }) => {
         "top-right"
       );
 
-      const geocoder = new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        mapboxgl,
-        marker: true,
-        placeholder: "Search location...",
-      });
+      // const geocoder = new MapboxGeocoder({
+      //   accessToken: mapboxgl.accessToken,
+      //   mapboxgl,
+      //   marker: true,
+      //   placeholder: "Search location...",
+      // });  
 
-      map.addControl(geocoder, "top-left");
+      // map.addControl(geocoder, "top-left");
 
       const addMarkers = () => {
         markersRef.current = markerData.map(
