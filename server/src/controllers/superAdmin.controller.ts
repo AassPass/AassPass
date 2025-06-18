@@ -52,7 +52,7 @@ const CreateAdmin = async (req: Request, res: Response): Promise<any> => {
       }
     });
 
-    await sendIDPasswordEmail(email, password);
+    await sendIDPasswordEmail(adminId, email, password);
 
     return res.status(201).json({
       message: 'Admin created successfully',

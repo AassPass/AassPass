@@ -108,6 +108,7 @@ const UserRegister = async (req: Request, res: Response): Promise<any> => {
         if(existingUser) {
             return res.status(409).json({ message: "User with this email already exists"});
         }
+        
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await prisma.user.create( {
             data: {

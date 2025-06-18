@@ -32,11 +32,17 @@ export default function Page() {
 
       router.push("/");
     } catch (err) {
-      console.error(err.message || "Login failed");
+      // Check for email verification error
+      if (err.message === "Verify your email first. Check your Inbox or spam folder.") {
+        alert(err.message);
+      } else {
+        console.error("Login failed");
+      }
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleSignup = async (e) => {
     e.preventDefault();

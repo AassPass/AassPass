@@ -3,7 +3,7 @@ import { prisma } from "../utils/prisma";
 import { VerificationStatus, SubscriptionType, BusinessType } from '@prisma/client';
 import { businessTypeMap, generatePassword } from "../utils/lib";
 import bcrypt from "bcrypt";
-import { sendIDPasswordEmail, sendVerificationEmail } from "../services/email.service";
+import { sendIDPasswordEmail, sendUserIDPasswordEmail, sendVerificationEmail } from "../services/email.service";
 import jwt from "jsonwebtoken";
 import { config } from "dotenv";
 
@@ -90,7 +90,7 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
       }
     });
 
-    await sendIDPasswordEmail(emailAddress, password);
+    await sendUserIDPasswordEmail(emailAddress, password);
 
     return res.status(201).json({ message: 'Business registered successfully', business: newBusiness, generatedPassword: password });
   } catch (error: any) {

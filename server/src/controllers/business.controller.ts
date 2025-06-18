@@ -26,8 +26,23 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
     if (!files || files.length === 0)
       return res.status(400).json({ message: "At least one image is required" });
 
-    const business = await prisma.business.findUnique({ where: { businessId } });
+    const business = await prisma.business.findUnique({
+      where: { businessId },
+      include: { ads: true },
+    });
+
     if (!business) return res.status(404).json({ message: "Business not found" });
+
+    // 2. Check ad limit based on subscription type
+    const currentAdCount = business.ads.length;
+    const subscription = business.subscriptionType;
+
+    let adLimit = 0;
+    if (subscription === "STANDARD") adLimit = 2;
+    else if (subscription === "PREMIUM") adLimit = 5;
+
+    if (currentAdCount >= adLimit)
+      return res.status(403).json({ message: `Ad limit reached (${adLimit} ads allowed for ${subscription} plan)` });
 
     // Create the ad
     const ad = await prisma.ads.create({
