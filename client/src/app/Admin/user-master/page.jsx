@@ -41,7 +41,7 @@ export default function UserMaster() {
 
                 
                 const result = await response.json();
-                console.log(result);
+                // console.log(result);
                 setUsers(result.data);
             } catch (error) {
                 console.error('Failed to load users.', error);

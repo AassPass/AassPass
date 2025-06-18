@@ -26,7 +26,7 @@ export default function ForgetPassword() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      console.log(response);
+      // console.log(response);
       if (response.ok) {
         setSuccess("OTP sent successfully!");
         setStep(2);

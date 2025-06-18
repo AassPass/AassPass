@@ -15,7 +15,7 @@ const page = () => {
     
     async function fetchUserData(){
         const token = localStorage.getItem('token');
-        console.log("token:", token);
+        // console.log("token:", token);
         try{
             const response = await fetch(`${BACKEND_USER_URL}/profile`, {
                 headers: {
@@ -23,7 +23,7 @@ const page = () => {
                 }
             });
             const data = await response.json();
-            console.log(data.user);
+            // console.log(data.user);
             if(response.ok){
                 setUserData(data.user);
                 setLoading(false);
