@@ -38,7 +38,7 @@ export default function Page() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 p-4 overflow-y-auto">
+            <main className="flex-1 bg-white p-4 overflow-y-auto">
                 <ActiveComponent />
             </main>
         </div>

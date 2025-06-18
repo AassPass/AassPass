@@ -1,33 +1,38 @@
 'use client';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '../Button';
 import colors from '@/libs/colors';
-
-// Dummy function (replace this with actual auth context or prop)
-const useAuth = () => {
-    // Replace with actual authentication logic
-    const user = null; // or an object like { name: "Juned" } if logged in
-    const logout = () => {
-        console.log('User logged out'); // Replace with actual logout logic
-        // Example: localStorage.clear(); router.push('/');
-    };
-    return { user, logout };
-};
+import { useRole } from '@/Context/RoleContext';
 
 const HeaderClientActions = ({ navLinks }) => {
     const router = useRouter();
     const [open, setOpen] = useState(false);
-    const { user, logout } = useAuth();
+    const { role, logout } = useRole();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    // Detect login state
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const token = localStorage.getItem('token');
+            setIsLoggedIn(!!token);
+        };
+
+        handleStorageChange(); // run once on mount
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
 
     const toggleMenu = () => setOpen(!open);
 
     const handleAuthAction = () => {
-        if (user) {
+        if (isLoggedIn) {
             logout();
+            router.push('/Account/user-login'); // redirect to login after logout
         } else {
             router.push('/Account/user-login');
         }
@@ -39,9 +44,9 @@ const HeaderClientActions = ({ navLinks }) => {
             {/* Desktop Button */}
             <div className="hidden md:flex">
                 <Button
-                    text={user ? 'Logout' : 'Login'}
-                    color={user ? '#e74c3c' : '#265049'}
-                    aria-label={user ? 'Logout' : 'Login'}
+                    text={isLoggedIn ? 'Logout' : 'Login'}
+                    color={isLoggedIn ? '#e74c3c' : '#265049'}
+                    aria-label={isLoggedIn ? 'Logout' : 'Login'}
                     onClick={handleAuthAction}
                 />
             </div>
@@ -53,12 +58,13 @@ const HeaderClientActions = ({ navLinks }) => {
                 aria-label={open ? 'Close menu' : 'Open menu'}
                 title={open ? 'Close menu' : 'Open menu'}
             >
-                {open ? <X size={28} /> : <Menu size={28} />}
+                {open ? <X size={28}/> : <Menu size={28}/>}
             </button>
 
             {/* Mobile Menu */}
             {open && (
-                <div className="absolute top-full left-0 w-full bg-white shadow-lg z-50 md:hidden border-t"
+                <div
+                    className="absolute top-full left-0 w-full bg-white shadow-lg z-50 md:hidden border-t"
                     style={{ backgroundColor: colors.background }}
                 >
                     <nav className="flex flex-col p-4 gap-4" aria-label="Mobile navigation">
@@ -76,8 +82,8 @@ const HeaderClientActions = ({ navLinks }) => {
                         ))}
                         <div className="mt-4">
                             <Button
-                                text={user ? 'Logout' : 'Login'}
-                                color={user ? '#e74c3c' : '#265049'}
+                                text={isLoggedIn ? 'Logout' : 'Login'}
+                                color={isLoggedIn ? '#e74c3c' : '#265049'}
                                 onClick={handleAuthAction}
                             />
                         </div>
@@ -87,5 +93,4 @@ const HeaderClientActions = ({ navLinks }) => {
         </div>
     );
 };
-
 export default HeaderClientActions;

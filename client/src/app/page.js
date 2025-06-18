@@ -8,6 +8,7 @@ import Info from '@/components/LandingPageComponents/Info';
 import { memo } from 'react';
 import Faq from '@/components/LandingPageComponents/Faq';
 import EventListing from '@/components/LandingPageComponents/EventListing';
+import BestPriceDeals from '@/components/LandingPageComponents/BestPriceDeals';
 
 function Home() {
   return (
@@ -18,6 +19,7 @@ function Home() {
         <HeroSection />
         <MapSection />
         {/* <Info /> */}
+        <BestPriceDeals/>
         <EventListing />
         <Faq />
       </main>

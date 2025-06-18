@@ -7,6 +7,7 @@ import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
 import { BACKEND_URL } from '@/app/Utils/backendUrl';
 import { Pencil, Trash2 } from 'lucide-react'; // Optional: icons for buttons
+import colors from '@/libs/colors';
 
 const ROW_HEIGHT = 56;
 
@@ -88,11 +89,13 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
     };
 
     return (
-        <div className="w-full max-w-7xl mx-auto p-4 md:p-6 bg-white rounded-xl shadow-md">
+        <div className="w-full max-w-7xl mx-auto p-4 md:p-6 "
+        >
 
 
             {/* Responsive Scroll Wrapper */}
-            <div className="overflow-x-auto rounded-lg border border-gray-200">
+            <div className="overflow-x-auto rounded-lg border border-gray-200"
+            >
                 <div className="min-w-[700px]"> {/* Minimum width for table layout */}
                     {/* Table Header */}
                     <div

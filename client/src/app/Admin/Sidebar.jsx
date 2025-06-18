@@ -19,7 +19,7 @@ const Sidebar = ({ activeComponent, setActiveComponent }) => {
         menuItems.push({ name: 'company-management', label: 'Business Master' });
     }
 
-    if (hasPermission(role, PERMISSIONS.VERIFY_ADS)) {
+    if (hasPermission(role, PERMISSIONS.ADD_ADS)) {
         menuItems.push({ name: 'ad-listing', label: 'Ad Listing' });
     }
 
@@ -43,16 +43,16 @@ const Sidebar = ({ activeComponent, setActiveComponent }) => {
             </nav>
 
             {/* Ad Credit Button */}
-            <div className="md:mt-6 w-full md:w-auto">
+            {/* <div className="md:mt-6 w-full md:w-auto">
                 <button
-                    className="font-semibold text-xs md:text-sm px-3 md:px-5 py-1.5 md:py-2 rounded text-white whitespace-nowrap w-full md:w-auto"
+                    className="font-semibold text-xs md:text-sm px-2 md:px-5 py-1.5 md:py-2 rounded text-white whitespace-nowrap w-full md:w-auto"
                     style={{
                         backgroundColor: colors.secondaryText,
                     }}
                 >
                     Ad Credit −5$
                 </button>
-            </div>
+            </div> */}
         </div>
 
 
