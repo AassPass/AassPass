@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 
 const Faq = () => {
     const userFaqs = [
@@ -47,25 +49,39 @@ const Faq = () => {
         },
     ];
 
-    const FaqBlock = (title, faqs, color, indexOffset = 0) => (
-        <div className="w-full md:w-1/2 px-2">
-            <h2 className={`text-lg font-semibold mb-4 ${color}`}>{title}</h2>
-            {faqs.map((item, i) => (
-                <details
-                    key={i}
-                    className="group border rounded-lg bg-white shadow mb-3 overflow-hidden transition-all"
-                >
-                    <summary className="flex items-center justify-between px-5 py-3 cursor-pointer font-medium text-gray-800 hover:bg-gray-100 transition-colors">
-                        <span>{i + 1 + indexOffset}. {item.q}</span>
-                        <span className="text-gray-400 group-open:rotate-180 transition-transform duration-300 text-lg">▾</span>
-                    </summary>
-                    <div className="max-h-0 group-open:max-h-[500px] px-5 pb-4 pt-0 text-sm text-gray-700 whitespace-pre-line leading-relaxed transition-all duration-500 ease-in-out">
-                        {item.a}
-                    </div>
-                </details>
-            ))}
-        </div>
-    );
+    const FaqBlock = (title, faqs, color, indexOffset = 0) => {
+        const [openIndex, setOpenIndex] = useState(null);
+
+        const toggleIndex = (index) => {
+            setOpenIndex(openIndex === index ? null : index);
+        };
+
+        return (
+            <div className="w-full md:w-1/2 px-2">
+                <h2 className={`text-lg font-semibold mb-4 ${color}`}>{title}</h2>
+                {faqs.map((item, i) => {
+                    const isOpen = openIndex === i;
+                    return (
+                        <div key={i} className="border rounded-lg bg-white shadow mb-3 overflow-hidden transition-all">
+                            <button
+                                onClick={() => toggleIndex(i)}
+                                className="w-full flex justify-between items-center px-5 py-3 font-medium text-left text-gray-800 hover:bg-gray-100 transition-colors"
+                            >
+                                <span>{i + 1 + indexOffset}. {item.q}</span>
+                                <span className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>▾</span>
+                            </button>
+                            <div
+                                className={`px-5 pt-0 pb-3 text-sm text-gray-700 whitespace-pre-line leading-relaxed transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                                    } overflow-hidden`}
+                            >
+                                {item.a}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
 
     return (
         <div id="faq" className="w-full px-4 py-10 flex justify-center bg-gray-50 min-h-screen">
