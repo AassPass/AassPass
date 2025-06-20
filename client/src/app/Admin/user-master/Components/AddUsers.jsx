@@ -64,6 +64,12 @@ function AddUsers({ edit, setEdit, selectedUser, setSelectedUser, setUsers }) {
             [name]: name === 'isActive' ? value === 'true' : value,
         }));
     };
+    const handleCancel = () => {
+        setFormData({ name: '', mobile: '', email: '', isActive: false });
+        setSelectedUser(null);
+        setEdit(false);
+        setErrors({});
+    };
 
     const handleKeyDown = useCallback((e) => {
         if (e.key === 'Enter') {
@@ -210,7 +216,7 @@ function AddUsers({ edit, setEdit, selectedUser, setSelectedUser, setUsers }) {
                 </label>
             </fieldset>
 
-            <div className="mt-4">
+            <div className="mt-4 flex gap-2">
                 <button
                     type="submit"
                     disabled={loading}
@@ -221,7 +227,18 @@ function AddUsers({ edit, setEdit, selectedUser, setSelectedUser, setUsers }) {
                 >
                     {loading ? 'Saving...' : edit ? 'Update User' : 'Add User'}
                 </button>
+
+                {edit && (
+                    <button
+                        type="button"
+                        onClick={handleCancel}
+                        className="px-4 py-2 text-sm font-medium rounded-md bg-gray-500 text-white hover:bg-gray-600"
+                    >
+                        Cancel
+                    </button>
+                )}
             </div>
+
         </form>
     );
 }

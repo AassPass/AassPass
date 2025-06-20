@@ -337,7 +337,10 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
                 {isEditing && (
                     <button
                         type="button"
-                        onClick={() => setIsEditing(false)}
+                        onClick={() => {
+                            setIsEditing(false);
+                            setFormData(initialFormData); // Reset the form data
+                        }}
                         className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs w-full md:w-auto"
                     >
                         Cancel
