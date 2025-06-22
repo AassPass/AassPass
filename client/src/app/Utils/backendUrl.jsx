@@ -1,4 +1,4 @@
-const BaseUrl = '13.51.194.186:3000';
+const BaseUrl = 'http://13.201.101.119:5000';
 
 export const BACKEND_URL = `${BaseUrl}/super-admin`;
 export const BACKEND_ADMIN_URL = `${BaseUrl}/admin`;

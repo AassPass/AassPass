@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { MAPBOX_TOKEN } from "@/app/Utils/backendUrl";
+// import { MAPBOX_TOKEN } from "@/app/Utils/backendUrl";
 import ReactDOM from "react-dom/client";
 import mapboxglModule from "mapbox-gl";
 import { createCustomImageMarker } from "./CustomImageMarker";
@@ -16,13 +16,14 @@ const Map = ({ markerData, userLocation }) => {
   const markersRef = useRef([]);
   // console.log(markerData);
 
+  console.log(process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
   useEffect(() => {
     if (!mapRef.current) return;
 
     const loadMap = async () => {
       // const mapboxgl = await import('mapbox-gl');
       const mapboxgl = mapboxglModule.default || mapboxglModule;
-      mapboxgl.accessToken = process.env.MAPBOX_TOKEN || "";
+      mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
 
       const map = new mapboxgl.Map({
         container: mapRef.current,
