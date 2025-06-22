@@ -2,53 +2,41 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Marquee from 'react-fast-marquee';
 
 const content = [
-    { text: 'Shop A - 20% OFF!', img: '/shop-a.png' },
-    { text: 'Shop B - New Arrivals!', img: '/shop-b.png' },
-    { text: 'Shop C - Buy 1 Get 1 Free!', img: '/shop-c.png' },
-    { text: 'Visit us now!', img: '/visit-us.png' },
+  { text: '20% OFF!', img: '/businessIcon/kfc.svg' },
+  { text: 'New Arrivals!', img: '/businessIcon/burger-king.svg' },
+  { text: 'Buy 1 Get 1 Free!', img: '/businessIcon/taco-bell.svg' },
+  { text: 'Visit us now!', img: '/businessIcon/popeyes.svg' },
+  { text: 'Buy 1 Get 1 Free!', img: '/businessIcon/taco-bell.svg' },
+  { text: 'New Arrivals!', img: '/businessIcon/burger-king.svg' },
+  { text: 'Visit us now!', img: '/businessIcon/popeyes.svg' },
+  { text: 'Buy 1 Get 1 Free!', img: '/businessIcon/taco-bell.svg' },
 ];
 
 const OfferBanner = () => {
-    return (
-        <div className="relative w-full overflow-hidden bg-yellow-100 py-4" aria-label="Promotional Offers Banner">
-            <div className="marquee flex gap-8 w-max animate-scroll hover:[animation-play-state:paused] px-4">
-                {[...content, ...content].map((item, idx) => (
-                    <div
-                        key={idx}
-                        className="flex-shrink-0 flex flex-col items-center w-[110px] sm:w-[130px] text-center text-gray-800 text-sm sm:text-base font-medium"
-                    >
-                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border border-gray-300 mb-2">
-                            <Image
-                                src={item.img}
-                                alt={item.text}
-                                fill
-                                className="object-cover"
-                                loading="lazy"
-                            />
-                        </div>
-                        <span className="truncate w-full">{item.text}</span>
-                    </div>
-                ))}
-            </div>
-
-            <style jsx>{`
-                @keyframes scroll {
-                    0% {
-                        transform: translateX(0%);
-                    }
-                    100% {
-                        transform: translateX(-50%);
-                    }
-                }
-
-                .animate-scroll {
-                    animation: scroll 20s linear infinite;
-                }
-            `}</style>
-        </div>
-    );
+  return (
+    <div className="relative w-full overflow-hidden bg-yellow-100 py-4" aria-label="Promotional Offers Banner">
+      <Marquee gradient={false} speed={50} pauseOnHover={true} className="px-4">
+        {content.map((item, index) => (
+          <div
+            key={index}
+            className="flex items-center gap-4 p-2 bg-white rounded-lg shadow-md mx-4 min-w-fit"
+          >
+            <Image
+              src={item.img}
+              alt={item.text}
+              width={40}
+              height={40}
+              className="w-10 h-10 object-contain"
+            />
+            <span className="text-sm font-semibold text-gray-800">{item.text}</span>
+          </div>
+        ))}
+      </Marquee>
+    </div>
+  );
 };
 
 export default OfferBanner;

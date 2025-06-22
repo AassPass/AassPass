@@ -83,7 +83,7 @@ export default function BestPriceDeals() {
                     {/* CTA Image */}
                     <div className="w-full md:w-[560px] h-[360px]">
                         <Image
-                            src="/Deal 3.png" // Make sure this path is correct
+                            src="/Deal 2.png" // Make sure this path is correct
                             alt="Start Saving"
                             width={500}
                             height={360}

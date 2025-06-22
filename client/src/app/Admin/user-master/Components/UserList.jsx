@@ -7,7 +7,7 @@ import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
 import { BACKEND_URL } from '@/app/Utils/backendUrl';
 import { Pencil, Trash2 } from 'lucide-react'; // Optional: icons for buttons
-import colors from '@/libs/colors';
+
 
 const ROW_HEIGHT = 56;
 
@@ -32,7 +32,7 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
                 },
             });
 
-            if (response.ok) {
+            if (response.status === "201" || response.status === "200") {
                 setUsers(prev => prev.filter(user => user.adminId !== id));
             } else {
                 console.error('Failed to delete user.');

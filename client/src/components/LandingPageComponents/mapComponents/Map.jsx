@@ -5,7 +5,7 @@ import { MAPBOX_TOKEN } from "@/app/Utils/backendUrl";
 import ReactDOM from "react-dom/client";
 import mapboxglModule from "mapbox-gl";
 import { createCustomImageMarker } from "./CustomImageMarker";
-import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+// import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "mapbox-gl/dist/mapbox-gl.css";
 import PopupContent from "./PopupContent";
 
@@ -17,12 +17,12 @@ const Map = ({ markerData, userLocation }) => {
   // console.log(markerData);
 
   useEffect(() => {
-    if (!mapRef.current || markerData.length === 0) return;
+    if (!mapRef.current) return;
 
     const loadMap = async () => {
       // const mapboxgl = await import('mapbox-gl');
       const mapboxgl = mapboxglModule.default || mapboxglModule;
-      mapboxgl.accessToken = MAPBOX_TOKEN;
+      mapboxgl.accessToken = process.env.MAPBOX_TOKEN || "";
 
       const map = new mapboxgl.Map({
         container: mapRef.current,
@@ -36,14 +36,16 @@ const Map = ({ markerData, userLocation }) => {
 
       map.addControl(new mapboxgl.NavigationControl(), "top-right");
       map.addControl(new mapboxgl.FullscreenControl(), "top-right");
-      map.addControl(
-        new mapboxgl.GeolocateControl({
-          positionOptions: { enableHighAccuracy: true },
-          trackUserLocation: true,
-          showUserHeading: true,
-        }),
-        "top-right"
-      );
+      const geolocate = new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true
+        },
+        trackUserLocation: true,
+        showUserHeading: true
+      });
+
+      // Add it to the map
+      map.addControl(geolocate, "top-right");
 
       // const geocoder = new MapboxGeocoder({
       //   accessToken: mapboxgl.accessToken,
@@ -97,6 +99,9 @@ const Map = ({ markerData, userLocation }) => {
 
       addMarkers();
       map.on("zoomend", handleZoom);
+      map.on("load", () => {
+        geolocate.trigger();
+      });
 
       return () => {
         map.off("zoomend", handleZoom);

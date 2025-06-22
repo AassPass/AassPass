@@ -8,7 +8,7 @@ import { Search } from 'lucide-react';
 const HeroSection = () => {
     return (
         <>
-            <section className="relative w-full min-h-[calc(100vh-84px)] overflow-hidden flex items-center justify-center">
+            <section className="relative w-full min-h-[calc(100vh-84px)] overflow-hidden flex items-center justify-center ">
                 {/* Background Banner Image */}
                 <Image
                     src="/banner.jpg"

@@ -17,7 +17,7 @@ const navLinks = [
 export default function Header() {
     return (
         <header
-            className="w-full shadow z-50 sticky top-0"
+            className="w-full shadow z-50 sticky"
             role="banner"
             style={{ backgroundColor: colors.background, color: colors.text }}
         >
