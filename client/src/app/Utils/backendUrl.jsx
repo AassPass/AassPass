@@ -1,4 +1,4 @@
-const BaseUrl = 'http://13.201.101.119:5000';
+const BaseUrl = 'https://api.aasspass.co.in';
 
 export const BACKEND_URL = `${BaseUrl}/super-admin`;
 export const BACKEND_ADMIN_URL = `${BaseUrl}/admin`;
