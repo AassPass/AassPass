@@ -14,7 +14,7 @@ import PopupContent from "./PopupContent";
 const Map = ({ markerData, userLocation }) => {
   const mapRef = useRef(null);
   const markersRef = useRef([]);
-  console.log(markerData);
+  // console.log(markerData);
 
   // console.log(process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
   useEffect(() => {
