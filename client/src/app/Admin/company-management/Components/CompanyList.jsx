@@ -82,7 +82,7 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
                 },
             });
 
-            if (!res.ok) {
+            if (!res.status === 200 || !res.status === 201) {
                 const errorData = await res.json().catch(() => ({}));
                 throw new Error(errorData.message || 'Delete failed');
             }
@@ -155,7 +155,7 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
                     <div className="py-1 px-2">
                         <button
                             onClick={() => {
-                                setEditingCompany(company.businessId);
+                                setEditingCompany(company);
                                 setIsEditing(true);
                             }}
                             className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded text-xs"

@@ -1,21 +1,12 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo, useTransition, memo, useRef } from 'react';
+import { useEffect, useState, useCallback, useMemo, useTransition, memo } from 'react';
 
-import { BACKEND_ADMIN_URL } from '@/app/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
 import { saveBusiness } from '@/services/business';
 
-export function useRafDebounce(callback) {
-    const frame = useRef(null);
 
-    return (...args) => {
-        if (frame.current) cancelAnimationFrame(frame.current);
-        frame.current = requestAnimationFrame(() => {
-            callback(...args);
-        });
-    };
-}
+
 
 const businessTypeMap = {
     'Retail Store': 'RETAIL_STORE',
@@ -92,44 +83,46 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
 
     const subscriptionTypes = ['STANDARD', 'PREMIUM'];
     const businessTypes = Object.keys(businessTypeMap);
+    const reverseBusinessTypeMap = useMemo(() => {
+        return Object.entries(businessTypeMap).reduce((acc, [label, value]) => {
+            acc[value] = label;
+            return acc;
+        }, {});
+    }, []);
 
     useEffect(() => {
         startTransition(() => {
             if (isEditing && editingCompany) {
                 setFormData({
+                    ...initialFormData,
                     ...editingCompany,
-                    socialLinks: editingCompany.socialLinks || [{ platform: '', link: '' }],
+                    businessType: reverseBusinessTypeMap[editingCompany.businessType] || '',
+                    socialLinks: editingCompany.socialLinks?.length > 0
+                        ? editingCompany.socialLinks
+                        : [{ platform: '', link: '' }],
                 });
             } else {
                 setFormData({ ...initialFormData });
             }
         });
-    }, [isEditing, editingCompany, contextBusinessId]);
+    }, [isEditing, editingCompany, contextBusinessId, reverseBusinessTypeMap]);
 
-    const debouncedHandleChange = useRafDebounce((name, value) => {
-        setFormData(prev => {
-            if (prev[name] === value) return prev;
-            return { ...prev, [name]: value };
-        });
-    });
+
 
     const handleChange = useCallback((e) => {
         const { name, value } = e.target;
-        debouncedHandleChange(name, value);
-    }, [debouncedHandleChange]);
+        setFormData(prev => ({ ...prev, [name]: value }));
+    }, []);
 
-    const debouncedSocialChange = useRafDebounce((index, field, value) => {
+
+
+    const handleSocialLinkChange = useCallback((index, field, value) => {
         setFormData(prev => {
             const updatedLinks = [...prev.socialLinks];
             updatedLinks[index][field] = value;
             return { ...prev, socialLinks: updatedLinks };
         });
-    });
-
-    const handleSocialLinkChange = useCallback((index, field, value) => {
-        debouncedSocialChange(index, field, value);
-    }, [debouncedSocialChange]);
-
+    }, []);
     const addSocialLink = useCallback(() => {
         setFormData(prev => ({
             ...prev,
@@ -191,7 +184,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
         const newBusiness = {
             ...formData,
             // businessId: editingCompany?.businessId || formData.businessId || `BUS${Date.now()}`,
-            businessType: businessTypeMap[formData.businessType] || 'OTHER',
+            // businessType: businessTypeMap[formData.businessType] || 'OTHER',
             // joinedDate: editingCompany?.joinedDate || new Date().toISOString().split('T')[0],
         };
 
