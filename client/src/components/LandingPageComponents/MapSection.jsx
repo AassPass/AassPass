@@ -33,7 +33,7 @@ const MapSection = () => {
 
   const fetchData = async (lat, lng) => {
     try {
-      const response = await getNearbyBusinesses({ lat: 28.61, lng: 77.20, radius: 5 });
+      const response = await getNearbyBusinesses({ lat, lng, radius: 5 });
       const businesses = response.data;
       // setBusinesses(businesses);
       setFilteredBusinesses(businesses);
@@ -43,29 +43,42 @@ const MapSection = () => {
   };
 
   useEffect(() => {
-    const watchId = navigator.geolocation.watchPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
+    const handlePosition = (position) => {
+      const { latitude, longitude } = position.coords;
 
-        if (lastLocationRef.current) {
-          const distance = getDistance(
-            lastLocationRef.current.latitude,
-            lastLocationRef.current.longitude,
-            latitude,
-            longitude
-          );
+      if (lastLocationRef.current) {
+        const distance = getDistance(
+          lastLocationRef.current.latitude,
+          lastLocationRef.current.longitude,
+          latitude,
+          longitude
+        );
 
-          if (distance < MIN_DISTANCE_METERS) return; // Skip if less than 100m
-        }
+        if (distance < MIN_DISTANCE_METERS) return;
+      }
 
-        lastLocationRef.current = { latitude, longitude };
-        setUserLocation({ latitude, longitude });
+      lastLocationRef.current = { latitude, longitude };
+      setUserLocation({ latitude, longitude });
 
-        if (debounceRef.current) clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => {
-          fetchData(latitude, longitude);
-        }, 3000); // debounce fetch
+      // Only debounce if it's not the first fetch
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        fetchData(latitude, longitude);
+      }, lastLocationRef.current ? 3000 : 0);
+    };
+
+    // First fetch with current position
+    navigator.geolocation.getCurrentPosition(
+      handlePosition,
+      (err) => {
+        console.error("Failed to get initial location:", err);
       },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+
+    // Start watching for location changes
+    const watchId = navigator.geolocation.watchPosition(
+      handlePosition,
       (err) => {
         console.error("Failed to get location:", err);
       },
@@ -74,6 +87,7 @@ const MapSection = () => {
 
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
+
 
   return (
     <section className="w-full flex justify-center items-center py-6 px-4 sm:px-6 bg-gray-50 text-black bg-gradient-to-r from-[#0b161c] to-[#201446]">
