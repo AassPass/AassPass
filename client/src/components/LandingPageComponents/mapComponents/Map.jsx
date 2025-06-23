@@ -16,7 +16,7 @@ const Map = ({ markerData, userLocation }) => {
   const markersRef = useRef([]);
   // console.log(markerData);
 
-  console.log(process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
+  // console.log(process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
   useEffect(() => {
     if (!mapRef.current) return;
 
