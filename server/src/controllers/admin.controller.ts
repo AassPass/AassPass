@@ -91,6 +91,7 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
     });
 
     await sendUserIDPasswordEmail(emailAddress, password);
+    console.log(newBusiness);
 
     return res.status(201).json({ message: 'Business registered successfully', business: newBusiness, generatedPassword: password });
   } catch (error: any) {

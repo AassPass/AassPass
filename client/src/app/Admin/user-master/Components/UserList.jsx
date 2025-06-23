@@ -20,6 +20,7 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
     }, [setSelectedUser, setEdit]);
 
     const handleDelete = useCallback(async (id) => {
+        console.log(id);
         if (!window.confirm('Are you sure you want to delete this user?')) return;
 
         try {
@@ -32,7 +33,7 @@ const UserList = ({ users, setUsers, setEdit, setSelectedUser }) => {
                 },
             });
 
-            if (response.status === "201" || response.status === "200") {
+            if (response.status === 201 || response.status === 200) {
                 setUsers(prev => prev.filter(user => user.adminId !== id));
             } else {
                 console.error('Failed to delete user.');

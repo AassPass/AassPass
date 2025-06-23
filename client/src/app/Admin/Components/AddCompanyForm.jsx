@@ -190,9 +190,9 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
 
         const newBusiness = {
             ...formData,
-            businessId: editingCompany?.businessId || formData.businessId || `BUS${Date.now()}`,
+            // businessId: editingCompany?.businessId || formData.businessId || `BUS${Date.now()}`,
             businessType: businessTypeMap[formData.businessType] || 'OTHER',
-            joinedDate: editingCompany?.joinedDate || new Date().toISOString().split('T')[0],
+            // joinedDate: editingCompany?.joinedDate || new Date().toISOString().split('T')[0],
         };
 
         setIsSubmitting(true);
@@ -208,6 +208,8 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
                 );
                 setIsEditing(false);
             } else {
+                // console.log("companies", companies);
+                // console.log("savedBusiness", savedBusiness);
                 setCompanies(prev => [savedBusiness, ...prev]);
                 setFormData(initialFormData);
             }

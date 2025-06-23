@@ -46,6 +46,7 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
     };
 
     const handleKycToggle = async (company) => {
+        console.log(company);
         if (loadingKycIds.has(company.businessId)) return;
         const newStatus = company.verificationStatus === 'VERIFIED' ? 'PENDING' : 'VERIFIED';
         setLoadingKycIds(prev => new Set(prev).add(company.businessId));
@@ -101,6 +102,7 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
 
     const Row = useCallback(({ index, style }) => {
         const company = companies[index];
+        if (!company) return null;
         return (
             <div
                 key={company.businessId}
@@ -153,7 +155,7 @@ const CompanyList = ({ companies, setCompanies, setEditingCompany, setIsEditing 
                     <div className="py-1 px-2">
                         <button
                             onClick={() => {
-                                setEditingCompany(company);
+                                setEditingCompany(company.businessId);
                                 setIsEditing(true);
                             }}
                             className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 rounded text-xs"

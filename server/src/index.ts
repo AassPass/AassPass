@@ -12,8 +12,7 @@ import UserRouter from "./routes/user.routes";
 const app = express();
 
 app.use(cors({
-  origin: ['https://aass-pass.vercel.app', 'https://www.aasspass.co.in/'],
-//   origin: 'http://localhost:3000', 
+  origin: ['https://aass-pass.vercel.app', 'https://www.aasspass.co.in/', 'http://localhost:3000'],
   credentials: true,
   methods: 'GET,POST,PUT,DELETE,PATCH',
 }));

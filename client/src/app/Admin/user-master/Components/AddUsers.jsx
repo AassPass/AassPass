@@ -141,7 +141,7 @@ function AddUsers({ edit, setEdit, selectedUser, setSelectedUser, setUsers }) {
 
         try {
             const data = edit ? await updateUser(token) : await saveNewUser(token);
-            const returnedUser = data.data || formData;
+            const returnedUser = data.admin || formData;
 
             setUsers((prev) =>
                 edit

@@ -16,11 +16,11 @@ export async function saveBusiness(businessData, isEditing, token) {
         body: JSON.stringify(businessData),
     });
 
-    if (!response.ok) {
+    if (!response.status === 201) {
         const errData = await response.json();
         throw new Error(errData.message || 'Failed to save business.');
     }
 
     const resJson = await response.json();
-    return resJson.data || businessData;
+    return resJson.business;
 }
