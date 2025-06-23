@@ -16,13 +16,13 @@ export async function loginAdmin({ adminId, password }) {
 
   return res.json();
 }
-
 export async function loginUser({ email, password }) {
   const res = await fetch(`${BACKEND_AUTH_URL}/user/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: 'include',   // <---- add this line
     body: JSON.stringify({ email, password }),
   });
 
