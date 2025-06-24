@@ -184,9 +184,10 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
         const newBusiness = {
             ...formData,
             // businessId: editingCompany?.businessId || formData.businessId || `BUS${Date.now()}`,
-            // businessType: businessTypeMap[formData.businessType] || 'OTHER',
+            businessType: businessTypeMap[formData.businessType] || 'OTHER',
             // joinedDate: editingCompany?.joinedDate || new Date().toISOString().split('T')[0],
         };
+        console.log(newBusiness)
 
         setIsSubmitting(true);
         try {
@@ -249,7 +250,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
                     <label className={labelClass}>Email</label>
-                    <input type="email" name="emailAddress" value={formData.emailAddress} onChange={handleChange} className={inputClass} />
+                    <input type="email" name="emailAddress" value={formData.emailAddress} onChange={handleChange} className={inputClass} required />
                 </div>
                 <div>
                     <label className={labelClass}>Address</label>
