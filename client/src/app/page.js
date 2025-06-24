@@ -13,7 +13,7 @@ function Home() {
   return (
     <div>
       <Banner />
-      <main className="flex flex-col items-center ">
+      <main className="flex flex-col items-center overflow-x-hidden ">
         <Header />
         <AnimatedSection index={0}><HeroSection /></AnimatedSection>
         <AnimatedSection index={1}><MapSection /></AnimatedSection>

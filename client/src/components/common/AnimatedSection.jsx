@@ -12,21 +12,18 @@ const AnimatedSection = ({ children, className = '', index = 0 }) => {
     const initialX = index % 2 === 0 ? -80 : 80;
 
     return (
-        <div className="overflow-hidden">
-
-            <motion.div
-                ref={ref}
-                initial={{ opacity: 0, x: initialX }}
-                animate={inView ? { opacity: 1, x: 0 } : {}}
-                transition={{
-                    duration: 0.6,
-                    ease: [0.25, 0.46, 0.45, 0.94],
-                }}
-                className={`w-full ${className}`}
-            >
-                {children}
-            </motion.div>
-        </div>
+        <motion.div
+            ref={ref}
+            initial={{ opacity: 0, x: initialX }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{
+                duration: 0.6,
+                ease: [0.25, 0.46, 0.45, 0.94],
+            }}
+            className={`w-full ${className}`}
+        >
+            {children}
+        </motion.div>
     );
 };
 
