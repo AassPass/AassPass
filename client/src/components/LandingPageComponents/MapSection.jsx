@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React, { useEffect, useRef, useState } from "react";
 import Map from "@/components/LandingPageComponents/mapComponents/Map";
@@ -8,9 +8,8 @@ const RADIUS_KM = 20;
 const MIN_DISTANCE_METERS = 100;
 
 function getDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371e3; // Earth radius in meters
+  const R = 6371e3;
   const toRad = (deg) => (deg * Math.PI) / 180;
-
   const φ1 = toRad(lat1);
   const φ2 = toRad(lat2);
   const Δφ = toRad(lat2 - lat1);
@@ -21,11 +20,10 @@ function getDistance(lat1, lon1, lat2, lon2) {
     Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-  return R * c; // in meters
+  return R * c;
 }
 
 const MapSection = () => {
-  // const [businesses, setBusinesses] = useState([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
   const lastLocationRef = useRef(null);
@@ -33,9 +31,8 @@ const MapSection = () => {
 
   const fetchData = async (lat, lng) => {
     try {
-      const response = await getNearbyBusinesses({ lat: 28.61, lng: 77.20, radius: 5 });
+      const response = await getNearbyBusinesses({ lat, lng, radius: RADIUS_KM });
       const businesses = response.data;
-      // setBusinesses(businesses);
       setFilteredBusinesses(businesses);
     } catch (error) {
       console.error("Error fetching business data:", error);
@@ -55,7 +52,7 @@ const MapSection = () => {
             longitude
           );
 
-          if (distance < MIN_DISTANCE_METERS) return; // Skip if less than 100m
+          if (distance < MIN_DISTANCE_METERS) return;
         }
 
         lastLocationRef.current = { latitude, longitude };
@@ -64,7 +61,7 @@ const MapSection = () => {
         if (debounceRef.current) clearTimeout(debounceRef.current);
         debounceRef.current = setTimeout(() => {
           fetchData(latitude, longitude);
-        }, 3000); // debounce fetch
+        }, 3000);
       },
       (err) => {
         console.error("Failed to get location:", err);
@@ -76,14 +73,11 @@ const MapSection = () => {
   }, []);
 
   return (
-    <section className="w-full flex justify-center items-center py-6 px-4 sm:px-6 bg-gray-50 text-black bg-gradient-to-r from-[#0b161c] to-[#201446]">
+    <section className="w-full flex justify-center items-center py-6 px-4 sm:px-6 bg-gradient-to-r from-[#0b161c] to-[#201446]">
       <div className="w-full sm:w-[60vw] h-[60vh] sm:h-[80vh]">
-        <div className="w-full h-full">
-          <Map markerData={filteredBusinesses} userLocation={userLocation} />
-        </div>
+        <Map markerData={filteredBusinesses} userLocation={userLocation} />
       </div>
     </section>
-
   );
 };
 

@@ -10,19 +10,22 @@ import PopupContent from './PopupContent';
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
-const Map = ({ markerData }) => {
+const Map = ({ markerData, userLocation }) => {
+    const mapContainerRef = useRef(null);
     const mapRef = useRef(null);
     const markersRef = useRef([]);
 
     useEffect(() => {
-        if (!mapRef.current || markerData.length === 0) return;
+        if (!mapContainerRef.current) return;
 
-        const map = new mapboxgl.Map({
-            container: mapRef.current,
+        mapRef.current = new mapboxgl.Map({
+            container: mapContainerRef.current,
             style: 'mapbox://styles/mapbox/streets-v11',
             center: [78.9629, 20.5937],
             zoom: 4.5,
         });
+
+        const map = mapRef.current;
 
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');
         map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
@@ -37,67 +40,51 @@ const Map = ({ markerData }) => {
 
         const geocoder = new MapboxGeocoder({
             accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl,
+            mapboxgl,
             marker: true,
             placeholder: 'Search location...',
         });
         map.addControl(geocoder, 'top-left');
 
-        const addMarkers = () => {
-            markersRef.current = markerData.map(({ coordinates, popupText }) => {
-                const popupNode = document.createElement('div');
-                ReactDOM.createRoot(popupNode).render(
-                    <PopupContent name={popupText} coordinates={coordinates} />
-                );
-
-                const popup = new mapboxgl.Popup({ offset: 25 }).setDOMContent(popupNode);
-
-                const el = document.createElement('div');
-                el.className = 'custom-image-marker';
-                el.innerHTML = `
-                    <div class="marker-image-wrapper">
-                        <img src="/marker.png" alt="marker" />
-                    </div>
-                `;
-
-                const marker = new mapboxgl.Marker(el)
-                    .setLngLat(coordinates)
-                    .setPopup(popup)
-                    .addTo(map);
-
-                return marker;
-            });
-        };
-
-        const removeMarkers = () => {
-            markersRef.current.forEach(marker => marker.remove());
-            markersRef.current = [];
-        };
-
-        const handleZoom = () => {
-            const zoom = map.getZoom();
-            if (zoom < 4) {
-                removeMarkers();
-            } else if (zoom >= 4 && markersRef.current.length === 0) {
-                addMarkers();
-            }
-        };
-
-        addMarkers();
-        map.on('zoomend', handleZoom);
-
         return () => {
-            map.off('zoomend', handleZoom);
-            removeMarkers();
             map.remove();
         };
+    }, []);
+
+    useEffect(() => {
+        const map = mapRef.current;
+        if (!map || !markerData || markerData.length === 0) return;
+
+        // Remove old markers
+        markersRef.current.forEach((marker) => marker.remove());
+        markersRef.current = [];
+
+        markerData.forEach(({ coordinates, popupText }) => {
+            const popupNode = document.createElement('div');
+            ReactDOM.createRoot(popupNode).render(
+                <PopupContent name={popupText} coordinates={coordinates} />
+            );
+
+            const popup = new mapboxgl.Popup({ offset: 25 }).setDOMContent(popupNode);
+
+            const el = document.createElement('div');
+            el.className = 'custom-image-marker';
+            el.innerHTML = `
+        <div class="marker-image-wrapper">
+          <img src="/marker.png" alt="marker" />
+        </div>
+      `;
+
+            const marker = new mapboxgl.Marker(el)
+                .setLngLat(coordinates)
+                .setPopup(popup)
+                .addTo(map);
+
+            markersRef.current.push(marker);
+        });
     }, [markerData]);
 
-    return (
-        <div className="h-screen w-full">
-            <div ref={mapRef} className="h-full w-full" />
-        </div>
-    );
+    return <div ref={mapContainerRef} className="h-full w-full" />;
 };
 
 export default Map;

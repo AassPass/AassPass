@@ -10,13 +10,13 @@ const HeroSection = () => {
         <>
             <section className="relative w-full min-h-[calc(100vh-84px)] overflow-hidden flex items-center justify-center ">
                 {/* Background Banner Image */}
-                <Image
+                {/* <Image
                     src="/banner.jpg"
                     alt="Background banner"
                     fill
                     className="object-cover object-center z-0"
                     priority
-                />
+                /> */}
 
                 {/* Overlay Content */}
                 <div className="relative z-10 max-w-7xl w-full h-full flex items-center px-6 lg:px-20">

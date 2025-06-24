@@ -17,7 +17,7 @@ const navLinks = [
 export default function Header() {
     return (
         <header
-            className="w-full shadow z-50 sticky"
+            className=" sticky top-0  left-0 w-full z-50 bg-white shadow"
             role="banner"
             style={{ backgroundColor: colors.background, color: colors.text }}
         >
@@ -31,7 +31,7 @@ export default function Header() {
                     >
                         <Image
                             src="/logo.png"
-                            alt="Asspass Logo"
+                            alt="Aasspass Logo"
                             fill
                             style={{ objectFit: 'contain' }}
                             priority
@@ -40,7 +40,7 @@ export default function Header() {
                     </Link>
                     <div className="flex flex-col">
                         <h1 className="text-xl font-extrabold" style={{ color: colors.primary }}>
-                            Asspass
+                            AassPass
                         </h1>
                         <p className="text-sm -mt-2" style={{ color: colors.secondaryText }}>
                             search kra kiya
