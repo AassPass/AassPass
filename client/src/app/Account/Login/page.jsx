@@ -23,6 +23,7 @@ export default function Page() {
         try {
             const data = await loginAdmin({ adminId, password }); // ✅ Reuse logic
             setRole(data.role);
+
             localStorage.setItem("token", data.token);
             router.push("/Admin");
         } catch (err) {

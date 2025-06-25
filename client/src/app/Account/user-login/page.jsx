@@ -29,8 +29,8 @@ export default function Page() {
       setBusinessId(data.businessId);
       setRole(data.role);
       localStorage.setItem("token", data.token);
-
-      router.push("/");
+      console.log(data.role)
+      router.push("/Admin");
     } catch (err) {
       // Check for email verification error
       if (err.message === "Verify your email first. Check your Inbox or spam folder.") {

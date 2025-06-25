@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
+import Dashboard from './dashboard/page';
+
 
 const Sidebar = dynamic(() => import('./Sidebar'), { ssr: false });
 const CompanyManagement = dynamic(() => import('./company-management/page'));
@@ -11,9 +13,10 @@ const UserMaster = dynamic(() => import('./user-master/page'));
 const Profile = dynamic(() => import('./Profile/page'));
 const AdListing = dynamic(() => import('./ad-master/page'));
 const MapContent = dynamic(() => import('./map/page'));
+const UserBusinessAddForm = dynamic(() => import('./Components/UserBusinessAddForm'))
 
 export default function Page() {
-    const [activeComponent, setActiveComponent] = useState('company-management');
+    const [activeComponent, setActiveComponent] = useState('');
     const router = useRouter();
     const [isCheckingAuth, setIsCheckingAuth] = useState(true); // Optional loading state
 
@@ -27,15 +30,16 @@ export default function Page() {
     }, [router]);
 
     const componentMap = {
-        dashboard: DashboardContent,
+        'dashboard': DashboardContent,
         'user-master': UserMaster,
         'ad-listing': AdListing,
         map: MapContent,
         profile: Profile,
         'company-management': CompanyManagement,
+        "Add Business": UserBusinessAddForm
     };
+    const ActiveComponent = componentMap[activeComponent] || DashboardContent;
 
-    const ActiveComponent = componentMap[activeComponent] || CompanyManagement;
 
     if (isCheckingAuth) return null; // Optional: Or show loading spinner
 

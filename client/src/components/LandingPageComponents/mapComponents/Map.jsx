@@ -143,7 +143,7 @@ const Map = ({ markerData, userLocation }) => {
 
     const map = new mapboxgl.Map({
       container: mapRef.current,
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: "mapbox://styles/aasspass/cmcbj135600ds01sibtg215yi",
       center: userLocation
         ? [userLocation.longitude, userLocation.latitude]
         : [78.9629, 20.5937],

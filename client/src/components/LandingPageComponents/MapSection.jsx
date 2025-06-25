@@ -7,7 +7,7 @@ import { getNearbyBusinesses } from "@/services/mapApi";
 const MIN_DISTANCE_METERS = 100;
 
 function getDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371e3;
+  const R = 6371e3; // Earth's radius in meters
   const toRad = (deg) => (deg * Math.PI) / 180;
   const φ1 = toRad(lat1);
   const φ2 = toRad(lat2);
@@ -31,25 +31,11 @@ const MapSection = () => {
   const initialFetchDoneRef = useRef(false);
   const watchIdRef = useRef(null);
 
-  const fetchIPLocation = async () => {
-    try {
-      const res = await fetch("https://ipapi.co/json/");
-      const data = await res.json();
-      return {
-        latitude: parseFloat(data.latitude),
-        longitude: parseFloat(data.longitude),
-      };
-    } catch (err) {
-      console.warn("IP fallback failed:", err);
-      return null;
-    }
-  };
-
   const fetchData = async (lat, lng) => {
     try {
       const response = await getNearbyBusinesses({ lat, lng, radius: 5 });
       setFilteredBusinesses(response.data);
-      console.log(response.data)
+      console.log(response.data);
     } catch (error) {
       console.error("Error fetching business data:", error);
     }
@@ -100,20 +86,22 @@ const MapSection = () => {
 
     watchIdRef.current = navigator.geolocation.watchPosition(
       handlePosition,
-      () => { },
+      (err) => {
+        console.error("Geolocation watchPosition error:", err);
+        setLocationError(true);
+        setLoading(false);
+      },
       geoOptions
     );
   };
 
   useEffect(() => {
-    fetchIPLocation().then((ipLocation) => {
-      if (ipLocation) {
-        setUserLocation(ipLocation);
-        fetchData(ipLocation.latitude, ipLocation.longitude);
-      }
+    if (!navigator.geolocation) {
+      console.warn("Geolocation is not supported by this browser.");
+      setLocationError(true);
       setLoading(false);
-    });
-
+      return;
+    }
     startGeoWatch();
 
     return () => {
@@ -131,11 +119,14 @@ const MapSection = () => {
           </div>
         ) : locationError && !userLocation ? (
           <div className="text-center">
-            <p className="mb-2">Location access is required to show nearby businesses.</p>
+            <p className="mb-2">
+              Location access is required to show nearby businesses.
+            </p>
             <button
               className="bg-white text-black px-4 py-2 rounded shadow hover:bg-gray-100"
               onClick={() => {
                 setLoading(true);
+                setLocationError(false);
                 startGeoWatch();
               }}
             >

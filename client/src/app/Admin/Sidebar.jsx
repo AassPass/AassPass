@@ -20,6 +20,10 @@ const Sidebar = ({ activeComponent, setActiveComponent }) => {
     if (hasPermission(role, PERMISSIONS.CREATE_BUSINESS)) {
         menuItems.push({ name: 'company-management', label: 'Business Master' });
     }
+    if (hasPermission(role, PERMISSIONS.USER_CREATE_BUSINESS)) {
+
+        menuItems.push({ name: 'Add Business', label: 'Add Business' })
+    }
 
     if (hasPermission(role, PERMISSIONS.ADD_ADS)) {
         menuItems.push({ name: 'ad-listing', label: 'Ad Listing' });
@@ -30,7 +34,7 @@ const Sidebar = ({ activeComponent, setActiveComponent }) => {
 
         // Optionally, clear role context or state if needed
         // Redirect to login or home
-        localStorage.removeItem('role');
+        localStorage.removeItem('role'); 
         localStorage.removeItem('token');
         localStorage.removeItem('adminId');
         localStorage.removeItem('businessId');

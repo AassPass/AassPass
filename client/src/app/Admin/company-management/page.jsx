@@ -57,6 +57,9 @@ export default function CompanyManagement() {
 
     return (
         <div className="flex flex-col gap-6 px-4 py-6 w-full max-w-[1200px] mx-auto">
+
+
+
             <AddCompanyForm
                 companies={companies}
                 setCompanies={setCompanies}
