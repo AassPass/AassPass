@@ -30,11 +30,8 @@ const Sidebar = ({ activeComponent, setActiveComponent }) => {
     }
 
     const handleLogout = () => {
-        // Clear token or any other auth storage
 
-        // Optionally, clear role context or state if needed
-        // Redirect to login or home
-        localStorage.removeItem('role'); 
+        localStorage.removeItem('role');
         localStorage.removeItem('token');
         localStorage.removeItem('adminId');
         localStorage.removeItem('businessId');
