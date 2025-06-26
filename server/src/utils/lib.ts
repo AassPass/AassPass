@@ -25,6 +25,19 @@ const businessTypeMap = {
   "Other": "OTHER",
 };
 
-export { generatePassword, businessTypeMap };
+const adCategoryMap = {
+  "Deals & Discounts": "DEALS_DISCOUNTS",
+  "Events": "EVENTS",
+  "Services": "SERVICES",
+  "Products for Sale": "PRODUCTS_FOR_SALE",
+  "Job Openings": "JOB_OPENINGS",
+  "Rentals & Properties": "RENTALS_PROPERTIES",
+  "Announcements": "ANNOUNCEMENTS",
+  "Contests & Giveaways": "CONTESTS_GIVEAWAYS",
+};
+
+
+
+export { generatePassword, businessTypeMap, adCategoryMap };
 
 

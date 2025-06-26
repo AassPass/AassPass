@@ -4,6 +4,8 @@ import { uploadImage } from "../services/imageStore";
 import fs from "fs";
 import path from "path";
 import { promisify } from "util";
+import { adCategoryMap } from "../utils/lib";
+import { AdCategory } from "@prisma/client";
 const unlinkAsync = promisify(fs.unlink);
 
 
@@ -13,13 +15,13 @@ const generateAdCode = (businessId: string) => {
   return `AD-${businessId}-${shortTime}`;
 };
 
+
 export const CreateAd = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { title, category, visibleFrom, visibleTo, stage, reset = false } = req.body;
+    const { title, category, visibleFrom, visibleTo, stage, reset = false, ...rest } = req.body;
     const businessId = req.user?.businessId;
     const files = req.files as Express.Multer.File[];
 
-    // console.log(req.user);
     if (!title || !category || !visibleFrom || !visibleTo || !stage)
       return res.status(400).json({ message: "Missing required fields" });
 
@@ -31,9 +33,9 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
       include: { ads: true },
     });
 
-    if (!business) return res.status(404).json({ message: "Business not found" });
+    if (!business)
+      return res.status(404).json({ message: "Business not found" });
 
-    // 2. Check ad limit based on subscription type
     const currentAdCount = business.ads.length;
     const subscription = business.subscriptionType;
 
@@ -44,21 +46,94 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
     if (currentAdCount >= adLimit)
       return res.status(403).json({ message: `Ad limit reached (${adLimit} ads allowed for ${subscription} plan)` });
 
-    // Create the ad
+    const mappedCategory = adCategoryMap[category as keyof typeof adCategoryMap];
+
+
+    // Determine category-specific metadata
+    let metadata: Record<string, any> = {};
+
+    switch (category) {
+      case 'Deals & Discounts':
+        metadata = {
+          discountPercentage: rest.discountPercentage,
+          validTill: rest.validTill,
+          terms: rest.terms,
+        };
+        break;
+      case 'Events':
+        metadata = {
+          location: rest.location,
+          time: rest.time,
+          rsvp: rest.rsvp,
+        };
+        break;
+      case 'Services':
+        metadata = {
+          serviceType: rest.serviceType,
+          contact: rest.contact,
+          radius: rest.radius,
+        };
+        break;
+      case 'Products for Sale':
+        metadata = {
+          price: rest.price,
+          deliveryOption: rest.deliveryOption,
+          condition: rest.condition, // e.g. new/used
+        };
+        break;
+      case 'Job Openings':
+        metadata = {
+          salary: rest.salary,
+          hours: rest.hours,
+          location: rest.location,
+          qualifications: rest.qualifications,
+        };
+        break;
+      case 'Rentals & Properties':
+        metadata = {
+          area: rest.area,
+          rent: rest.rent,
+          amenities: rest.amenities,
+          contact: rest.contact,
+          availableFrom: rest.availableFrom,
+        };
+        break;
+      case 'Announcements':
+        metadata = {
+          announcementType: rest.announcementType,
+          content: rest.content,
+          importanceLevel: rest.importanceLevel, // e.g. high/medium/low
+        };
+        break;
+      case 'Contests & Giveaways':
+        metadata = {
+          rules: rest.rules,
+          endDate: rest.endDate,
+          eligibility: rest.eligibility,
+          prize: rest.prize,
+        };
+        break;
+      default:
+        metadata = {};
+    }
+
+
+    // Create ad with metadata
     const ad = await prisma.ads.create({
       data: {
         adId: generateAdCode(businessId as string),
         title,
-        category,
+        category: mappedCategory as AdCategory,
         visibleFrom: new Date(visibleFrom),
         visibleTo: new Date(visibleTo),
         stage,
         reset,
         businessId: business.id,
+        metadata,
       },
     });
 
-    // Upload each image to Cloudinary and save to DB
+    // Upload images
     const imageEntries = [];
 
     for (const file of files) {
@@ -68,7 +143,7 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
       const imageUrl = await uploadImage(tempPath); // uploads to Cloudinary
       imageEntries.push({ url: imageUrl, adId: ad.id });
 
-      await unlinkAsync(tempPath); // delete temp file
+      await unlinkAsync(tempPath);
     }
 
     await prisma.adImage.createMany({ data: imageEntries });
@@ -79,6 +154,7 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 
 export const UpdateAd = async (req: Request, res: Response): Promise<any> => {
