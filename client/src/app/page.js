@@ -17,7 +17,7 @@ function Home() {
         <Header />
 
         <AnimatedSection index={0}><HeroSection /></AnimatedSection>
-        <MapSection />
+        {/* <MapSection /> */}
         <AnimatedSection index={2}><BestPriceDeals /></AnimatedSection>
         <AnimatedSection index={3}><EventListing /></AnimatedSection>
         <AnimatedSection index={4}><Faq /></AnimatedSection>
