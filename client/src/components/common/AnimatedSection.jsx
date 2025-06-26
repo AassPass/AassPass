@@ -5,20 +5,20 @@ import { useInView } from 'react-intersection-observer';
 
 const AnimatedSection = ({ children, className = '', index = 0 }) => {
     const { ref, inView } = useInView({
-        triggerOnce: true, // ✅ Only animate the first time it comes into view
+        triggerOnce: true,
         threshold: 0.1,
     });
 
-    const initialX = index % 2 === 0 ? -80 : 80;
+    const initialX = index % 2 === 0 ? -60 : 60;
 
     return (
         <motion.div
             ref={ref}
             initial={{ opacity: 0, x: initialX }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
+            animate={{ opacity: inView ? 1 : 0, x: inView ? 0 : initialX }}
             transition={{
-                duration: 0.6,
-                ease: [0.25, 0.46, 0.45, 0.94],
+                duration: 1.1, // ⏱️ Slower
+                ease: [0.22, 1, 0.36, 1], // Smooth and natural
             }}
             className={`w-full ${className}`}
         >

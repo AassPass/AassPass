@@ -118,10 +118,14 @@ const Map = ({ markerData, userLocation }) => {
       {selectedBusinessId && (
         <div
           ref={drawerRef}
-          className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-xl overflow-y-auto transform transition-transform duration-300"
+          className={`fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-xl overflow-y-auto transform transition-transform duration-300 ${selectedBusinessId ? 'translate-x-0' : 'translate-x-full'
+            }`}
         >
-          <AdView businessId={selectedBusinessId} onClose={closeDrawer} />
+          {selectedBusinessId && (
+            <AdView businessId={selectedBusinessId} onClose={closeDrawer} />
+          )}
         </div>
+      
       )}
     </div>
   );

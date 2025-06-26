@@ -11,13 +11,13 @@ const navLinks = [
     { href: '/Account/user-login', label: 'Register Your Business' },
     { href: '/ads-plan', label: 'Ads Plan' },
     { href: '/about-us', label: 'About Us' },
-    { href: '/#faq', label: 'FAQ' }
+    { href: '/#faq', label: 'FAQ' },
 ];
 
 export default function Header() {
     return (
         <header
-            className=" sticky top-0  left-0 w-full z-50 bg-white shadow"
+            className="sticky top-0 left-0 w-full z-50 shadow"
             role="banner"
             style={{ backgroundColor: colors.background, color: colors.text }}
         >
@@ -51,26 +51,89 @@ export default function Header() {
                 {/* Right: Navigation + Login */}
                 <div className="flex items-center gap-6">
                     <nav
-                        className="hidden md:flex gap-6 text-sm lg:text-base font-light"
+                        className="hidden md:flex gap-6 text-sm lg:text-base font-light relative"
                         aria-label="Main navigation"
                     >
-                        {navLinks.map(({ href, label }) => (
-                            <Link
-                                key={href}
-                                href={href}
-                                className="group relative"
-                                style={{ color: colors.primary }}
+                        {/* Home */}
+                        <Link
+                            href="/"
+                            className="group relative"
+                            style={{ color: colors.primary }}
+                        >
+                            Home
+                            <span
+                                className="absolute left-0 -bottom-1 h-[3px] w-0 bg-current transition-all duration-300 group-hover:w-full"
+                                style={{ backgroundColor: colors.secondaryText }}
+                            ></span>
+                        </Link>
+
+                        {/* Lokaly Map */}
+                        <Link
+                            href="/#lokaly-map"
+                            className="group relative"
+                            style={{ color: colors.primary }}
+                        >
+                            Lokaly Map
+                            <span
+                                className="absolute left-0 -bottom-1 h-[3px] w-0 bg-current transition-all duration-300 group-hover:w-full"
+                                style={{ backgroundColor: colors.secondaryText }}
+                            ></span>
+                        </Link>
+
+                        {/* For Business Dropdown */}
+                        <div className="group relative">
+                            <span className="cursor-pointer" style={{ color: colors.primary }}>
+                                For Business
+                            </span>
+                            <div
+                                className="absolute hidden group-hover:block top-full mt-2 bg-white shadow-lg rounded-md min-w-[180px] border"
+                                style={{ zIndex: 1000 }}
                             >
-                                {label}
-                                <span
-                                    className="absolute left-0 -bottom-1 h-[3px] w-0 bg-current transition-all duration-300 group-hover:w-full"
-                                    style={{ backgroundColor: colors.secondaryText }}
-                                ></span>
-                            </Link>
-                        ))}
+                                <Link
+                                    href="/Account/user-login"
+                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                    style={{ color: colors.primary }}
+                                >
+                                    Register Your Business
+                                </Link>
+                                <Link
+                                    href="/ads-plan"
+                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                    style={{ color: colors.primary }}
+                                >
+                                    Ads Plan
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* About Dropdown */}
+                        <div className="group relative">
+                            <span className="cursor-pointer" style={{ color: colors.primary }}>
+                                About
+                            </span>
+                            <div
+                                className="absolute hidden group-hover:block top-full mt-2 bg-white shadow-lg rounded-md min-w-[150px] border"
+                                style={{ zIndex: 1000 }}
+                            >
+                                <Link
+                                    href="/about-us"
+                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                    style={{ color: colors.primary }}
+                                >
+                                    About Us
+                                </Link>
+                                <Link
+                                    href="/#faq"
+                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
+                                    style={{ color: colors.primary }}
+                                >
+                                    FAQ
+                                </Link>
+                            </div>
+                        </div>
                     </nav>
 
-
+                    {/* ✅ Pass navLinks to client actions */}
                     <HeaderClientActions navLinks={navLinks} />
                 </div>
             </div>

@@ -12,12 +12,12 @@ import AnimatedSection from '@/components/common/AnimatedSection';
 function Home() {
   return (
     <div>
-      <Banner />
-      <main className="flex flex-col items-center overflow-x-hidden ">
+      {/* <Banner /> */}
+      <main className="flex flex-col items-center overflow-x-hidden bg-gradient-to-r from-[#0b161c] to-[#201446] ">
         <Header />
 
         <AnimatedSection index={0}><HeroSection /></AnimatedSection>
-        <AnimatedSection index={1}><MapSection /></AnimatedSection>
+        <MapSection />
         <AnimatedSection index={2}><BestPriceDeals /></AnimatedSection>
         <AnimatedSection index={3}><EventListing /></AnimatedSection>
         <AnimatedSection index={4}><Faq /></AnimatedSection>

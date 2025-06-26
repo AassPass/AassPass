@@ -58,7 +58,7 @@ const HeaderClientActions = ({ navLinks }) => {
                 aria-label={open ? 'Close menu' : 'Open menu'}
                 title={open ? 'Close menu' : 'Open menu'}
             >
-                {open ? <X size={28}/> : <Menu size={28}/>}
+                {open ? <X size={28} /> : <Menu size={28} />}
             </button>
 
             {/* Mobile Menu */}

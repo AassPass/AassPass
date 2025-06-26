@@ -5,6 +5,8 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+
+
 .right-arrow::before {
   content: "";
   position: absolute;
@@ -15,6 +17,7 @@
   border-radius: 5px;
   transform: translateY(-7.45px) rotate(45deg);
 }
+
 .right-arrow::after {
   content: "";
   position: absolute;
@@ -28,6 +31,7 @@
 html {
   scroll-behavior: smooth;
 }
+
 
 @theme inline {
   --color-background: var(--background);

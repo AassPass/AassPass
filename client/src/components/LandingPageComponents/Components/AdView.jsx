@@ -127,7 +127,7 @@ export default function AdView({ businessId, onClose }) {
                     {ads.map((ad) => (
                         <div
                             key={ad.adCode}
-                            className="border rounded-xl shadow hover:shadow-md transition bg-white overflow-hidden flex flex-col"
+                            className="border  shadow hover:shadow-md transition bg-white overflow-hidden flex flex-col"
                         >
                             {ad.images?.[0] ? (
                                 <img
