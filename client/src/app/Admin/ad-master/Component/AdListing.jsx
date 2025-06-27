@@ -21,7 +21,7 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
     const { businessId } = useRole();
 
     const initialAddData = {
-        adCode: `AD${Date.now()}`,
+
         title: '',
         category: '',
         startDate: '',
@@ -77,17 +77,28 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
             const token = localStorage.getItem('token');
             const formData = new FormData();
 
-            const { adCode, title, category, startDate, endDate, images, extra } = form;
-            [adCode, title, category, startDate, endDate, JSON.stringify(extra)].forEach((val, i) =>
-                formData.append(['adCode', 'title', 'category', 'startDate', 'endDate', 'extra'][i], val)
-            );
+            const {
+                title,
+                category,
+                startDate,   // needs to be renamed
+                endDate,     // needs to be renamed
+                stage,       // new field to add
+                reset = false,
+                images,
+                extra,
+            } = form;
 
-            formData.append('status', status);
-            images.forEach((img) => formData.append('images', img));
-
+            formData.append('title', title);
+            formData.append('category', category);
+            formData.append('visibleFrom', startDate); // ✅ renamed
+            formData.append('visibleTo', endDate);     // ✅ renamed
+            formData.append('stage', stage || 'DRAFT'); // ✅ default fallback
+            formData.append('reset', reset ? 'true' : 'false');
+            images.forEach((img) => formData.append('files', img));
+            console.log(formData)
             const endpoint = isAdEditing
                 ? `${BACKEND_BUSINESS_URL}/ads/${form.adCode}`
-                : `${BACKEND_BUSINESS_URL}/${businessId}/new-ad`;
+                : `${BACKEND_BUSINESS_URL}/new-ad`;
 
             const method = isAdEditing ? 'PUT' : 'POST';
 
@@ -95,7 +106,7 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
                 method,
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    // Note: Do NOT set 'Content-Type' manually when using FormData. The browser will set it correctly.
+                    // Don't set content-type manually!
                 },
                 body: formData,
             });
@@ -119,6 +130,7 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
             console.error('Ad submission error:', err);
         }
     };
+
 
     const renderExtraFields = () => {
         const { category, extra } = form;

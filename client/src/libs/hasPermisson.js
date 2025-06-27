@@ -21,12 +21,12 @@ const permissions = {
         PERMISSIONS.VERIFY_ADS,
         // PERMISSIONS.VERIFY_KYC            // ✅ Optional: Give to admin too
     ],
-    BUSINESS: [
-        PERMISSIONS.CREATE_BUSINESS,
-
+    USER: [
+        PERMISSIONS.CREATE_USER,
+        PERMISSIONS.USER_CREATE_BUSINESS,
         PERMISSIONS.ADD_ADS,
         PERMISSIONS.EDIT_ADS,
-        PERMISSIONS.DELETE_BUSINESS_ADS
+        PERMISSIONS.DELETE_USER_ADS
     ]
 };
 

@@ -139,33 +139,42 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
 
 
     // Create the business
-    const newBusiness = await prisma.business.create({
-      data: {
-        businessId,
-        businessName,
-        ownerName: owner.name,
-        ownerId: user.id,
-        phoneNumber,
-        emailAddress,
-        address,
-        gstNumber,
-        websiteLink,
-        businessType: prismaBusinessType as BusinessType,
-        verificationStatus: VerificationStatus.PENDING,
-        subscriptionType: SubscriptionType.STANDARD,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
-        socialLinks: {
-          create: socialLinks?.map((link: { platform: string; link: string }) => ({
-            platform: link.platform,
-            link: link.link
-          })) || [],
+    const [newBusiness, updatedUser] = await prisma.$transaction([
+      prisma.business.create({
+        data: {
+          businessId,
+          businessName,
+          ownerName: owner.name,
+          ownerId: user.id,
+          phoneNumber,
+          emailAddress,
+          address,
+          gstNumber,
+          websiteLink,
+          businessType: prismaBusinessType as BusinessType,
+          verificationStatus: VerificationStatus.PENDING,
+          subscriptionType: SubscriptionType.STANDARD,
+          latitude: parseFloat(latitude),
+          longitude: parseFloat(longitude),
+          socialLinks: {
+            create: socialLinks?.map((link: { platform: string; link: string }) => ({
+              platform: link.platform,
+              link: link.link
+            })) || [],
+          },
         },
-      },
-      include: {
-        socialLinks: true
-      }
-    });
+        include: {
+          socialLinks: true
+        }
+      }),
+      prisma.user.update({
+        where: { id: user.id },
+        data: {
+          role: 'OWNER', // or UserRole.OWNER if using enum import
+        }
+      }),
+    ]);
+
 
     const token = jwt.sign(
         { id: user.id, role: UserRole.OWNER, businessId: newBusiness.businessId },

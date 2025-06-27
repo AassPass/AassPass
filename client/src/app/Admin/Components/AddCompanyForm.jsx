@@ -183,9 +183,9 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
 
         const newBusiness = {
             ...formData,
-            // businessId: editingCompany?.businessId || formData.businessId || `BUS${Date.now()}`,
-            // businessType: businessTypeMap[formData.businessType] || 'OTHER',
-            // joinedDate: editingCompany?.joinedDate || new Date().toISOString().split('T')[0],
+            businessType: isEditing
+                ? formData.businessType // send label (e.g. "Freelancer / Consultant") as-is
+                : businessTypeMap[formData.businessType] || 'OTHER', // convert label to enum only while adding
         };
 
         setIsSubmitting(true);
@@ -201,8 +201,6 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
                 );
                 setIsEditing(false);
             } else {
-                // console.log("companies", companies);
-                // console.log("savedBusiness", savedBusiness);
                 setCompanies(prev => [savedBusiness, ...prev]);
                 setFormData(initialFormData);
             }
@@ -212,6 +210,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
             setIsSubmitting(false);
         }
     };
+    
 
 
     return (
@@ -231,40 +230,40 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
                 )}
                 <div>
                     <label className={labelClass}>Business Name *</label>
-                    <input type="text" name="businessName" value={formData.businessName} onChange={handleChange} className={inputClass} />
+                    <input type="text" name="businessName" value={formData.businessName} onChange={handleChange} className={inputClass} required />
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
                     <label className={labelClass}>Owner Name</label>
-                    <input type="text" name="ownerName" value={formData.ownerName} onChange={handleChange} className={inputClass} />
+                    <input type="text" name="ownerName" value={formData.ownerName} onChange={handleChange} className={inputClass} required />
                 </div>
                 <div>
                     <label className={labelClass}>Phone *</label>
-                    <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} className={inputClass} />
+                    <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} className={inputClass} required />
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
                     <label className={labelClass}>Email</label>
-                    <input type="email" name="emailAddress" value={formData.emailAddress} onChange={handleChange} className={inputClass} />
+                    <input type="email" name="emailAddress" value={formData.emailAddress} onChange={handleChange} className={inputClass} required />
                 </div>
                 <div>
                     <label className={labelClass}>Address</label>
-                    <input type="text" name="address" value={formData.address} onChange={handleChange} className={inputClass} />
+                    <input type="text" name="address" value={formData.address} onChange={handleChange} className={inputClass} required />
                 </div>
             </div>
 
             <div className="grid grid-cols-3 gap-2">
                 <div>
                     <label className={labelClass}>Latitude *</label>
-                    <input type="number" name="latitude" value={formData.latitude} onChange={handleChange} className={inputClass} />
+                    <input type="number" name="latitude" value={formData.latitude} onChange={handleChange} className={inputClass} required />
                 </div>
                 <div>
                     <label className={labelClass}>Longitude *</label>
-                    <input type="number" name="longitude" value={formData.longitude} onChange={handleChange} className={inputClass} />
+                    <input type="number" name="longitude" value={formData.longitude} onChange={handleChange} className={inputClass} required />
                 </div>
                 <div>
                     <label className={`${labelClass} invisible`}>Use Location</label>
@@ -281,7 +280,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
                     <label className={labelClass}>Subscription</label>
-                    <select name="subscriptionType" value={formData.subscriptionType} onChange={handleChange} className={inputClass}>
+                    <select name="subscriptionType" value={formData.subscriptionType} onChange={handleChange} className={inputClass} required>
                         <option value="">Select</option>
                         {subscriptionTypes.map((type, idx) => (
                             <option key={idx} value={type}>{type}</option>
@@ -290,7 +289,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
                 </div>
                 <div>
                     <label className={labelClass}>GST No</label>
-                    <input type="text" name="gstNumber" value={formData.gstNumber} onChange={handleChange} className={inputClass} />
+                    <input type="text" name="gstNumber" value={formData.gstNumber} onChange={handleChange} className={inputClass} required />
                 </div>
             </div>
 
@@ -303,7 +302,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
                 {/* Social links span full width on desktop */}
                 <div className="md:col-span-1">
                     <label className={labelClass}>Business Type *</label>
-                    <select name="businessType" value={formData.businessType} onChange={handleChange} className={inputClass}>
+                    <select name="businessType" value={formData.businessType} onChange={handleChange} className={inputClass} required>
                         <option value="">Select</option>
                         {businessTypes.map((type, index) => (
                             <option key={index} value={type}>{type}</option>
