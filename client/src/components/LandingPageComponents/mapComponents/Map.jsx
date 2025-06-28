@@ -90,7 +90,7 @@ const Map = ({ markerData, userLocation }) => {
     map.addControl(geolocate, 'top-right');
 
     map.on('load', () => {
-      geolocate.trigger();
+      // geolocate.trigger();
       addMarkers(map);
     });
 
