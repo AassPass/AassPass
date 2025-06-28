@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
-import { BACKEND_URL } from '@/app/Utils/backendUrl';
+import { BACKEND_URL } from '@/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
 
 const inputBaseClass =

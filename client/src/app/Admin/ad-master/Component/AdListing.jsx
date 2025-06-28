@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 
-import { BACKEND_BUSINESS_URL } from '@/app/Utils/backendUrl';
+import { BACKEND_BUSINESS_URL } from '@/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
 
 // ✅ Define categories outside to avoid re-creation on every render

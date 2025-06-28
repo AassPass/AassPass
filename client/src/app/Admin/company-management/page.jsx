@@ -1,6 +1,6 @@
 'use client';
 
-import { BACKEND_URL } from '@/app/Utils/backendUrl';
+import { BACKEND_URL } from '@/Utils/backendUrl';
 import { useState, useEffect, useCallback } from 'react';
 import AddCompanyForm from '../Components/AddCompanyForm';
 import CompanyFilter from './Components/CompanyFilter';

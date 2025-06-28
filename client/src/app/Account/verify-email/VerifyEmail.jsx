@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from 'next/navigation';
-import { BACKEND_AUTH_URL } from "@/app/Utils/backendUrl";
+import { BACKEND_AUTH_URL } from "@/Utils/backendUrl";
 
 
 function VerifyEmailPage() { // Renamed for clarity, but 'page' is fine too

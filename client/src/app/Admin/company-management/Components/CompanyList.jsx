@@ -5,7 +5,7 @@ import { FixedSizeList as List } from 'react-window';
 import { useRole } from '@/Context/RoleContext';
 import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
-import { BACKEND_URL } from '@/app/Utils/backendUrl';
+import { BACKEND_URL } from '@/Utils/backendUrl';
 
 const DeferredLink = ({ children, ...props }) => {
     const [mounted, setMounted] = useState(false);

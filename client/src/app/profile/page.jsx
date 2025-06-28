@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BACKEND_USER_URL } from "../Utils/backendUrl";
+import { BACKEND_USER_URL } from "../../Utils/backendUrl";
 
 const page = () => {
     const [userData, setUserData] = useState({

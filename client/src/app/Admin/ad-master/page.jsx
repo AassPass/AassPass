@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 
 
 import { useRole } from '@/Context/RoleContext';
-import { BACKEND_BUSINESS_URL } from '@/app/Utils/backendUrl';
+import { BACKEND_BUSINESS_URL } from '@/Utils/backendUrl';
 
 // ✅ Lazy load components to reduce initial JS bundle size
 const AdList = dynamic(() => import('./Component/AdList'), { ssr: false });

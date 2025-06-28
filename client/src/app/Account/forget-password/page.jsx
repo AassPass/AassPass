@@ -1,6 +1,6 @@
 "use client";
 
-import { BACKEND_AUTH_URL } from "@/app/Utils/backendUrl";
+import { BACKEND_AUTH_URL } from "@/Utils/backendUrl";
 import colors from "@/libs/colors";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
