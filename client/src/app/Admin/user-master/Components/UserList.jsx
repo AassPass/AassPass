@@ -5,7 +5,7 @@ import { FixedSizeList as List } from 'react-window';
 import { useRole } from '@/Context/RoleContext';
 import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
-import { BACKEND_URL } from '@/app/Utils/backendUrl';
+import { BACKEND_URL } from '@/Utils/backendUrl';
 import { Pencil, Trash2 } from 'lucide-react'; // Optional: icons for buttons
 
 

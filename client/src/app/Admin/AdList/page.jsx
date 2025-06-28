@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 
 import AllAdsList from './Component/AllAdsList';
-import { BACKEND_ADMIN_URL } from '@/app/Utils/backendUrl';
+import { BACKEND_ADMIN_URL } from '@/Utils/backendUrl';
 
 const DUMMY_ADS = [
     {

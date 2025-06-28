@@ -1,4 +1,4 @@
-import { BACKEND_USER_URL } from "@/app/Utils/backendUrl";
+import { BACKEND_USER_URL } from "@/Utils/backendUrl";
 
 export async function getNearbyBusinesses({ lat, lng, radius }) {
   try {
@@ -20,4 +20,3 @@ export async function getNearbyBusinesses({ lat, lng, radius }) {
     throw error; // rethrow for caller to handle
   }
 }
-

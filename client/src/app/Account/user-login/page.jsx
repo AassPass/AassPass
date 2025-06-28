@@ -30,7 +30,7 @@ export default function Page() {
       setRole(data.role);
       localStorage.setItem("token", data.token);
       console.log(data.role)
-      router.push("/Admin");
+      router.push("/");
     } catch (err) {
       // Check for email verification error
       if (err.message === "Verify your email first. Check your Inbox or spam folder.") {

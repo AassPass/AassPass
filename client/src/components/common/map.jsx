@@ -5,7 +5,7 @@ import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { MAPBOX_TOKEN } from '@/app/Utils/backendUrl';
+import { MAPBOX_TOKEN } from '@/Utils/backendUrl';
 import ReactDOM from 'react-dom/client';
 import PopupContent from './PopupContent';
 

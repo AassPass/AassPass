@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from "react";
 import Map from "@/components/LandingPageComponents/mapComponents/Map";
 import { getNearbyBusinesses } from "@/services/mapApi";
 import { motion } from "framer-motion";
-import { useRole } from "@/Context/RoleContext";
 
 const MIN_DISTANCE_METERS = 100;
 
@@ -30,14 +29,13 @@ const MapSection = () => {
   const lastLocationRef = useRef(null);
   const watchIdRef = useRef(null);
 
-  const { userLocation, setUserLocation } = useRole();
+  const [ userLocation, setUserLocation ] = useState({latitude: 28.6327, longitude: 77.2198});
 
   const fetchData = async (lat, lng) => {
     try {
       setLoading(true);
       const response = await getNearbyBusinesses({ lat, lng, radius: 5 });
       setFilteredBusinesses(response.data);
-      console.log(response.data); // ✅ Fixed typo
     } catch (error) {
       console.error("Error fetching business data:", error);
     } finally {
@@ -89,12 +87,17 @@ const MapSection = () => {
   };
 
   useEffect(() => {
-    if (!navigator.geolocation) {
-      console.warn("Geolocation is not supported.");
-      setLocationError(true);
-      setLoading(false);
-      return;
-    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        setUserLocation({longitude: lng, latitude: lat});
+      },
+      (error) => {
+        console.error("Error getting user location:", error);
+      }
+    );
+    
 
     startGeoWatch();
 
