@@ -1,6 +1,6 @@
 'use client';
 
-import { BACKEND_ADMIN_URL } from '@/app/Utils/backendUrl';
+import { BACKEND_ADMIN_URL } from '@/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
 import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';

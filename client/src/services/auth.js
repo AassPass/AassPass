@@ -1,4 +1,4 @@
-import { BACKEND_AUTH_URL } from "@/app/Utils/backendUrl";
+import { BACKEND_AUTH_URL } from "@/Utils/backendUrl";
 
 export async function loginAdmin({ adminId, password }) {
   const res = await fetch(`${BACKEND_AUTH_URL}/admin/login`, {
@@ -22,7 +22,7 @@ export async function loginUser({ email, password }) {
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: 'include',   // <---- add this line
+    credentials: "include", // <---- add this line
     body: JSON.stringify({ email, password }),
   });
 

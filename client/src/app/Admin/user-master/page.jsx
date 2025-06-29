@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
-import { BACKEND_URL } from '@/app/Utils/backendUrl';
+import { BACKEND_URL } from '@/Utils/backendUrl';
 
 
 // Lazy loading

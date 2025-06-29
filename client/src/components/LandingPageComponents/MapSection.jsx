@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from "react";
 import Map from "@/components/LandingPageComponents/mapComponents/Map";
 import { getNearbyBusinesses } from "@/services/mapApi";
 import { motion } from "framer-motion";
-import { useRole } from "@/Context/RoleContext";
 
 const MIN_DISTANCE_METERS = 100;
 
@@ -27,17 +26,16 @@ const MapSection = () => {
   const [loading, setLoading] = useState(true);
   const [locationError, setLocationError] = useState(false);
 
-  const lastLocationRef = useRef(null);
-  const watchIdRef = useRef(null);
+  // const lastLocationRef = useRef(null);
+  // const watchIdRef = useRef(null);
 
-  const { userLocation, setUserLocation } = useRole();
+  const [ userLocation, setUserLocation ] = useState({latitude: 28.676853, longitude: 77.260113});
 
   const fetchData = async (lat, lng) => {
     try {
       setLoading(true);
       const response = await getNearbyBusinesses({ lat, lng, radius: 5 });
       setFilteredBusinesses(response.data);
-      console.log(response.data); // ✅ Fixed typo
     } catch (error) {
       console.error("Error fetching business data:", error);
     } finally {
@@ -45,62 +43,70 @@ const MapSection = () => {
     }
   };
 
-  const handlePosition = (position) => {
-    const { latitude, longitude } = position.coords;
+  // const handlePosition = (position) => {
+  //   const { latitude, longitude } = position.coords;
 
-    const last = lastLocationRef.current;
-    if (last) {
-      const distance = getDistance(last.latitude, last.longitude, latitude, longitude);
-      if (distance < MIN_DISTANCE_METERS) return;
-    }
+  //   const last = lastLocationRef.current;
+  //   if (last) {
+  //     const distance = getDistance(last.latitude, last.longitude, latitude, longitude);
+  //     if (distance < MIN_DISTANCE_METERS) return;
+  //   }
 
-    lastLocationRef.current = { latitude, longitude };
-    setUserLocation({ latitude, longitude });
-    setLocationError(false);
-    fetchData(latitude, longitude); // ✅ Directly fetch after location update
-  };
+  //   lastLocationRef.current = { latitude, longitude };
+  //   setUserLocation({ latitude, longitude });
+  //   setLocationError(false);
+  //   fetchData(latitude, longitude); // ✅ Directly fetch after location update
+  // };
 
-  const startGeoWatch = () => {
-    const geoOptions = {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 10000,
-    };
+  // const startGeoWatch = () => {
+  //   const geoOptions = {
+  //     enableHighAccuracy: true,
+  //     timeout: 10000,
+  //     maximumAge: 10000,
+  //   };
 
-    navigator.geolocation.getCurrentPosition(
-      handlePosition,
-      (err) => {
-        console.error("Geo error:", err);
-        setLocationError(true);
-        setLoading(false);
-      },
-      geoOptions
-    );
+  //   navigator.geolocation.getCurrentPosition(
+  //     handlePosition,
+  //     (err) => {
+  //       console.error("Geo error:", err);
+  //       setLocationError(true);
+  //       setLoading(false);
+  //     },
+  //     geoOptions
+  //   );
 
-    watchIdRef.current = navigator.geolocation.watchPosition(
-      handlePosition,
-      (err) => {
-        console.error("watchPosition error:", err);
-        setLocationError(true);
-        setLoading(false);
-      },
-      geoOptions
-    );
-  };
+  //   watchIdRef.current = navigator.geolocation.watchPosition(
+  //     handlePosition,
+  //     (err) => {
+  //       console.error("watchPosition error:", err);
+  //       setLocationError(true);
+  //       setLoading(false);
+  //     },
+  //     geoOptions
+  //   );
+  // };
 
   useEffect(() => {
-    if (!navigator.geolocation) {
-      console.warn("Geolocation is not supported.");
-      setLocationError(true);
-      setLoading(false);
-      return;
-    }
+    const lat = 28.676853;
+    const lng = 77.260113;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        // setUserLocation({longitude: lng, latitude: lat});
+      },
+      (error) => {
+        console.error("Error getting user location:", error);
+      }
+    );
+    fetchData(lat, lng);
+    
 
-    startGeoWatch();
+    // startGeoWatch();
 
-    return () => {
-      navigator.geolocation.clearWatch(watchIdRef.current);
-    };
+    // return () => {
+    //   navigator.geolocation.clearWatch(watchIdRef.current);
+    // };
   }, []);
 
   return (

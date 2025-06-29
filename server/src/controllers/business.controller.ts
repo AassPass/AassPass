@@ -231,3 +231,31 @@ export const GetAds = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
+export const DeleteAd = async (req: Request, res: Response): Promise<any> => {
+  try{
+    const id = req.params.id;
+    const businessId = req.user?.businessId;
+
+    const ad = await prisma.ads.findUnique({
+      where: {id},
+      include: {
+        business: true,
+      }
+    });
+
+    if(ad?.business.id !== businessId){
+      return res.status(403).json({ message: "You do not have permission to delete this ad" });
+    }
+
+    await prisma.ads.delete({
+      where: { id }
+    });
+
+    res.status(200).json({ message: "Ad deleted successfully"});
+  }
+  catch (error){
+    console.error("Error while deleting ad:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+

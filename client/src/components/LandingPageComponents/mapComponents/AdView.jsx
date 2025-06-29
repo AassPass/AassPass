@@ -49,7 +49,7 @@ const renderCategoryDetails = (category, extra = {}) => {
                     <p>Location: {extra.location}</p>
                 </>
             );
-        case 'EVENT':
+        case 'EVENTS':
             return (
                 <>
                     <p>Time: {extra.time}</p>
@@ -72,40 +72,21 @@ const renderCategoryDetails = (category, extra = {}) => {
     }
 };
 
-export default function AdView({ businessId, onClose }) {
+export default function AdView({ business, onClose }) {
+    // console.log("business: ",business);
     const [ads, setAds] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [businessName, setBusinessName] = useState('');
+    // const [businessName, setBusinessName] = useState('');
 
     useEffect(() => {
-        const fetchAds = async () => {
-            try {
-                const res = await fetch(`/api/business/${businessId}/ads`);
-                if (!res.ok) throw new Error('Failed to fetch');
-
-                const data = await res.json();
-                const fetchedAds = data.ads || [];
-
-                if (fetchedAds.length === 0) {
-                    setAds(dummyAds);
-                    setBusinessName('Dummy Business');
-                } else {
-                    setAds(fetchedAds);
-                    setBusinessName(data.businessName || 'Business');
-                }
-            } catch (err) {
-                console.error('Fetch error, showing dummy data:', err);
-                setAds(dummyAds);
-                setBusinessName('Dummy Business');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (businessId) {
-            fetchAds();
+        if (business && business.ads) {
+            setAds(business.ads);
+            setLoading(false);
+        } else {
+            setAds([]);
+            setLoading(false);
         }
-    }, [businessId]);
+    }, [business]);
 
     return (
         <div className="relative w-full h-full p-6 overflow-y-auto">
@@ -113,11 +94,11 @@ export default function AdView({ businessId, onClose }) {
                 className="absolute top-4 right-4 text-gray-600 hover:text-black text-xl"
                 onClick={onClose}
             >
-                ✕
+                X
             </button>
 
-            <h2 className="text-2xl font-bold mb-4">
-                {loading ? 'Loading...' : businessName}
+            <h2 className="text-2xl font-bold mb-4 text-black">
+                {loading ? 'Loading...' : business.businessName}
             </h2>
 
             {loading ? (
@@ -126,7 +107,7 @@ export default function AdView({ businessId, onClose }) {
                 <div className="space-y-6">
                     {ads.map((ad) => (
                         <div
-                            key={ad.adCode}
+                            key={ad.adId}
                             className="border  shadow hover:shadow-md transition bg-white overflow-hidden flex flex-col"
                         >
                             {ad.images?.[0] ? (
@@ -142,9 +123,9 @@ export default function AdView({ businessId, onClose }) {
                             )}
 
                             <div className="p-4 flex flex-col gap-2">
-                                <h3 className="text-lg font-semibold">{ad.title}</h3>
+                                <h3 className="text-lg font-semibold text-black">{ad.title}</h3>
                                 <span
-                                    className={`inline-block w-fit px-2 py-0.5 text-xs rounded-full ${ad.status === 'PUBLISHED'
+                                    className={`inline-block w-fit px-2 py-0.5 text-xs rounded-full ${ad.status === 'SAVED'
                                         ? 'bg-green-100 text-green-700'
                                         : 'bg-yellow-100 text-yellow-700'
                                         }`}
@@ -158,11 +139,11 @@ export default function AdView({ businessId, onClose }) {
                                 </p>
 
                                 <div className="text-sm text-gray-800 space-y-1 mt-2">
-                                    {renderCategoryDetails(ad.category, ad.extra)}
+                                    {renderCategoryDetails(ad.category, ad.metadata)}
                                 </div>
 
                                 <p className="text-[11px] text-gray-400 mt-3">
-                                    Ad Code: {ad.adCode}
+                                    Ad Code: {ad.adId}
                                 </p>
                             </div>
                         </div>

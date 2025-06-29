@@ -1,6 +1,6 @@
 'use client';
 
-import { BACKEND_USER_URL } from '@/app/Utils/backendUrl';
+import { BACKEND_USER_URL } from '@/Utils/backendUrl';
 import React, { useState } from 'react';
 
 const businessTypeOptions = [

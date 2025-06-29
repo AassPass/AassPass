@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { BACKEND_URL } from "@/app/Utils/backendUrl";
+import { BACKEND_URL } from "@/Utils/backendUrl";
 import FilterOptions from "./FilterOptions";
 import dynamic from "next/dynamic";
 const Map = dynamic(

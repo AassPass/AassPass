@@ -38,6 +38,7 @@ const bgColorMap = {
   OTHER: "#CBD5E0",                // soft gray-blue
 };
 
+
 const iconMap = {
   RETAIL_STORE: '/icons/retail_store.svg',
   RESTAURANT_CAFE: '/icons/restaurant_cafe.svg',
