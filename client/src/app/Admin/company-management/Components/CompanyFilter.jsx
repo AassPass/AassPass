@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React from 'react';
 
 const CompanyFilter = ({
     status,
@@ -13,24 +13,18 @@ const CompanyFilter = ({
     setLimit,
     onFilter,
 }) => {
-
-
-
-
     const handleStatusChange = (e) => {
-        const value = e.target.value;
-        setStatus(value);
+        setStatus(e.target.value);
     };
 
     const handleTypeChange = (e) => {
-        const value = e.target.value;
-        setType(value);
+        setType(e.target.value);
     };
 
     const handleLimitChange = (e) => {
-        const value = Number(e.target.value);
-        setLimit(value);
+        setLimit(Number(e.target.value));
     };
+
     const handlePrev = () => {
         if (page > 1) {
             const newPage = page - 1;
@@ -46,13 +40,13 @@ const CompanyFilter = ({
     };
 
     const handleApplyFilter = () => {
-        setPage(1); // Go to first page on filter
+        setPage(1);
         onFilter(1, limit, status, type);
     };
 
     return (
         <form
-            className={`mb-6 text-black flex flex-wrap gap-4 items-end bg-white p-4 rounded-lg shadow-sm border border-gray-200 transition-opacity`}
+            className="text-black flex flex-wrap gap-4 items-end bg-white p-4 transition-opacity"
             onSubmit={(e) => {
                 e.preventDefault();
                 handleApplyFilter();
@@ -63,7 +57,6 @@ const CompanyFilter = ({
 
             {/* Status */}
             <div className="flex flex-col min-w-[150px]">
-                <label htmlFor="status" className="text-sm font-medium text-gray-800 mb-1">Status</label>
                 <select
                     id="status"
                     value={status}
@@ -71,6 +64,7 @@ const CompanyFilter = ({
                     className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus-visible:ring-2"
                     aria-label="Status Filter"
                 >
+                    <option value="" disabled>Select Status</option>
                     <option value="">All</option>
                     <option value="verified">Verified</option>
                     <option value="pending">Pending</option>
@@ -80,7 +74,6 @@ const CompanyFilter = ({
 
             {/* Type */}
             <div className="flex flex-col min-w-[150px]">
-                <label htmlFor="type" className="text-sm font-medium text-gray-800 mb-1">Type</label>
                 <select
                     id="type"
                     value={type}
@@ -88,6 +81,7 @@ const CompanyFilter = ({
                     className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus-visible:ring-2"
                     aria-label="Business Type Filter"
                 >
+                    <option value="" disabled>Select Type</option>
                     <option value="">All</option>
                     <option value="restaurant">Restaurant</option>
                     <option value="shop">Shop</option>
@@ -97,16 +91,18 @@ const CompanyFilter = ({
 
             {/* Limit */}
             <div className="flex flex-col min-w-[100px]">
-                <label htmlFor="limit" className="text-sm font-medium text-gray-800 mb-1">Limit</label>
-                <input
+                <select
                     id="limit"
-                    type="number"
-                    min="1"
                     value={limit}
                     onChange={handleLimitChange}
                     className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus-visible:ring-2"
                     aria-label="Limit per page"
-                />
+                >
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={30}>30</option>
+                    <option value={50}>50</option>
+                </select>
             </div>
 
             {/* Pagination Controls */}

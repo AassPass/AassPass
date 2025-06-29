@@ -8,7 +8,7 @@ const API_SECRET = process.env.API_SECRET_CLOUDINARY;
 
 // Configure Cloudinary
 cloudinary.config({ 
-    cloud_name: 'damlni3ea', 
+    cloud_name: 'dmmtzycyf', 
     api_key: API_KEY, 
     api_secret: API_SECRET 
 });

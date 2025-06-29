@@ -8,16 +8,18 @@ import Faq from '@/components/LandingPageComponents/Faq';
 
 import { memo } from 'react';
 import AnimatedSection from '@/components/common/AnimatedSection';
+import AdsPage from '@/components/LandingPageComponents/AdsPage';
 
 function Home() {
   return (
     <div>
       {/* <Banner /> */}
-      <main className="flex flex-col items-center overflow-x-hidden bg-gradient-to-r from-[#0b161c] to-[#201446] ">
+      <main className="flex flex-col items-center overflow-x-hidden  ">
         <Header />
 
         <AnimatedSection index={0}><HeroSection /></AnimatedSection>
-        {/* <MapSection /> */}
+        <AdsPage/>
+        <MapSection />
         <AnimatedSection index={2}><BestPriceDeals /></AnimatedSection>
         <AnimatedSection index={3}><EventListing /></AnimatedSection>
         <AnimatedSection index={4}><Faq /></AnimatedSection>

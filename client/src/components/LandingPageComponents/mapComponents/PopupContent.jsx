@@ -63,8 +63,8 @@ const PopupContent = ({ business }) => {
         </CarouselContent>
 
         {/* Show navigation on hover or always visible */}
-        <CarouselPrevious className="hover:bg-gray-200" />
-        <CarouselNext className="hover:bg-gray-200" />
+        {/* <CarouselPrevious className="hover:bg-gray-200" />
+        <CarouselNext className="hover:bg-gray-200" /> */}
       </Carousel>
     </div>
   );

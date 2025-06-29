@@ -5,7 +5,7 @@ import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 const RoleContext = createContext();
 
 export const RoleProvider = ({ children }) => {
-    const [role, setRole] = useState();
+    const [role, setRole] = useState("");
     const [adminId, setAdminId] = useState(null);
     const [businessId, setBusinessId] = useState(null);
     const [userLocation, setUserLocation] = useState(null);

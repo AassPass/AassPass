@@ -69,7 +69,7 @@ export default function Header() {
 
                         {/* Lokaly Map */}
                         <Link
-                            href="/#lokaly-map"
+                            href="/lokalymap"
                             className="group relative"
                             style={{ color: colors.primary }}
                         >
@@ -81,56 +81,58 @@ export default function Header() {
                         </Link>
 
                         {/* For Business Dropdown */}
-                        <div className="group relative">
-                            <span className="cursor-pointer" style={{ color: colors.primary }}>
-                                For Business
-                            </span>
-                            <div
-                                className="absolute hidden group-hover:block top-full mt-2 bg-white shadow-lg rounded-md min-w-[180px] border"
-                                style={{ zIndex: 1000 }}
-                            >
-                                <Link
-                                    href="/Account/user-login"
-                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                    style={{ color: colors.primary }}
-                                >
-                                    Register Your Business
-                                </Link>
-                                <Link
-                                    href="/ads-plan"
-                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                    style={{ color: colors.primary }}
-                                >
-                                    Ads Plan
-                                </Link>
-                            </div>
-                        </div>
+                       <div className="group relative">
+    <span className="cursor-pointer" style={{ color: colors.primary }}>
+        For Business
+    </span>
+    <div
+        className="absolute hidden group-hover:flex flex-col top-full left-0 bg-white shadow-md rounded-b-md min-w-[180px] border border-t-0"
+        style={{ zIndex: 1000 }}
+    >
+        <Link
+            href="/Account/user-login"
+            className="px-4 py-2 text-sm hover:bg-gray-100"
+            style={{ color: colors.primary }}
+        >
+            Register Your Business
+        </Link>
+        <Link
+            href="/ads-plan"
+            className="px-4 py-2 text-sm hover:bg-gray-100"
+            style={{ color: colors.primary }}
+        >
+            Ads Plan
+        </Link>
+    </div>
+</div>
+
 
                         {/* About Dropdown */}
                         <div className="group relative">
-                            <span className="cursor-pointer" style={{ color: colors.primary }}>
-                                About
-                            </span>
-                            <div
-                                className="absolute hidden group-hover:block top-full mt-2 bg-white shadow-lg rounded-md min-w-[150px] border"
-                                style={{ zIndex: 1000 }}
-                            >
-                                <Link
-                                    href="/about-us"
-                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                    style={{ color: colors.primary }}
-                                >
-                                    About Us
-                                </Link>
-                                <Link
-                                    href="/#faq"
-                                    className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                    style={{ color: colors.primary }}
-                                >
-                                    FAQ
-                                </Link>
-                            </div>
-                        </div>
+    <span className="cursor-pointer" style={{ color: colors.primary }}>
+        About
+    </span>
+    <div
+        className="absolute hidden group-hover:flex flex-col top-full left-0 bg-white shadow-md rounded-b-md min-w-[150px] border border-t-0"
+        style={{ zIndex: 1000 }}
+    >
+        <Link
+            href="/about-us"
+            className="px-4 py-2 text-sm hover:bg-gray-100"
+            style={{ color: colors.primary }}
+        >
+            About Us
+        </Link>
+        <Link
+            href="/#faq"
+            className="px-4 py-2 text-sm hover:bg-gray-100"
+            style={{ color: colors.primary }}
+        >
+            FAQ
+        </Link>
+    </div>
+</div>
+
                     </nav>
 
                     {/* ✅ Pass navLinks to client actions */}

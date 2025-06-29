@@ -1,7 +1,7 @@
 'use client';
 
-import React, { memo } from 'react';
-import { useRouter } from 'next/navigation'; // For navigation after logout
+import React, { memo, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useRole } from '@/Context/RoleContext';
 import { PERMISSIONS } from '@/libs/permissions';
 import { hasPermission } from '@/libs/hasPermisson';
@@ -10,61 +10,89 @@ import colors from '@/libs/colors';
 const Sidebar = ({ activeComponent, setActiveComponent }) => {
     const { role } = useRole();
     const router = useRouter();
+    const [menuItems, setMenuItems] = useState([]);
 
-    const menuItems = [];
+    // Set menu items based on role permissions
+    useEffect(() => {
+        const items = [{ name: 'dashboard', label: 'Dashboard' }];
 
-    if (hasPermission(role, PERMISSIONS.CREATE_ADMIN)) {
-        menuItems.push({ name: 'user-master', label: 'User Master' });
-    }
+        if (hasPermission(role, PERMISSIONS.CREATE_ADMIN)) {
+            items.push({ name: 'user-master', label: 'User Master' });
+        }
 
-    if (hasPermission(role, PERMISSIONS.CREATE_BUSINESS)) {
-        menuItems.push({ name: 'company-management', label: 'Business Master' });
-    }
-    if (hasPermission(role, PERMISSIONS.USER_CREATE_BUSINESS)) {
+        if (hasPermission(role, PERMISSIONS.CREATE_BUSINESS)) {
+            items.push({ name: 'company-management', label: 'Business Master' });
+        }
 
-        menuItems.push({ name: 'Add Business', label: 'Add Business' })
-    }
+        if (hasPermission(role, PERMISSIONS.USER_CREATE_BUSINESS)) {
+            items.push({ name: 'Add Business', label: 'Add Business' });
+        }
 
-    if (hasPermission(role, PERMISSIONS.ADD_ADS)) {
-        menuItems.push({ name: 'ad-listing', label: 'Ad Listing' });
-    }
+        if (hasPermission(role, PERMISSIONS.ADD_ADS)) {
+            items.push({ name: 'ad-listing', label: 'Ad Listing' });
+        }
+
+        setMenuItems(items);
+    }, [role]);
+
+    // Set selected component from localStorage on load
+    useEffect(() => {
+        const stored = localStorage.getItem('activeComponent');
+        if (stored) {
+            setActiveComponent(stored);
+        }
+    }, [setActiveComponent]);
+
+    // Save selection to localStorage and state
+    const handleMenuClick = (name) => {
+        setActiveComponent(name);
+        localStorage.setItem('activeComponent', name);
+    };
 
     const handleLogout = () => {
-
         localStorage.removeItem('role');
         localStorage.removeItem('token');
         localStorage.removeItem('adminId');
         localStorage.removeItem('businessId');
+        localStorage.removeItem('activeComponent');
         router.push('/Account/Login');
     };
 
+    const activeIndex = menuItems.findIndex((item) => item.name === activeComponent);
+
     return (
-        <div className="flex md:flex-col md:flex-nowrap justify-start md:justify-between items-center gap-2 w-full">
-            {/* Navigation Menu */}
-            <nav className="flex flex-row md:flex-col gap-2 items-center w-full md:w-auto">
+        <div className="flex md:flex-col md:flex-nowrap justify-start md:justify-between items-center gap-2 w-full p-2">
+            {/* Navigation */}
+            <nav className="relative flex flex-col gap-2 w-full">
+                {/* Animated Active Highlight */}
+                {activeIndex !== -1 && (
+                    <div
+                        className="absolute left-0 w-full h-10 rounded-md z-0 transition-all duration-300 ease-in-out"
+                        style={{
+                            backgroundColor: colors.primary,
+                            top: `${activeIndex * 44}px`, // 44px = button height
+                        }}
+                    />
+                )}
+
+                {/* Buttons */}
                 {menuItems.map(({ name, label }) => (
                     <button
                         key={name}
-                        onClick={() => setActiveComponent(name)}
-                        className="px-3 md:px-5 py-1.5 md:py-2 rounded-md text-xs md:text-sm font-medium transition-colors whitespace-nowrap  md:w-auto"
-                        style={{
-                            backgroundColor: activeComponent === name ? colors.primary : colors.background,
-                            color: activeComponent === name ? '#fff' : colors.text,
-                        }}
+                        onClick={() => handleMenuClick(name)}
+                        className="relative z-10 w-full text-left px-4 py-2 text-sm font-medium text-white transition-all duration-300 ease-in-out"
                     >
                         {label}
                     </button>
                 ))}
             </nav>
 
-            {/* Logout Button */}
-            <div className="md:mt-6 w-full md:w-auto">
+            {/* Logout */}
+            <div className="md:mt-6 w-full">
                 <button
                     onClick={handleLogout}
-                    className="font-semibold text-xs md:text-sm px-2 md:px-5 py-1.5 md:py-2 rounded text-white whitespace-nowrap w-full md:w-auto"
-                    style={{
-                        backgroundColor: '#ef4444', // Tailwind red-500
-                    }}
+                    className="font-semibold text-xs md:text-sm px-2 md:px-5 py-1.5 md:py-2 text-white whitespace-nowrap w-full rounded transition-all duration-300"
+                    style={{ backgroundColor: '#ef4444' }} // Tailwind red-500
                 >
                     Logout
                 </button>

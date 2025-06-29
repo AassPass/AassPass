@@ -1,246 +1,215 @@
 'use client';
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { BACKEND_URL } from '@/app/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
 
-const inputBaseClass =
-    'w-full border px-2 py-1 rounded-sm focus:outline-none focus:ring-1 text-sm text-black';
-const inputValidClass = 'border-gray-300 focus:ring-blue-500';
-const inputInvalidClass = 'border-red-500 focus:ring-red-500';
+const inputClass = 'w-full px-2 py-1 text-xs rounded border border-gray-300 text-black h-8';
+const labelClass = 'block font-medium text-gray-700 text-xs';
 
-const InputField = ({ id, name, type, label, value, onChange, onKeyDown, error, maxLength }) => (
-    <label htmlFor={id} className="block text-xs font-medium text-gray-700">
-        {label}
-        <span className="text-red-500">*</span>
-        <input
-            id={id}
-            name={name}
-            type={type}
-            value={value}
-            onChange={onChange}
-            onKeyDown={onKeyDown}
-            maxLength={maxLength}
-            className={`${inputBaseClass} ${error ? inputInvalidClass : inputValidClass}`}
-            required
-            aria-invalid={!!error}
-            aria-describedby={error ? `${id}-error` : undefined}
-        />
-        {error && (
-            <p id={`${id}-error`} className="text-red-500 text-xs mt-1" role="alert" aria-live="polite">
-                {error}
-            </p>
-        )}
-    </label>
-);
+const AddUsers = ({ edit, setEdit, selectedUser, setSelectedUser, setUsers }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    mobile: '',
+    email: '',
+    isActive: false,
+  });
 
-function AddUsers({ edit, setEdit, selectedUser, setSelectedUser, setUsers }) {
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
-    const [formData, setFormData] = useState({
-        name: '',
-        mobile: '',
-        email: '',
-        isActive: false,
+  useEffect(() => {
+    if (edit && selectedUser) {
+      setFormData({
+        ...selectedUser,
+        isActive: selectedUser.isActive === true || selectedUser.isActive === 'true',
+      });
+    }
+  }, [edit, selectedUser]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === 'isActive' ? value === 'true' : value,
+    }));
+  };
+
+  const handleCancel = () => {
+    setFormData({ name: '', mobile: '', email: '', isActive: false });
+    setSelectedUser(null);
+    setEdit(false);
+    setErrors({});
+  };
+
+  const validate = useCallback(() => {
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = 'User Name is required';
+    if (!formData.mobile) newErrors.mobile = 'Mobile No. is required';
+    else if (!/^\d{10}$/.test(formData.mobile)) newErrors.mobile = 'Mobile No. must be 10 digits';
+    if (!formData.email) newErrors.email = 'Email Address is required';
+    else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email))
+      newErrors.email = 'Invalid email address';
+    return newErrors;
+  }, [formData]);
+
+  const saveNewUser = async (token) => {
+    const res = await fetch(`${BACKEND_URL}/admin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(formData),
     });
+    if (!res.ok) throw new Error('Failed to save user');
+    return res.json();
+  };
 
-    const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
+  const updateUser = async (token) => {
+    const res = await fetch(`${BACKEND_URL}/admin/update/${selectedUser.adminId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(formData),
+    });
+    if (!res.ok) throw new Error('Failed to update user');
+    return res.json();
+  };
 
-    useEffect(() => {
-        if (edit && selectedUser) {
-            const updated = {
-                ...selectedUser,
-                isActive: selectedUser.isActive === true || selectedUser.isActive === 'true',
-            };
-            setFormData((prev) => {
-                return JSON.stringify(prev) !== JSON.stringify(updated) ? updated : prev;
-            });
-        }
-    }, [edit, selectedUser]);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formErrors = validate();
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
+    }
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: name === 'isActive' ? value === 'true' : value,
-        }));
-    };
-    const handleCancel = () => {
-        setFormData({ name: '', mobile: '', email: '', isActive: false });
-        setSelectedUser(null);
-        setEdit(false);
-        setErrors({});
-    };
+    setLoading(true);
+    const token = localStorage.getItem('token');
 
-    const handleKeyDown = useCallback((e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            const formElements = Array.from(
-                e.currentTarget.form.elements
-            ).filter((el) => el.tagName !== 'FIELDSET' && !el.disabled && el.type !== 'hidden');
+    try {
+      const data = edit ? await updateUser(token) : await saveNewUser(token);
+      const returnedUser = data.admin || formData;
 
-            const index = formElements.indexOf(e.target);
-            if (index > -1 && index < formElements.length - 1) {
-                formElements[index + 1].focus();
-            } else {
-                e.currentTarget.form.requestSubmit();
-            }
-        }
-    }, []);
+      setUsers((prev) =>
+        edit
+          ? prev.map((u) => (u.adminId === selectedUser.adminId ? returnedUser : u))
+          : [returnedUser, ...prev]
+      );
 
-    const validate = useCallback(() => {
-        const newErrors = {};
-        if (!formData.name.trim()) newErrors.name = 'User Name is required';
-        if (!formData.mobile) newErrors.mobile = 'Mobile No. is required';
-        else if (!/^\d{10}$/.test(formData.mobile)) newErrors.mobile = 'Mobile No. must be 10 digits';
-        if (!formData.email) newErrors.email = 'Email Address is required';
-        else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email))
-            newErrors.email = 'Invalid email address';
-        return newErrors;
-    }, [formData]);
+      handleCancel();
+    } catch (err) {
+      console.error('Error saving user:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const saveNewUser = async (token) => {
-        const res = await fetch(`${BACKEND_URL}/admin`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(formData),
-        });
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-md shadow-md w-full  mx-auto text-sm border overflow-hidden"
+    >
+      {/* Form Heading */}
+      <div className="bg-blue-500 text-white px-4 py-2">
+        <h2 className="text-sm font-semibold">{edit ? 'Edit Admin' : 'Add Admin'}</h2>
+      </div>
 
-        if (!res.ok) throw new Error('Failed to save user');
-        return res.json();
-    };
+      {/* Form Content */}
+      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="name" className={labelClass}>
+              User Name *
+            </label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              value={formData.name}
+              onChange={handleChange}
+              className={inputClass}
+              required
+            />
+            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
+          </div>
 
-    const updateUser = async (token) => {
-        // console.log(selectedUser.adminId);
-        const res = await fetch(`${BACKEND_URL}/admin/update/${selectedUser.adminId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(formData),
-        });
+          <div>
+            <label htmlFor="mobile" className={labelClass}>
+              Mobile No. *
+            </label>
+            <input
+              id="mobile"
+              name="mobile"
+              type="tel"
+              maxLength={10}
+              value={formData.mobile}
+              onChange={handleChange}
+              className={inputClass}
+              required
+            />
+            {errors.mobile && <p className="text-xs text-red-500 mt-1">{errors.mobile}</p>}
+          </div>
 
-        if (!res.ok) throw new Error('Failed to update user');
-        return res.json();
-    };
+          <div>
+            <label htmlFor="email" className={labelClass}>
+              Email Address *
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={inputClass}
+              required
+            />
+            {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+          </div>
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const formErrors = validate();
-        if (Object.keys(formErrors).length > 0) {
-            setErrors(formErrors);
-            return;
-        }
+          <div>
+            <label htmlFor="isActive" className={labelClass}>
+              Active *
+            </label>
+            <select
+              id="isActive"
+              name="isActive"
+              value={formData.isActive ? 'true' : 'false'}
+              onChange={handleChange}
+              className={inputClass}
+            >
+              <option value="true">YES</option>
+              <option value="false">NO</option>
+            </select>
+          </div>
+        </div>
 
-        setErrors({});
-        setLoading(true);
-        const token = localStorage.getItem('token');
+        {/* Action Buttons */}
+        <div className="flex flex-col gap-4 justify-end">
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-6 py-2 rounded hover:bg-blue-400 cursor-pointer border-2 border-blue-400 text-blue-400 hover:text-white text-sm font-bold w-full transition-colors duration-200"
+          >
+            {loading ? 'Saving...' : edit ? 'Update User' : 'Add User'}
+          </button>
 
-        try {
-            const data = edit ? await updateUser(token) : await saveNewUser(token);
-            const returnedUser = data.admin || formData;
-
-            setUsers((prev) =>
-                edit
-                    ? prev.map((u) => (u.adminId === selectedUser.adminId ? returnedUser : u))
-                    : [returnedUser, ...prev]
-            );
-
-            setFormData({ name: '', mobile: '', email: '', isActive: false });
-            setSelectedUser(null);
-            setEdit(false);
-        } catch (err) {
-            console.error('Error saving user:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <form onSubmit={handleSubmit} noValidate>
-            <fieldset className="bg-white p-3 rounded shadow space-y-3 w-full max-w-2xl mx-auto text-xs">
-                <h2 className="text-sm font-semibold text-black">{edit ? 'Edit Admin' : 'Add Admin'}</h2>
-
-                <InputField
-                    id="name"
-                    name="name"
-                    type="text"
-                    label="User Name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    error={errors.name}
-                />
-
-                <InputField
-                    id="mobile"
-                    name="mobile"
-                    type="tel"
-                    label="Mobile No."
-                    value={formData.mobile}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    error={errors.mobile}
-                    maxLength={10}
-                />
-
-                <InputField
-                    id="email"
-                    name="email"
-                    type="email"
-                    label="Email Address"
-                    value={formData.email}
-                    onChange={handleChange}
-                    onKeyDown={handleKeyDown}
-                    error={errors.email}
-                />
-
-                {/* isActive */}
-                <label htmlFor="isActive" className="block text-xs font-medium text-gray-700">
-                    Active
-                    <select
-                        id="isActive"
-                        name="isActive"
-                        value={formData.isActive ? 'true' : 'false'}
-                        onChange={handleChange}
-                        onKeyDown={handleKeyDown}
-                        className="w-full border border-gray-300 px-2 py-1 rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm text-black"
-                        aria-label="Active status"
-                    >
-                        <option value="true">YES</option>
-                        <option value="false">NO</option>
-                    </select>
-                </label>
-            </fieldset>
-
-            <div className="mt-4 flex gap-2">
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className={`px-4 py-2 text-sm font-medium rounded-md ${loading
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
-                        }`}
-                >
-                    {loading ? 'Saving...' : edit ? 'Update User' : 'Add User'}
-                </button>
-
-                {edit && (
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="px-4 py-2 text-sm font-medium rounded-md bg-gray-500 text-white hover:bg-gray-600"
-                    >
-                        Cancel
-                    </button>
-                )}
-            </div>
-
-        </form>
-    );
-}
+          {edit && (
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="px-6 py-2 rounded border-2 text-sm font-bold text-gray-600 border-gray-400 hover:bg-gray-400 hover:text-white transition-colors duration-200"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+      </div>
+    </form>
+  );
+};
 
 export default AddUsers;

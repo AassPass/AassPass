@@ -12,6 +12,7 @@ export const Button = ({
         <button
             onClick={onClick}
             className={`
+                cursor-pointer
         px-4 py-2
         sm:px-5 sm:py-2.5
         md:px-5 md:py-2

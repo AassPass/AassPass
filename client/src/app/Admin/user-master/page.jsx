@@ -54,7 +54,7 @@ export default function UserMaster() {
     return (
         <div className="flex flex-col gap-6 md:px-4 py-6 w-full max-w-7xl mx-auto">
             {/* Add User Form */}
-            <div className="w-full bg-white rounded-lg shadow-md p-4">
+            <div className="w-full  p-4">
                 <AddUsers
                     edit={edit}
                     users={users}
@@ -66,7 +66,7 @@ export default function UserMaster() {
             </div>
 
             {/* User List */}
-            <div className="w-full bg-white rounded-lg text-black shadow-lg md:p-4">
+            <div className="w-full  text-black  md:p-4">
                 <UserList
                     users={users}
                     setUsers={setUsers}

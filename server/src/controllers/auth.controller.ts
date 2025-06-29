@@ -136,49 +136,64 @@ const UserRegister = async (req: Request, res: Response): Promise<any> => {
 }
 
 const UserLogin = async (req: Request, res: Response): Promise<any> => {
-    try{
-        const { email, password } = req.body;
-
-        if(!email || !password){
-            res.status(400).json({ message: "Email and password are required"});
+    try {
+      const { email, password } = req.body;
+  
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+  
+      const user = await prisma.user.findUnique({
+        where: { email },
+        include: {
+          businesses: {
+            select: {
+              businessId: true
+            }
+          }
         }
-
-        const user = await prisma.user.findUnique({
-            where: { email }
+      });
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      if (!user.emailVerified) {
+        return res.status(409).json({
+          message: "Verify your email first. Check your Inbox or spam folder."
         });
-
-        if(!user){
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        if(!(user.emailVerified)){
-            return res.status(409).json({ message: "Verify your email first. Check your Inbox or spam folder."});
-        }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        
-        if (!isPasswordValid) {
-            return res.status(401).json({ message: "Invalid password" });
-        }
-
-        const jwtToken = jwt.sign(
-            { id: user.id, role: user.role },
-            jwtSecret as string,
-            { expiresIn: "7d" }
-        );
-
-        res.status(200).json({
-            message: "Admin logged in successfully",
-            token: jwtToken,
-            role: user.role
-        });
-
+      }
+  
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+  
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: "Invalid password" });
+      }
+  
+      const firstBusinessId = user.businesses[0]?.businessId ?? null;
+  
+      const jwtToken = jwt.sign(
+        {
+          id: user.id,
+          role: user.role,
+          businessId: firstBusinessId, // null if no business
+        },
+        jwtSecret as string,
+        { expiresIn: "7d" }
+      );
+  
+      res.status(200).json({
+        message: "User logged in successfully",
+        token: jwtToken,
+        role: user.role,
+        businessId: firstBusinessId,
+      });
+  
     } catch (error) {
-        console.error("Error during logging in user:", error);
-        return res.status(500).json({ message: "Internal server error"});
+      console.error("Error during logging in user:", error);
+      return res.status(500).json({ message: "Internal server error" });
     }
-}
-
+  };
 const VerifyEmail = async (req: Request, res: Response): Promise<any> => {
     try {
         const { token } = req.body;

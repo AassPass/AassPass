@@ -42,6 +42,12 @@ const HeroSection = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const { setUserLocation } = useRole();
+    const [isDayTime, setIsDayTime] = useState(true);
+
+useEffect(() => {
+    const hour = new Date().getHours();
+    setIsDayTime(hour >= 6 && hour < 18);
+}, []);
 
     useEffect(() => {
         const sublineTimer = setInterval(() => {
@@ -113,75 +119,80 @@ const HeroSection = () => {
 
     return (
         <section className="relative w-full min-h-[calc(100vh-84px)] overflow-hidden flex flex-col items-center justify-between py-6">
-            <div className="relative z-10 max-w-7xl w-full h-full flex flex-col lg:flex-row items-center px-6 lg:px-20">
+            <div className="relative z-10 max-w-7xl w-full h-full flex flex-col lg:flex-row items-center px-6 lg:px-10 gap-8">
                 {/* LEFT */}
                 <motion.div
-                    className="w-full lg:w-1/2 flex flex-col gap-6 justify-center"
+                    className="w-full lg:w-1/2 flex flex-col"
                     initial={{ x: -100, opacity: 0, rotate: -5 }}
                     animate={{ x: 0, opacity: 1, rotate: 0 }}
                     transition={{ duration: 0.8, ease: 'easeOut' }}
                 >
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
-                        <AnimatePresence mode="wait">
-                            <motion.span
-                                key={headings[headingIndex].title}
-                                className="block mt-2"
-                                style={{ color: colors.primaryText }}
-                            >
-                                {renderWords(headings[headingIndex].title)}
-                            </motion.span>
-                        </AnimatePresence>
-                    </h2>
+                  <div className="flex flex-col gap-4" style={{ minHeight: '240px' }}>
+    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+        <AnimatePresence mode="wait">
+            <motion.span
+                key={headings[headingIndex].title}
+                className="block mt-2"
+                style={{ color: colors.primaryText }}
+            >
+                {renderWords(headings[headingIndex].title)}
+            </motion.span>
+        </AnimatePresence>
+    </h2>
 
-                    <div className="h-8">
-                        <AnimatePresence mode="wait">
-                            <motion.span
-                                key={headings[headingIndex].sublines[sublineIndex]}
-                                className="block mt-2"
-                                style={{ color: colors.secondaryText }}
-                            >
-                                {renderWords(headings[headingIndex].sublines[sublineIndex])}
-                            </motion.span>
-                        </AnimatePresence>
-                    </div>
+    <div>
+        <AnimatePresence mode="wait">
+            <motion.span
+                key={headings[headingIndex].sublines[sublineIndex]}
+                className="block mt-2 text-base md:text-lg"
+                style={{ color: colors.secondaryText }}
+            >
+                {renderWords(headings[headingIndex].sublines[sublineIndex])}
+            </motion.span>
+        </AnimatePresence>
+    </div>
+</div>
+
 
                     {/* Search Box */}
-                    <div className="relative w-full mt-2">
-                        <span
-                            onClick={handleEnterSearch}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 bg-yellow-400 p-2 rounded-full z-10 cursor-pointer"
-                            title="Search"
-                        >
-                            <MapPin size={20} color="#fff" />
-                        </span>
+               {/* Search Box */}
+<div className="relative w-full mt-4">
+    <span
+        onClick={handleEnterSearch}
+        className="absolute right-3 top-1/2 -translate-y-1/2 bg-yellow-400 p-2 rounded-full z-10 cursor-pointer"
+        title="Search"
+    >
+        <MapPin size={20} color="#fff" />
+    </span>
 
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleEnterSearch();
-                            }}
-                            onBlur={() => setTimeout(() => setSuggestions([]), 150)}
-                            placeholder="Search shops, locations..."
-                            className="w-full pl-4 pr-12 py-3 rounded-full focus:outline-none text-black placeholder-gray-500 shadow-md"
-                            style={{ border: '2px solid #facc15', backgroundColor: '#fff' }}
-                        />
+    <input
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onKeyDown={(e) => {
+            if (e.key === 'Enter') handleEnterSearch();
+        }}
+        onBlur={() => setTimeout(() => setSuggestions([]), 150)}
+        placeholder="Search shops, locations..."
+        className="w-full pl-4 pr-12 py-3 rounded-full focus:outline-none text-black placeholder-gray-500 shadow-md"
+        style={{ border: '2px solid #facc15', backgroundColor: '#fff' }}
+    />
 
-                        {suggestions.length > 0 && (
-                            <ul className="absolute z-20 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-md max-h-60 overflow-y-auto">
-                                {suggestions.map((place) => (
-                                    <li
-                                        key={place.id}
-                                        onClick={() => handleSelect(place)}
-                                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                    >
-                                        {place.place_name}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
+    {suggestions.length > 0 && (
+        <ul className="absolute z-20 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-md max-h-60 overflow-y-auto">
+            {suggestions.map((place) => (
+                <li
+                    key={place.id}
+                    onClick={() => handleSelect(place)}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                >
+                    {place.place_name}
+                </li>
+            ))}
+        </ul>
+    )}
+</div>
+
                 </motion.div>
 
                 {/* RIGHT */}
@@ -191,14 +202,14 @@ const HeroSection = () => {
                     animate={{ x: 0, opacity: 1, rotate: 0 }}
                     transition={{ duration: 1.2, ease: 'easeOut' }}
                 >
-                    <Image
-                        src="/hero-image.png"
-                        alt="Hero Illustration"
-                        width={500}
-                        height={500}
-                        className="object-contain"
-                        priority
-                    />
+                  <Image
+    src={isDayTime ? "/Home page Day.jpg" : "/Home Night.jpg"}
+    alt="Hero Illustration"
+    width={600}
+    height={600}
+    className="object-contain"
+    priority
+/>
                 </motion.div>
             </div>
 

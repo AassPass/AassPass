@@ -168,7 +168,7 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
     });
 
     const token = jwt.sign(
-        { id: user.id, role: user.role, businessId: newBusiness.businessId },
+        { id: user.id, role: UserRole.OWNER, businessId: newBusiness.businessId },
         jwtSecret as string,
         { expiresIn: "7d" }
     );
