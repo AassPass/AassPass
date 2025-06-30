@@ -1,58 +1,73 @@
 'use client';
-import React, { useEffect, useRef } from 'react';
+import { GetRandomAds } from '@/services/homeGetAds';
+import React, { useEffect, useRef, useState } from 'react';
 
-const adsData = [
-  { id: 1, type: 'normal', title: 'Ad 1', image: '/ads/ad1.jpg' },
-  { id: 2, type: 'normal', title: 'Ad 2', image: '/ads/ad2.jpg' },
-  { id: 3, type: 'normal', title: 'Ad 3', image: '/ads/ad3.jpg' },
-  { id: 4, type: 'banner', title: 'Banner 1', image: '/ads/banner1.jpg' },
-  { id: 5, type: 'banner', title: 'Banner 2', image: '/ads/banner2.jpg' },
-  { id: 6, type: 'banner', title: 'Banner 3', image: '/ads/banner3.jpg' },
-  { id: 7, type: 'normal', title: 'Ad 4', image: '/ads/ad4.jpg' },
-  { id: 8, type: 'normal', title: 'Ad 5', image: '/ads/ad5.jpg' },
-];
+// const adsData = [
+//   { id: 1, type: 'normal', title: 'Ad 1', image: '/ads/ad1.jpg' },
+//   { id: 2, type: 'normal', title: 'Ad 2', image: '/ads/ad2.jpg' },
+//   { id: 3, type: 'normal', title: 'Ad 3', image: '/ads/ad3.jpg' },
+//   { id: 4, type: 'banner', title: 'Banner 1', image: '/ads/banner1.jpg' },
+//   { id: 5, type: 'banner', title: 'Banner 2', image: '/ads/banner2.jpg' },
+//   { id: 6, type: 'banner', title: 'Banner 3', image: '/ads/banner3.jpg' },
+//   { id: 7, type: 'normal', title: 'Ad 4', image: '/ads/ad4.jpg' },
+//   { id: 8, type: 'normal', title: 'Ad 5', image: '/ads/ad5.jpg' },
+// ];
 
 // Group consecutive ads of same type
 const groupConsecutiveAds = (ads) => {
-  const groups = [];
-  let currentGroup = [];
+  let normalImages = [];
+  let bannerImages = [];
 
-  for (let i = 0; i < ads.length; i++) {
-    const ad = ads[i];
-    const prevType = currentGroup[0]?.type;
+  ads.forEach(ad => {
+    ad.images.forEach(img => {
+      const imageWithMeta = {
+        ...img,
+        title: ad.title,
+        id: ad.id,
+        image: img.url, // alias for <img src=...>
+      };
 
-    if (currentGroup.length === 0 || ad.type === prevType) {
-      currentGroup.push(ad);
-    } else {
-      groups.push([...currentGroup]);
-      currentGroup = [ad];
-    }
-  }
+      if (img.type === 'NORMAL') {
+        normalImages.push(imageWithMeta);
+      } else if (img.type === 'BANNER') {
+        bannerImages.push(imageWithMeta);
+      }
+    });
+  });
 
-  if (currentGroup.length > 0) groups.push(currentGroup);
-  return groups;
+  const half = Math.floor(normalImages.length / 2);
+  const firstHalf = normalImages.slice(0, half);
+  const secondHalf = normalImages.slice(half);
+
+  return [firstHalf, bannerImages, secondHalf];
 };
 
+
+
 const AdsPage = () => {
-  const groupedAds = groupConsecutiveAds(adsData);
+  const [groupedAds, setGroupedAds] = useState([[], [], []]);
+  // const groupedAds = groupConsecutiveAds(adsData);
+
+  useEffect(() => {
+    const fetchAds = async () => {
+      const ads = await GetRandomAds();
+      console.log(ads);
+      if (Array.isArray(ads)) {
+        setGroupedAds(groupConsecutiveAds(ads));
+      }
+    };
+
+    fetchAds();
+  }, []);
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
-     
 
-      {groupedAds.map((group, index) => {
-        const type = group[0]?.type;
+      {groupedAds[0]?.length > 0 && <AutoScrollRow ads={groupedAds[0]} />}
+      {groupedAds[1]?.length > 0 && <AutoScrollBanner banners={groupedAds[1]} />}
+      {groupedAds[2]?.length > 0 && <AutoScrollRow ads={groupedAds[2]} />}
 
-        if (type === 'normal') {
-          return <AutoScrollRow key={index} ads={group} />;
-        }
-
-        if (type === 'banner') {
-          return <AutoScrollBanner key={index} banners={group} />;
-        }
-
-        return null;
-      })}
     </div>
   );
 };
