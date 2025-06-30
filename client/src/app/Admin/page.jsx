@@ -46,6 +46,7 @@ export default function Page() {
         dashboard: DashboardContent,
         'user-master': UserMaster,
         'ad-listing': AdListing,
+        
         map: MapContent,
         profile: Profile,
         'company-management': CompanyManagement,

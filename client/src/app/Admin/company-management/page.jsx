@@ -90,6 +90,7 @@ export default function CompanyManagement() {
 
             if (response.ok) {
                 const data = await response.json();
+                console.log(data)
                 setCompanies(data?.data || []);
             } else {
                 console.error(`Failed to fetch companies: ${response.status}`);
@@ -125,7 +126,7 @@ export default function CompanyManagement() {
                 setEditingCompany={setEditingCompany}
             />
 
-            <div className="border  rounded-md shodow-md border border-gray-300">
+            <div className="rounded-md shodow-md border border-gray-300">
                 <CompanyFilter
                     status={status}
                     type={type}

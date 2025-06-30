@@ -12,7 +12,8 @@ const permissions = {
         PERMISSIONS.DELETE_ADS,
         PERMISSIONS.BLACKLIST_ADS,
         PERMISSIONS.VERIFY_KYC,
-        PERMISSIONS.VERIFY_AD,        // ✅ NEW
+        PERMISSIONS.VERIFY_AD,      
+        PERMISSIONS.BLOCK_AD  // ✅ NEW
         // PERMISSIONS.DELETE_BUSINESS
     ],
     ADMIN: [
@@ -22,6 +23,8 @@ const permissions = {
         // PERMISSIONS.VERIFY_KYC            // ✅ Optional: Give to admin too
     ],
     USER: [
+        PERMISSIONS.CREATE_PROFILE,
+        PERMISSIONS.BLOCK_AD ,
         PERMISSIONS.CREATE_USER,
         PERMISSIONS.USER_CREATE_BUSINESS,
         PERMISSIONS.ADD_ADS,
