@@ -1,99 +1,165 @@
-"use client";
-
 import { FaMapMarkedAlt, FaTags, FaCheckCircle, FaMoneyBillWave } from "react-icons/fa";
 import Image from "next/image";
 
 export default function BestPriceDeals() {
     const features = [
         {
+            id: "compare",
             icon: <FaCheckCircle className="text-green-400 text-2xl" />,
             title: "Compare Prices Instantly",
-            description: "Quickly scan prices across local gyms, salons, and more.",
+            description:
+                "Quickly scan and compare prices across local gyms, salons, spas, restaurants, and more — no more overpaying!",
+            image: "/compareprice.jpeg",
         },
         {
+            id: "map",
             icon: <FaMapMarkedAlt className="text-blue-400 text-2xl" />,
             title: "See Offers Nearby on the Map",
-            description: "Find deals around you with a real-time map view.",
+            description:
+                "Discover what’s happening around you using our live Lokaly Map. Find real-time deals and promotions near your current location.",
+            image: "/Near by Price 2.jpg",
         },
         {
+            id: "verified",
             icon: <FaTags className="text-yellow-400 text-2xl" />,
             title: "Verified Listings & Discounts",
-            description: "Only trusted, verified listings shown with real savings.",
+            description:
+                "Only genuine, verified local businesses are featured. Enjoy exclusive deals with complete peace of mind.",
+            image: "/Deal 2.png",
         },
         {
+            id: "smart",
             icon: <FaMoneyBillWave className="text-purple-400 text-2xl" />,
-            title: "Join Events & Services Smartly",
-            description: "Book smarter by seeing true value before committing.",
+            title: "Join Events & Book Services Easily",
+            description:
+                "See who’s hosting what nearby and book in seconds — no calls, no confusion.",
+            image: "/Deal 2.png",
         },
     ];
 
     return (
-        <section className="w-full text-white bg-gradient-to-r from-[#0b161c] to-[#201446] px-4">
-            <div className="max-w-7xl mx-auto py-14 space-y-20">
+        <section id="feature-section" className="w-full text-white">
+            {/* Top Feature Section */}
+            <div className="w-full flex flex-col bg-[#1c1f2b] md:flex-row items-center justify-evenly gap-0 px-4">
+                {/* Image */}
+              <div className="w-full md:w-1/2 max-w-full">
+  <img
+    id="feature-image"
+    data-img={features[0].image}
+    data-alt={features[0].title}
+    className="w-full h-full object-cover"
+  />
+</div>
 
-                {/* Section Title & Features */}
-                <div>
-                    <h2 className="text-3xl md:text-4xl font-semibold text-center mb-12 bg-gradient-to-r from-[#6aabf2] to-[#8989de] bg-clip-text text-transparent">
-                        Find Nearby Deals Instantly
-                    </h2>
 
-                    <div className="flex flex-col md:flex-row items-center justify-evenly py-12 gap-12 bg-gradient-to-r from-[#2c3b44] to-[#3b2f5d] rounded-xl px-4">
-                        {/* Map Image */}
-                        <div className="w-full md:w-1/2 max-w-sm md:max-w-md">
-                            <Image
-                                src="/Deal 1.png" // Replace with your real image path
-                                alt="Nearby Deals"
-                                width={500}
-                                height={400}
-                                className="rounded-lg shadow-md"
-                            />
+                {/* Feature List */}
+                <div className="w-full md:w-1/2 flex flex-col gap-2 px-4 py-6" id="feature-list">
+                    {features.map((feature) => (
+                        <div
+                            key={feature.id}
+                            className="feature-item flex gap-4 items-start cursor-pointer p-4 transition hover:bg-white/10"
+                            data-img={feature.image}
+                            data-theme={feature.theme}
+                        >
+                            {feature.icon}
+                            <div>
+                                <h4 className="text-lg font-semibold">{feature.title}</h4>
+                                <p className="text-white/80 text-sm">{feature.description}</p>
+                            </div>
                         </div>
-
-                        {/* Features List */}
-                        <div className="flex flex-col gap-8 max-w-md text-left">
-                            {features.map((feature, idx) => (
-                                <div key={idx} className="flex gap-4 items-start">
-                                    {feature.icon}
-                                    <div>
-                                        <h4 className="text-lg font-semibold">{feature.title}</h4>
-                                        <p className="text-white/80 text-sm">{feature.description}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    ))}
                 </div>
-
-                {/* CTA Section With Image */}
-                {/* CTA Section With Image */}
-                <div className="flex flex-col md:flex-row items-center gap-10 bg-[#1b2430] rounded-xl p-6 md:p-12">
-                    {/* Text CTA */}
-                    <div className="flex-1 space-y-5 text-left">
-                        <h3 className="text-2xl md:text-3xl font-semibold">
-                            Stop Guessing. Start Saving.
-                        </h3>
-                        <p className="text-white/80">
-                            Whether it's a fitness center, salon, course, or weekend event—know what you’re paying for before you commit.
-                        </p>
-                        <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 transition rounded-md text-white font-medium">
-                            Explore Deals Around You
-                        </button>
-                    </div>
-
-                    {/* CTA Image */}
-                    <div className="w-full md:w-[560px] h-[360px]">
-                        <Image
-                            src="/Deal 2.png" // Make sure this path is correct
-                            alt="Start Saving"
-                            width={500}
-                            height={360}
-                            className="rounded-lg shadow-md object-cover h-full w-full"
-                        />
-                    </div>
-                </div>
-
-
             </div>
+
+            {/* CTA Section */}
+            <div className="w-full flex flex-col md:flex-row items-center gap-0 px-4 py-6 bg-white text-black">
+                <div className="flex-1 px-4">
+                    <h3 className="text-2xl md:text-3xl font-semibold">
+                        Stop Guessing. Start Saving.
+                    </h3>
+                    <p className=" mt-2 mb-4">
+                        Whether it's a fitness center, salon, course, or weekend event—know what you’re paying for before you commit.
+                    </p>
+                    <button className="px-6 py-3 hover:bg-blue-400 border-blue-400 border-2 transition rounded-md hover:text-white text-blue-400 font-medium">
+                        Explore Deals Around You
+                    </button>
+                </div>
+                <div className="w-full md:w-[560px] h-[360px]">
+                    <Image
+                        src="/Deal 2.png"
+                        alt="Start Saving"
+                        width={650}
+                        height={460}
+                        className="object-cover w-full h-full"
+                    />
+                </div>
+            </div>
+
+            {/* Business Register Section */}
+            <div className="w-full flex flex-col md:flex-row items-center gap-0 px-4 py-6 bg-[#1c1f2b]">
+                {/* Text Content */}
+                <div className="flex-1 px-4">
+                    <h3 className="text-2xl md:text-3xl font-semibold">
+                        Register Your Business Now
+                    </h3>
+                    <p className="text-white/80 mt-2">No setup cost. Easy dashboard. Local visibility guaranteed.</p>
+                    <p className="text-white/80 mt-2">
+                        <strong>Let Your Business Stand Out in the Crowd</strong><br />
+                        Register your shop, salon, gym, or service with <span className="text-blue-400 font-semibold">AassPass</span> and connect with local customers instantly.
+                    </p>
+                    <button className="mt-4 px-6 py-3 hover:bg-green-400 border-green-400 border-2 transition rounded-md hover:text-white text-green-400 font-medium">
+                        Get Started for Free
+                    </button>
+                </div>
+
+                {/* Image */}
+                <div className="w-full md:w-[560px] h-[360px]">
+                    <Image
+                        src="/Check near by deals and offer.jpg"
+                        alt="Register Business with AassPass"
+                        width={500}
+                        height={360}
+                        className="object-cover w-full h-full"
+                    />
+                </div>
+            </div>
+
+            {/* JavaScript for Image Switch (no React hooks) */}
+           <script
+  dangerouslySetInnerHTML={{
+    __html: `
+      document.addEventListener("DOMContentLoaded", function () {
+        const items = document.querySelectorAll(".feature-item");
+        const img = document.getElementById("feature-image");
+
+        if (img) {
+          // Set default image
+          img.src = img.getAttribute("data-img");
+          img.alt = img.getAttribute("data-alt");
+
+          // Click handler to switch image
+          items.forEach(item => {
+            item.addEventListener("click", () => {
+              const newImg = item.getAttribute("data-img");
+              const newAlt = item.querySelector("h4")?.textContent || "";
+
+              if (newImg) {
+                img.setAttribute("src", newImg);
+                img.setAttribute("alt", newAlt);
+              }
+
+              // Highlight selected item (optional)
+              items.forEach(i => i.classList.remove("bg-white/10"));
+              item.classList.add("bg-white/10");
+            });
+          });
+        }
+      });
+    `,
+  }}
+/>
+
+
         </section>
     );
 }
