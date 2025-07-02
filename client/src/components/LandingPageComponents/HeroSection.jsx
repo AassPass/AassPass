@@ -118,7 +118,7 @@ useEffect(() => {
         ));
 
     return (
-        <section className="relative w-full min-h-[calc(100vh-84px)] overflow-hidden flex flex-col items-center justify-between py-6">
+        <section className="relative w-full  overflow-hidden flex flex-col items-center justify-between py-6">
             <div className="relative z-10 max-w-7xl w-full h-full flex flex-col lg:flex-row items-center px-6 lg:px-10 gap-8">
                 {/* LEFT */}
                 <motion.div
@@ -197,7 +197,7 @@ useEffect(() => {
 
                 {/* RIGHT */}
                 <motion.div
-                    className="hidden lg:flex lg:w-1/2 h-full items-center justify-center relative"
+                    className=" lg:flex lg:w-1/2 h-full items-center justify-center relative"
                     initial={{ x: 100, opacity: 0, rotate: 5 }}
                     animate={{ x: 0, opacity: 1, rotate: 0 }}
                     transition={{ duration: 1.2, ease: 'easeOut' }}

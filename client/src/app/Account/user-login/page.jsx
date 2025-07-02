@@ -78,7 +78,13 @@ const handleSignup = async (e) => {
 
 
   return (
-    <div className="flex  h-screen justify-center px-4 items-center bg-gray-100 relative">
+    <div className="flex  h-screen justify-center px-4 items-center bg-gray-100 relative"
+    style={{
+  backgroundImage: `url('/Registration Page.jpeg')`,
+  backgroundSize: 'cover', // instead of objectFit
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'center',
+}}>
       <form
         onSubmit={isSignup ? handleSignup : handleLogin}
         className="w-full max-w-md p-8 rounded shadow-md"

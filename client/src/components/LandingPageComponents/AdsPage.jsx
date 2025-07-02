@@ -37,7 +37,7 @@ const AdsPage = () => {
   const groupedAds = groupConsecutiveAds(adsData);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-12" id='explore-offers'>
      
 
       {groupedAds.map((group, index) => {
