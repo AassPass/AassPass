@@ -6,6 +6,16 @@ import { useRole } from '@/Context/RoleContext';
 import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
 import { BACKEND_URL } from '@/Utils/backendUrl';
+import { FaEdit } from 'react-icons/fa';
+import {
+  FaLinkedin,
+  FaTwitter,
+  FaFacebook,
+  FaInstagram,
+  FaYoutube,
+  FaGlobe,
+} from 'react-icons/fa';
+
 
 const DeferredLink = ({ children, ...props }) => {
     const [mounted, setMounted] = useState(false);
