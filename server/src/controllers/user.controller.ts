@@ -140,7 +140,7 @@ export const GetBusinesses = async (req: Request, res: Response): Promise<any> =
       },
     });
 
-
+    console.log(businesses);
     res.status(200).json({
       message: "Nearby businesses retrieved successfully",
       data: businesses,
@@ -151,7 +151,7 @@ export const GetBusinesses = async (req: Request, res: Response): Promise<any> =
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
+                                                        
 
 export const CreateBusiness = async (req: Request, res: Response): Promise<any> => {
   try{
