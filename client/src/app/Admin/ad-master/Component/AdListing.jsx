@@ -8,14 +8,13 @@ import { BACKEND_BUSINESS_URL } from '@/Utils/backendUrl';
 
 
 import { useEffect, useState, useCallback } from 'react';
-
-import { BACKEND_BUSINESS_URL } from '@/Utils/backendUrl';
+import { BACKEND_BUSINESS_URL } from '@/app/Utils/backendUrl';
 import { useRole } from '@/Context/RoleContext';
 
-// ✅ Define categories outside to avoid re-creation on every render
+// ✅ Enum category values as backend expects
 const categories = [
-    'DEAL',
-    'EVENT',
+    'Deals & Discounts',
+    'Events',
     'Services',
     'Products for Sale',
     'Job Openings',
@@ -24,15 +23,19 @@ const categories = [
     'Contests & Giveaways',
 ];
 
+
 export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setAds }) {
     const { businessId } = useRole();
 
-    const initialAddData = {
+    console.log(localStorage.getItem("token"))
 
+    const initialAddData = {
         title: '',
         category: '',
         startDate: '',
         endDate: '',
+        stage: 'DRAFT',
+        reset: false,
         images: [],
         extra: {},
     };
@@ -40,12 +43,15 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
     const [form, setForm] = useState(initialAddData);
     const [previewImages, setPreviewImages] = useState([]);
 
-    // ✅ Controlled edit mode with cleanup
     useEffect(() => {
         if (isAdEditing && editingAd) {
             setForm({
                 ...editingAd,
-                extra: editingAd.extra || {},
+                startDate: editingAd.visibleFrom?.split('T')[0] || '',
+                endDate: editingAd.visibleTo?.split('T')[0] || '',
+                stage: editingAd.stage || 'DRAFT',
+                reset: editingAd.reset || false,
+                extra: editingAd.metadata || {},
                 images: [],
             });
             setPreviewImages([]);
@@ -60,8 +66,11 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
     }, [previewImages]);
 
     const handleChange = useCallback((e) => {
-        const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        setForm((prev) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value,
+        }));
     }, []);
 
     const handleExtraChange = useCallback((e) => {
@@ -74,11 +83,11 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
 
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files).slice(0, 3);
-        const newPreviews = files.map((file) => URL.createObjectURL(file));
-
+        const previews = files.map((file) => URL.createObjectURL(file));
         setForm((prev) => ({ ...prev, images: files }));
-        setPreviewImages(newPreviews);
+        setPreviewImages(previews);
     };
+
     const handleSubmit = async (status) => {
         try {
             const token = localStorage.getItem('token');
@@ -87,22 +96,28 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
             const {
                 title,
                 category,
-                startDate,   // needs to be renamed
-                endDate,     // needs to be renamed
-                stage,       // new field to add
-                reset = false,
+                startDate,
+                endDate,
+                stage,
+                reset,
                 images,
                 extra,
             } = form;
 
             formData.append('title', title);
             formData.append('category', category);
-            formData.append('visibleFrom', startDate); // ✅ renamed
-            formData.append('visibleTo', endDate);     // ✅ renamed
-            formData.append('stage', stage || 'DRAFT'); // ✅ default fallback
-            formData.append('reset', reset ? 'true' : 'false');
-            images.forEach((img) => formData.append('files', img));
-            console.log(formData)
+            formData.append('visibleFrom', startDate);
+            formData.append('visibleTo', endDate);
+            formData.append('stage', status === 'draft' ? 'DRAFT' : stage);
+            formData.append('reset', reset ? true : false);
+            Object.entries(extra).forEach(([key, value]) => {
+                formData.append(key, value);
+            });
+
+
+            images.forEach((img) => formData.append('images', img)); // ✅ match backend
+
+
             const endpoint = isAdEditing
                 ? `${BACKEND_BUSINESS_URL}/ads/${form.adCode}`
                 : `${BACKEND_BUSINESS_URL}/new-ad`;
@@ -113,12 +128,11 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
                 method,
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    // Don't set content-type manually!
                 },
                 body: formData,
             });
 
-            if (!res.ok) throw new Error('Failed to submit ad');
+            if (!res.status === 200 || !re.status === 201) throw new Error('Failed to submit ad');
 
             const updatedAd = await res.json();
 
@@ -128,7 +142,7 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
                     : [updatedAd, ...prev]
             );
 
-            console.success(`Ad ${isAdEditing ? 'updated' : status === 'draft' ? 'saved as draft' : 'submitted'} successfully!`);
+            console.log(`Ad ${isAdEditing ? 'updated' : status === 'draft' ? 'saved as draft' : 'submitted'} successfully!`);
 
             setForm(initialAddData);
             setPreviewImages([]);
@@ -138,12 +152,10 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
         }
     };
 
-
     const renderExtraFields = () => {
         const { category, extra } = form;
-
         const commonInput = (name, placeholder) => (
-            <Input name={name} placeholder={placeholder} onChange={handleExtraChange} value={extra[name] || ''} />
+            <Input name={name} placeholder={placeholder} onChange={handleExtraChange} value={extra[name] ?? ''} />
         );
 
         switch (category) {
@@ -168,6 +180,7 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
                     <>
                         {commonInput('price', 'Price')}
                         {commonInput('deliveryOption', 'Pickup/Delivery Option')}
+                        {commonInput('condition', 'Condition (New/Used)')}
                     </>
                 );
             case 'Job Openings':
@@ -176,6 +189,7 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
                         {commonInput('salary', 'Salary')}
                         {commonInput('hours', 'Working Hours')}
                         {commonInput('location', 'Location')}
+                        {commonInput('qualifications', 'Qualifications')}
                     </>
                 );
             case 'Rentals & Properties':
@@ -185,6 +199,7 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
                         {commonInput('rent', 'Rent')}
                         {commonInput('amenities', 'Amenities')}
                         {commonInput('contact', 'Contact Info')}
+                        {commonInput('availableFrom', 'Available From')}
                     </>
                 );
             case 'Contests & Giveaways':
@@ -193,6 +208,23 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
                         {commonInput('rules', 'Rules')}
                         {commonInput('endDate', 'End Date')}
                         {commonInput('eligibility', 'Eligibility')}
+                        {commonInput('prize', 'Prize')}
+                    </>
+                );
+            case 'Announcements':
+                return (
+                    <>
+                        {commonInput('announcementType', 'Type')}
+                        {commonInput('content', 'Announcement Content')}
+                        {commonInput('importanceLevel', 'Importance (Low/Medium/High)')}
+                    </>
+                );
+            case 'DEAL':
+                return (
+                    <>
+                        {commonInput('discountPercentage', 'Discount %')}
+                        {commonInput('validTill', 'Valid Till')}
+                        {commonInput('terms', 'Terms & Conditions')}
                     </>
                 );
             default:
@@ -257,6 +289,11 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
                     )}
                 </div>
 
+                <div className="flex items-center gap-2">
+                    <input type="checkbox" name="reset" checked={form.reset} onChange={handleChange} />
+                    <label htmlFor="reset">Reset after campaign ends</label>
+                </div>
+
                 <div className="flex gap-4 pt-4">
                     <button
                         onClick={() => handleSubmit('submit')}
@@ -276,7 +313,7 @@ export default function AdListing({ setIsAdEditing, editingAd, isAdEditing, setA
     );
 }
 
-// ✅ Reusable Input component
+// ✅ Reusable Input Component
 const Input = ({ label, ...props }) => (
     <div>
         {label && <label className="block text-sm font-medium mb-1">{label}</label>}

@@ -147,7 +147,7 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
         visibleFrom: new Date(visibleFrom),
         visibleTo: new Date(visibleTo),
         stage,
-        reset,
+        reset, // ✅ now it's always a Boolean
         businessId: business.id,
         metadata,
       },
@@ -311,7 +311,6 @@ export const UpdateAd = async (req: Request, res: Response): Promise<any> => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 
 export const GetAds = async (req: Request, res: Response): Promise<any> => {

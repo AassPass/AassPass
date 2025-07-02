@@ -40,14 +40,15 @@ const HeaderClientActions = ({ navLinks }) => {
     };
 
     return (
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-2 md:gap-4 ">
             {/* Desktop Button */}
-            <div className="hidden md:flex">
+            <div className="hidden md:flex ">
                 <Button
                     text={isLoggedIn ? 'Logout' : 'Login'}
                     color={isLoggedIn ? '#e74c3c' : '#265049'}
                     aria-label={isLoggedIn ? 'Logout' : 'Login'}
                     onClick={handleAuthAction}
+                     
                 />
             </div>
 
