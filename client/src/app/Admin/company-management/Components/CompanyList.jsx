@@ -4,11 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useRole } from '@/Context/RoleContext';
 import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
-<<<<<<< HEAD
+
 import { BACKEND_URL } from '@/Utils/backendUrl';
-=======
-import { BACKEND_URL } from '@/app/Utils/backendUrl';
->>>>>>> backup-my-changes
+
 import { FaEdit } from 'react-icons/fa';
 import {
   FaLinkedin,
