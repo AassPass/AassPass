@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback, useMemo, useTransition } from 'react'
 import { useRole } from '@/Context/RoleContext';
 import { saveBusiness } from '@/services/business';
 import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
+import { showToast } from '@/Utils/toastUtil';
 
 const businessTypeMap = {
   'Retail Store': 'RETAIL_STORE',
@@ -54,6 +55,10 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
   const [formData, setFormData] = useState(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [errors, setErrors] = useState({
+  phoneNumber: '',
+  gstNumber: '',
+});
 
   const subscriptionTypes = ['STANDARD', 'PREMIUM'];
   const businessTypes = Object.keys(businessTypeMap);
@@ -65,7 +70,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
     }, {});
   }, []);
 
- useEffect(() => {
+useEffect(() => {
   startTransition(() => {
     if (isEditing && editingCompany) {
       const socialObj = {
@@ -74,14 +79,13 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
         twitter: '',
       };
 
-      const socialLinks = editingCompany.socialLinks || {};
-
-      // populate socialObj with existing links from socialLinks object
-      for (const platform of ['instagram', 'facebook', 'twitter']) {
-        if (socialLinks[platform]) {
-          socialObj[platform] = socialLinks[platform];
+      // Convert array of links to object
+      (editingCompany.socialLinks || []).forEach((item) => {
+        const platform = item.platform?.toLowerCase();
+        if (socialObj.hasOwnProperty(platform)) {
+          socialObj[platform] = item.link;
         }
-      }
+      });
 
       setFormData({
         ...initialFormData,
@@ -95,10 +99,29 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
   });
 }, [isEditing, editingCompany, contextBusinessId, reverseBusinessTypeMap]);
 
-  const handleChange = useCallback((e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  }, []);
+const handleChange = useCallback((e) => {
+  const { name, value } = e.target;
+
+  setFormData((prev) => ({ ...prev, [name]: value }));
+
+  // Live validation
+  if (name === 'phoneNumber') {
+    const isValid = /^(\+91)?[6-9]\d{9}$/.test(value);
+    setErrors((prev) => ({
+      ...prev,
+      phoneNumber: isValid || value === '' ? '' : 'Invalid phone number',
+    }));
+  }
+
+  if (name === 'gstNumber') {
+    const isValidGST = value === '' || /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(value);
+    setErrors((prev) => ({
+      ...prev,
+      gstNumber: isValidGST ? '' : 'Invalid GST number',
+    }));
+  }
+}, []);
+
 
   const handleSocialLinkChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -112,18 +135,24 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
   }, []);
 
   const handleUseLocation = useCallback(() => {
-    navigator.geolocation?.getCurrentPosition(
-      (pos) => {
-        setFormData((prev) => ({
-          ...prev,
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-        }));
-      },
-      () => {
-        console.error('Location permission denied');
-      }
-    );
+   navigator.geolocation.getCurrentPosition(
+  (pos) => {
+    setFormData((prev) => ({
+      ...prev,
+      latitude: pos.coords.latitude,
+      longitude: pos.coords.longitude,
+    }));
+  },
+  (error) => {
+    showToast('Location permission denied or unavailable.', 'error');
+  },
+  {
+    enableHighAccuracy: true, // try for better accuracy but might be slower
+    timeout: 10000,           // 10 seconds max wait
+    maximumAge: 60000,        // use cached position if it's less than 1 minute old
+  }
+);
+
   }, []);
 
   const isFormValid =
@@ -134,39 +163,54 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
     formData.longitude;
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!isFormValid) {
-      console.error('Business Name, Phone, Type, Latitude and Longitude required');
-      return;
+  e.preventDefault();
+  if (!isFormValid) {
+    showToast('Please fill in all required fields.', 'warning');
+    return;
+  }
+
+ const formattedSocialLinks = Object.entries(formData.socialLinks)
+  .filter(([_, link]) => link.trim() !== '')
+  .map(([platform, link]) => ({
+    platform,
+    link,
+  }));
+
+const newBusiness = {
+  ...formData,
+  businessType: isEditing
+    ? formData.businessType
+    : businessTypeMap[formData.businessType] || 'OTHER',
+  socialLinks: formattedSocialLinks,
+};
+
+
+  setIsSubmitting(true);
+  
+  try {
+    const token = localStorage.getItem('token');
+    
+    const savedBusiness = await saveBusiness(newBusiness, isEditing, token);
+    if (isEditing) {
+      setCompanies((prev) =>
+        prev.map((company) =>
+          company.businessId === editingCompany.businessId ? savedBusiness : company
+        )
+      );
+      setIsEditing(false);
+      showToast('Business updated successfully!', 'success');
+    } else {
+      setCompanies((prev) => [savedBusiness, ...prev]);
+      setFormData(initialFormData);
+      showToast('Business added successfully!', 'success');
     }
+  } catch (error) {
+    showToast('Error submitting business: ' + error.message, 'error');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
-    const newBusiness = {
-      ...formData,
-      businessType: isEditing
-        ? formData.businessType // send label as-is when editing
-        : businessTypeMap[formData.businessType] || 'OTHER', // convert label to enum when adding
-    };
-
-    setIsSubmitting(true);
-    try {
-      const token = localStorage.getItem('token');
-      const savedBusiness = await saveBusiness(newBusiness, isEditing, token);
-
-      if (isEditing) {
-        setCompanies((prev) =>
-          prev.map((company) => (company.businessId === editingCompany.businessId ? savedBusiness : company))
-        );
-        setIsEditing(false);
-      } else {
-        setCompanies((prev) => [savedBusiness, ...prev]);
-        setFormData(initialFormData);
-      }
-    } catch (error) {
-      console.error('Error submitting:', error.message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <form
@@ -174,7 +218,7 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
       className="bg-white rounded-md shadow-md w-full max-w-5xl mx-auto text-sm border overflow-hidden"
     >
       {/* Form Heading */}
-      <div className="bg-primary text-white px-4 py-2">
+      <div className="bg-blue-400 text-white px-4 py-2">
         <h2 className="text-sm font-semibold">{isEditing ? 'Edit Business' : 'Add Business'}</h2>
       </div>
 
@@ -206,16 +250,19 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
           </div>
 
           <div className="max-w-xs">
-            <label className={labelClass}>Phone Number *</label>
-            <input
-              type="tel"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              className={inputClass}
-              required
-            />
-          </div>
+  <label className={labelClass}>Phone Number *</label>
+  <input
+    type="tel"
+    name="phoneNumber"
+    value={formData.phoneNumber}
+    onChange={handleChange}
+    className={inputClass}
+    required
+  />
+  {errors.phoneNumber && (
+    <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>
+  )}
+</div>
 
           <div className="max-w-xs">
             <label className={labelClass}>Email Address</label>
@@ -296,15 +343,18 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
             </div>
 
             <div className="max-w-xs">
-              <label className={labelClass}>GST Number</label>
-              <input
-                type="text"
-                name="gstNumber"
-                value={formData.gstNumber}
-                onChange={handleChange}
-                className={inputClass}
-              />
-            </div>
+  <label className={labelClass}>GST Number</label>
+  <input
+    type="text"
+    name="gstNumber"
+    value={formData.gstNumber}
+    onChange={handleChange}
+    className={inputClass}
+  />
+  {errors.gstNumber && (
+    <p className="text-red-500 text-xs mt-1">{errors.gstNumber}</p>
+  )}
+</div>
 
             <div className="max-w-xs">
               <label className={labelClass}>Business Type *</label>
@@ -374,49 +424,50 @@ export default function AddCompanyForm({ editingCompany, isEditing, setIsEditing
 
           {/* Row 3: Social Links */}
           <div className="max-w-2xl space-y-4">
-            <label className={`${labelClass} block text-base font-medium text-gray-700`}>Social Links</label>
+  <label className={`${labelClass} block text-base font-medium text-gray-700`}>Social Links</label>
 
-            <div className="grid grid-cols-1 gap-4">
-              {/* Instagram */}
-              <div className="flex items-center gap-2">
-                <FaInstagram className="text-pink-500 text-xl" />
-                <input
-                  type="url"
-                  name="instagram"
-                  placeholder="Instagram URL"
-                  value={formData.socialLinks?.instagram || ''}
-                  onChange={handleSocialLinkChange}
-                  className={inputClass}
-                />
-              </div>
+  <div className="grid grid-cols-1 gap-4">
+    {/* Instagram */}
+    <div className="flex items-center gap-2">
+      <FaInstagram className="text-pink-500 text-xl" />
+      <input
+        type="url"
+        name="instagram"
+        placeholder="Instagram URL"
+        value={formData.socialLinks?.instagram || ''}
+        onChange={handleSocialLinkChange}
+        className={inputClass}
+      />
+    </div>
 
-              {/* Facebook */}
-              <div className="flex items-center gap-2">
-                <FaFacebookF className="text-blue-600 text-xl" />
-                <input
-                  type="url"
-                  name="facebook"
-                  placeholder="Facebook URL"
-                  value={formData.socialLinks?.facebook || ''}
-                  onChange={handleSocialLinkChange}
-                  className={inputClass}
-                />
-              </div>
+    {/* Facebook */}
+    <div className="flex items-center gap-2">
+      <FaFacebookF className="text-blue-600 text-xl" />
+      <input
+        type="url"
+        name="facebook"
+        placeholder="Facebook URL"
+        value={formData.socialLinks?.facebook || ''}
+        onChange={handleSocialLinkChange}
+        className={inputClass}
+      />
+    </div>
 
-              {/* Twitter */}
-              <div className="flex items-center gap-2">
-                <FaTwitter className="text-sky-500 text-xl" />
-                <input
-                  type="url"
-                  name="twitter"
-                  placeholder="Twitter URL"
-                  value={formData.socialLinks?.twitter || ''}
-                  onChange={handleSocialLinkChange}
-                  className={inputClass}
-                />
-              </div>
-            </div>
-          </div>
+    {/* Twitter */}
+    <div className="flex items-center gap-2">
+      <FaTwitter className="text-sky-500 text-xl" />
+      <input
+        type="url"
+        name="twitter"
+        placeholder="Twitter URL"
+        value={formData.socialLinks?.twitter || ''}
+        onChange={handleSocialLinkChange}
+        className={inputClass}
+      />
+    </div>
+  </div>
+</div>
+
         </div>
       </div>
     </form>

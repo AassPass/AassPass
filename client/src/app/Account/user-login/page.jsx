@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRole } from "@/Context/RoleContext";
 import colors from "@/libs/colors";
 import { loginUser, signupUser } from "@/services/auth";
+import { showToast } from "@/Utils/toastUtil";
 
 export default function Page() {
   const router = useRouter();
@@ -16,57 +17,74 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    const email = e.target.email.value.trim();
-    const password = e.target.password.value.trim();
+  e.preventDefault();
+  const email = e.target.email.value.trim();
+  const password = e.target.password.value.trim();
 
-    if (!email || !password) return;
+  if (!email || !password) {
+    showToast('Please enter both email and password.', 'warning');
+    return;
+  }
 
-    setLoading(true);
-    try {
-      const data = await loginUser({ email, password });
-
-      setBusinessId(data.businessId);
-      setRole(data.role);
-      localStorage.setItem("token", data.token);
-      console.log(data.role)
-      router.push("/");
-    } catch (err) {
-      // Check for email verification error
-      if (err.message === "Verify your email first. Check your Inbox or spam folder.") {
-        alert(err.message);
-      } else {
-        console.error("Login failed");
-      }
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    const data = await loginUser({ email, password });
+console.log(data)
+    setBusinessId(data.businessId);
+    setRole(data.role);
+    localStorage.setItem("token", data.token);
+    showToast('Login successful!', 'success');
+    router.push("/Admin");
+  } catch (err) {
+    if (err.message === "Verify your email first. Check your Inbox or spam folder.") {
+      showToast(err.message, 'warning');
+    } else {
+      showToast('Login failed. Please check your credentials.', 'error');
+      console.error("Login failed", err);
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
+const handleSignup = async (e) => {
+  e.preventDefault();
+  const name = e.target.name.value.trim();
+  const email = e.target.email.value.trim();
+  const password = e.target.password.value.trim();
+  const confirmPassword = e.target.confirmPassword.value.trim();
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    const name = e.target.name.value.trim();
-    const email = e.target.email.value.trim();
-    const password = e.target.password.value.trim();
-    const confirmPassword = e.target.confirmPassword.value.trim();
+  if (!name || !email || !password || !confirmPassword) {
+    showToast('Please fill in all fields.', 'warning');
+    return;
+  }
+  if (password !== confirmPassword) {
+    showToast('Passwords do not match.', 'error');
+    return;
+  }
 
-    if (!name || !email || !password || !confirmPassword) return;
-    if (password !== confirmPassword) return;
+  setLoading(true);
+  try {
+    await signupUser({ email, password, name });
+    showToast('Signup successful. Please verify your email.', 'success');
+    setIsSignup(false);
+  } catch (err) {
+    showToast(err.message || "Signup failed", 'error');
+    console.error(err.message || "Signup failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
-    setLoading(true);
-    try {
-      await signupUser({ email, password, name });
-      setIsSignup(false);
-    } catch (err) {
-      console.error(err.message || "Signup failed");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
-    <div className="flex  h-screen justify-center px-4 items-center bg-gray-100 relative">
+    <div className="flex  h-screen justify-center px-4 items-center bg-gray-100 relative"
+    style={{
+  backgroundImage: `url('/Registration Page.jpeg')`,
+  backgroundSize: 'cover', // instead of objectFit
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'center',
+}}>
       <form
         onSubmit={isSignup ? handleSignup : handleLogin}
         className="w-full max-w-md p-8 rounded shadow-md"

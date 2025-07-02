@@ -15,6 +15,10 @@ const Sidebar = ({ activeComponent, setActiveComponent }) => {
     // Set menu items based on role permissions
     useEffect(() => {
         const items = [{ name: 'dashboard', label: 'Dashboard' }];
+        
+         if (hasPermission(role, PERMISSIONS.CREATE_PROFILE)) {
+            items.push({ name: 'profile', label: 'Profile' });
+        }
 
         if (hasPermission(role, PERMISSIONS.CREATE_ADMIN)) {
             items.push({ name: 'user-master', label: 'User Master' });
@@ -55,7 +59,7 @@ const Sidebar = ({ activeComponent, setActiveComponent }) => {
         localStorage.removeItem('adminId');
         localStorage.removeItem('businessId');
         localStorage.removeItem('activeComponent');
-        router.push('/Account/Login');
+        router.push('/');
     };
 
     const activeIndex = menuItems.findIndex((item) => item.name === activeComponent);

@@ -192,31 +192,31 @@ const CompanyList = ({
                   '-'
                 )}
               </td>
-             <td className="border border-blue-400 px-2 py-1 min-w-[150px]">
-  {company.socialLinks && Object.entries(company.socialLinks).filter(([_, link]) => link).length > 0 ? (
+          <td className="border border-blue-400 px-2 py-1 min-w-[150px]">
+  {Array.isArray(company.socialLinks) && company.socialLinks.length > 0 ? (
     <div className="flex gap-2 justify-center">
-      {Object.entries(company.socialLinks).map(([platform, link], i) => {
+      {company.socialLinks.map(({ platform, link }, i) => {
         if (!link) return null;
 
         let Icon = FaGlobe;
-        let color = '';  // default no color = inherits text color (black)
+        let color = '';
         const name = platform.toLowerCase();
 
         if (name.includes('linkedin')) {
           Icon = FaLinkedin;
-          color = '#0A66C2'; // LinkedIn blue
+          color = '#0A66C2';
         } else if (name.includes('twitter')) {
           Icon = FaTwitter;
-          color = '#1DA1F2'; // Twitter blue
+          color = '#1DA1F2';
         } else if (name.includes('facebook')) {
           Icon = FaFacebook;
-          color = '#1877F2'; // Facebook blue
+          color = '#1877F2';
         } else if (name.includes('instagram')) {
           Icon = FaInstagram;
-          color = '#E4405F'; // Instagram pink/red (simplified)
+          color = '#E4405F';
         } else if (name.includes('youtube')) {
           Icon = FaYoutube;
-          color = '#FF0000'; // YouTube red
+          color = '#FF0000';
         }
 
         return (
@@ -237,6 +237,7 @@ const CompanyList = ({
     '-'
   )}
 </td>
+
 
 
 

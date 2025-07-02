@@ -2,194 +2,287 @@
 
 import { BACKEND_USER_URL } from '@/Utils/backendUrl';
 import React, { useState } from 'react';
+import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
 
 const businessTypeOptions = [
-    'Retail Store',
-    'Restaurant / Café',
-    'Salon / Spa',
-    'Gym / Fitness Center',
-    'Medical / Health Store',
-    'Service Provider',
-    'Freelancer / Consultant',
-    'Event Organizer',
-    'Education / Coaching',
-    'Home-based Business',
-    'Real Estate / Rentals',
-    'Courier / Delivery',
-    'Automobile Services',
-    'Pet Services',
-    'NGO / Community Org.',
-    'Shop / Store / Office',
-    'Other',
+  'Retail Store', 'Restaurant / Café', 'Salon / Spa', 'Gym / Fitness Center',
+  'Medical / Health Store', 'Service Provider', 'Freelancer / Consultant',
+  'Event Organizer', 'Education / Coaching', 'Home-based Business',
+  'Real Estate / Rentals', 'Courier / Delivery', 'Automobile Services',
+  'Pet Services', 'NGO / Community Org.', 'Shop / Store / Office', 'Other',
 ];
 
-const inputClass = 'w-full p-2 text-sm border border-gray-300 rounded';
+const inputClass = 'w-full border border-gray-300 rounded px-3 py-2 text-sm';
+const labelClass = 'block text-sm font-medium text-gray-700';
 
 export default function UserBusinessAddForm() {
-    const [form, setForm] = useState({
-        businessName: '',
-        phoneNumber: '',
-        emailAddress: '',
-        address: '',
-        gstNumber: '',
-        businessType: '',
-        websiteLink: '',
-        latitude: '',
-        longitude: '',
-        socialLinks: [{ platform: '', link: '' }],
-    });
+  const [form, setForm] = useState({
+    businessName: '',
+    phoneNumber: '',
+    emailAddress: '',
+    address: '',
+    gstNumber: '',
+    businessType: '',
+    websiteLink: '',
+    latitude: '',
+    longitude: '',
+    socialLinks: { instagram: '', facebook: '', twitter: '' },
+  });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
-    const handleSocialChange = (index, field, value) => {
-        const updated = [...form.socialLinks];
-        updated[index][field] = value;
-        setForm(prev => ({ ...prev, socialLinks: updated }));
-    };
+  const handleSocialLinkChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      socialLinks: { ...prev.socialLinks, [name]: value },
+    }));
+  };
 
-    const addSocialLink = () => {
-        setForm(prev => ({
-            ...prev,
-            socialLinks: [...prev.socialLinks, { platform: '', link: '' }],
+  const handleUseLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setForm((prev) => ({
+          ...prev,
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
         }));
-    };
+      },
+      () => alert('Permission denied or unavailable.')
+    );
+  };
 
-    const removeSocialLink = (index) => {
-        setForm(prev => ({
-            ...prev,
-            socialLinks: prev.socialLinks.filter((_, i) => i !== index),
-        }));
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${BACKEND_USER_URL}/business`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(form),
+      });
 
-    const handleUseLocation = () => {
-        navigator.geolocation.getCurrentPosition(
-            pos => {
-                setForm(prev => ({
-                    ...prev,
-                    latitude: pos.coords.latitude,
-                    longitude: pos.coords.longitude,
-                }));
-            },
-            () => alert('Permission denied or unavailable.')
-        );
-    };
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save');
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const token = localStorage.getItem("token");
-        try {
-            const res = await fetch(`${BACKEND_USER_URL}/business`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(form),
-            });
+      alert('Business saved successfully!');
+      localStorage.setItem('token', data.token);
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  };
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Failed to save');
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-md shadow-md w-full max-w-5xl mx-auto text-sm border overflow-hidden"
+    >
+      {/* Form Heading */}
+      <div className="bg-blue-400 text-white px-4 py-2">
+        <h2 className="text-sm font-semibold">Add Business</h2>
+      </div>
 
-            alert('Business saved successfully!');
-            console.log(data.business);
-            localStorage.setItem('token', data.token)
-        } catch (err) {
-            alert('Error: ' + err.message);
-        }
-    };
+      {/* Form Body */}
+      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Column 1 */}
+        <div className="space-y-4">
+          <div className="max-w-xs">
+            <label className={labelClass}>Business Name *</label>
+            <input
+              type="text"
+              name="businessName"
+              value={form.businessName}
+              onChange={handleChange}
+              className={inputClass}
+              required
+            />
+          </div>
 
+          <div className="max-w-xs">
+            <label className={labelClass}>Phone Number *</label>
+            <input
+              type="tel"
+              name="phoneNumber"
+              value={form.phoneNumber}
+              onChange={handleChange}
+              className={inputClass}
+              required
+            />
+          </div>
 
-    return (
-        <form onSubmit={handleSubmit} className="space-y-4 max-w-xl mx-auto p-4 bg-white rounded shadow">
-            <h2 className="text-lg font-bold">Business Form</h2>
+          <div className="max-w-xs">
+            <label className={labelClass}>Email Address</label>
+            <input
+              type="email"
+              name="emailAddress"
+              value={form.emailAddress}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
 
-            <input className={inputClass} name="businessName" placeholder="Business Name" value={form.businessName} onChange={handleChange} required />
-            <input className={inputClass} name="phoneNumber" placeholder="Phone Number" value={form.phoneNumber} onChange={handleChange} required />
-            <input className={inputClass} name="emailAddress" placeholder="Email Address" value={form.emailAddress} onChange={handleChange} required />
-            <input className={inputClass} name="address" placeholder="Address" value={form.address} onChange={handleChange} />
-            <input className={inputClass} name="gstNumber" placeholder="GST Number" value={form.gstNumber} onChange={handleChange} />
+          <div className="max-w-xs">
+            <label className={labelClass}>Address</label>
+            <input
+              type="text"
+              name="address"
+              value={form.address}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
 
-            <select className={inputClass} name="businessType" value={form.businessType} onChange={handleChange} required>
-                <option value="">Select Business Type</option>
-                {businessTypeOptions.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                ))}
+          <div className="max-w-xs">
+            <label className={labelClass}>GST Number</label>
+            <input
+              type="text"
+              name="gstNumber"
+              value={form.gstNumber}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        {/* Column 2 */}
+        <div className="space-y-4">
+          <div className="max-w-xs">
+            <label className={labelClass}>Business Type *</label>
+            <select
+              name="businessType"
+              value={form.businessType}
+              onChange={handleChange}
+              className={inputClass}
+              required
+            >
+              <option value="">Select Business Type</option>
+              {businessTypeOptions.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
             </select>
+          </div>
 
-            <input className={inputClass} name="websiteLink" placeholder="Website Link" value={form.websiteLink} onChange={handleChange} />
+          <div className="max-w-xs">
+            <label className={labelClass}>Website</label>
+            <input
+              type="url"
+              name="websiteLink"
+              value={form.websiteLink}
+              onChange={handleChange}
+              className={inputClass}
+            />
+          </div>
 
-            <div className="grid grid-cols-2 gap-2">
-                <input
-                    className={inputClass}
-                    type="number"
-                    step="any"
-                    name="latitude"
-                    placeholder="Latitude"
-                    value={form.latitude}
-                    onChange={handleChange}
-                />
-                <input
-                    className={inputClass}
-                    type="number"
-                    step="any"
-                    name="longitude"
-                    placeholder="Longitude"
-                    value={form.longitude}
-                    onChange={handleChange}
-                />
+          <div className="grid grid-cols-3 gap-2">
+            <div className="max-w-xs">
+              <label className={labelClass}>Latitude</label>
+              <input
+                type="number"
+                name="latitude"
+                value={form.latitude}
+                onChange={handleChange}
+                className={inputClass}
+              />
             </div>
-
-            <button
+            <div className="max-w-xs">
+              <label className={labelClass}>Longitude</label>
+              <input
+                type="number"
+                name="longitude"
+                value={form.longitude}
+                onChange={handleChange}
+                className={inputClass}
+              />
+            </div>
+            <div className="max-w-xs flex items-end">
+              <button
                 type="button"
                 onClick={handleUseLocation}
-                className="text-xs text-blue-600 hover:underline"
-            >
+                className="text-sm bg-blue-400 hover:bg-blue-600 cursor-pointer text-white px-4 py-1 rounded w-full"
+              >
                 Use My Location
-            </button>
-
-            <div className="space-y-2">
-                <label className="text-sm font-medium block">Social Links</label>
-                {form.socialLinks.map((link, index) => (
-                    <div key={index} className="flex gap-2 items-center">
-                        <input
-                            type="text"
-                            placeholder="Platform"
-                            value={link.platform}
-                            onChange={(e) => handleSocialChange(index, 'platform', e.target.value)}
-                            className={`${inputClass} w-1/3`}
-                        />
-                        <input
-                            type="url"
-                            placeholder="Link"
-                            value={link.link}
-                            onChange={(e) => handleSocialChange(index, 'link', e.target.value)}
-                            className={`${inputClass} flex-grow`}
-                        />
-                        {form.socialLinks.length > 1 && (
-                            <button type="button" onClick={() => removeSocialLink(index)} className="text-red-600 font-bold">
-                                ×
-                            </button>
-                        )}
-                    </div>
-                ))}
-                <button
-                    type="button"
-                    onClick={addSocialLink}
-                    className="text-xs text-blue-500 hover:underline"
-                >
-                    + Add another link
-                </button>
+              </button>
             </div>
+          </div>
 
-            <button
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
-            >
-                Submit
-            </button>
-        </form>
-    );
+          <div className="max-w-xl space-y-4">
+            <label className="text-sm font-medium block text-gray-700">Social Links</label>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <FaInstagram className="text-pink-500 text-xl" />
+                <input
+                  type="url"
+                  name="instagram"
+                  placeholder="Instagram URL"
+                  value={form.socialLinks.instagram}
+                  onChange={handleSocialLinkChange}
+                  className={inputClass}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <FaFacebookF className="text-blue-600 text-xl" />
+                <input
+                  type="url"
+                  name="facebook"
+                  placeholder="Facebook URL"
+                  value={form.socialLinks.facebook}
+                  onChange={handleSocialLinkChange}
+                  className={inputClass}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <FaTwitter className="text-sky-500 text-xl" />
+                <input
+                  type="url"
+                  name="twitter"
+                  placeholder="Twitter URL"
+                  value={form.socialLinks.twitter}
+                  onChange={handleSocialLinkChange}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Form Footer */}
+      <div className="flex justify-end gap-4 border-t px-6 py-4">
+        <button
+          type="submit"
+          className="px-6 py-2 rounded hover:bg-blue-500 cursor-pointer border-2 border-blue-400 text-blue-500 hover:text-white text-sm font-bold transition-colors duration-200"
+        >
+          Submit
+        </button>
+        <button
+          type="reset"
+          onClick={() =>
+            setForm({
+              businessName: '',
+              phoneNumber: '',
+              emailAddress: '',
+              address: '',
+              gstNumber: '',
+              businessType: '',
+              websiteLink: '',
+              latitude: '',
+              longitude: '',
+              socialLinks: { instagram: '', facebook: '', twitter: '' },
+            })
+          }
+          className="px-6 py-2 rounded border-2 cursor-pointer text-sm font-bold text-gray-600 border-gray-400 hover:bg-gray-400 hover:text-white transition-colors duration-200"
+        >
+          Reset
+        </button>
+      </div>
+    </form>
+  );
 }

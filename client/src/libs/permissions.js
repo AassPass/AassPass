@@ -14,8 +14,9 @@ export const PERMISSIONS = {
     VERIFY_AD: 'verify_ads',
     DELETE_BUSINESS: 'delete_business',
     // Business permissions
+    CREATE_PROFILE:'create_profile',
     USER_CREATE_BUSINESS: 'user_create_business',
-
+BLOCK_AD :'block_ads',
     ADD_ADS: 'add_ads',
     DELETE_USER_ADS: 'delete_business_ads',
 };
