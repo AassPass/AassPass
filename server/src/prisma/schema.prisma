@@ -116,11 +116,17 @@ enum AdStage {
   SAVED
 }
 
+enum AdImageType {
+  BANNER
+  NORMAL
+}
+
 model AdImage {
-  id   String @id @default(uuid())
+  id   String      @id @default(uuid())
   url  String
   adId String
-  ad   Ads    @relation(fields: [adId], references: [id])
+  type AdImageType @default(NORMAL)
+  ad   Ads         @relation(fields: [adId], references: [id])
 
   @@index([adId])
 }

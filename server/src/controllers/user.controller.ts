@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../utils/prisma";
 import { VerificationStatus, SubscriptionType, BusinessType, Role, UserRole } from '@prisma/client';
 import { businessTypeMap, generatePassword } from "../utils/lib";
-import bcrypt from "bcrypt";
+// import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { config } from "dotenv";
 
@@ -11,6 +11,50 @@ config();
 
 const jwtSecret = process.env.JWT_SECRET;
 
+export const GetAds = async (req: Request, res: Response): Promise<any> => {
+  try {
+    // Get `n` from query params, fallback to 5 if not provided
+    const n = parseInt(req.query.n as string) || 5;
+
+    // Step 1: Count total ads
+    const totalAds = await prisma.ads.count({
+      where: {
+        verificationStatus: VerificationStatus.VERIFIED, // optional filter
+        visibleFrom: { lte: new Date() },
+        visibleTo: { gte: new Date() }
+      }
+    });
+
+    if (totalAds === 0) {
+      return res.status(200).json({ ads: [] });
+    }
+
+    // Step 2: Generate random skip values (limit to totalAds - n)
+    const skip = Math.max(0, Math.floor(Math.random() * Math.max(1, totalAds - n)));
+
+    // Step 3: Get n random ads with business and images
+    const ads = await prisma.ads.findMany({
+      where: {
+        verificationStatus: VerificationStatus.VERIFIED,
+        visibleFrom: { lte: new Date() },
+        visibleTo: { gte: new Date() }
+      },
+      skip,
+      take: n,
+      include: {
+        business: true,
+        images: true
+      }
+    });
+
+    console.log(ads);
+    res.status(200).json({ ads });
+  } catch (error) {
+    console.error("Error fetching random ads:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 
 export const GetUserInfo = async (req: Request, res: Response): Promise<any> => {
   try{
@@ -18,16 +62,27 @@ export const GetUserInfo = async (req: Request, res: Response): Promise<any> => 
     // console.log(id);
 
     const user = await prisma.user.findUnique({
-      where: {id},
+      where: { id },
       select: {
         id: true,
         name: true,
         email: true,
         mobile: true,
         emailVerified: true,
-        role: true
+        role: true,
+        businesses: {
+          include: {
+            socialLinks: true,
+            ads: {
+              include: {
+                images: true
+              }
+            }
+          }
+        }
       }
     });
+
 
     if(!user){
       return res.status(404).json({message: "No user found"});
