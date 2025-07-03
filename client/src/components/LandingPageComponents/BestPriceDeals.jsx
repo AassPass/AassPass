@@ -1,6 +1,7 @@
 import { FaMapMarkedAlt, FaTags, FaCheckCircle, FaMoneyBillWave } from "react-icons/fa";
 import Image from "next/image";
 import FeatureImageSwitcher from "./Components/FeatureImageSwitcher";
+import Link from "next/link";
 // Adjust path if needed
 
 export default function BestPriceDeals() {
@@ -52,51 +53,63 @@ export default function BestPriceDeals() {
       </div>
 
       {/* CTA Section */}
-      <div className="w-full flex flex-col md:flex-row items-center gap-4 px-4 py-6 bg-white text-black">
-        <div className="flex-1 px-4">
-          <h3 className="text-2xl md:text-3xl font-semibold">
-            Stop Guessing. Start Saving.
-          </h3>
-          <p className="mt-2 mb-4">
-            Whether it's a fitness center, salon, course, or weekend event—know
-            what you’re paying for before you commit.
-          </p>
-          <button className="px-6 py-3 hover:bg-blue-400 border-blue-400 border-2 transition rounded-md hover:text-white text-blue-400 font-medium">
-            Explore Deals Around You
-          </button>
-        </div>
+      <div className="w-full flex flex-col md:flex-row items-center gap-4 px-4 py-6 bg-gray-200 text-black">
+       <div className="flex-1 px-4 flex flex-col gap-4">
+  <h3 className="text-2xl md:text-3xl font-semibold">
+    Stop Guessing. Start Saving.
+  </h3>
+  <p>
+    Whether it's a fitness center, salon, course, or weekend event—know
+    what you’re paying for before you commit.
+  </p>
+  <Link
+    href="/lokalymap"
+    className="px-6 py-3 w-max cursor-pointer hover:bg-blue-400 border-blue-400 border-2 transition rounded-md hover:text-white text-blue-400 font-medium"
+  >
+    Explore Deals Around You
+  </Link>
+</div>
+
         <div className="w-full md:w-[560px] h-[360px]">
           <Image
             src="/Deal 2.png"
             alt="Start Saving"
             width={650}
             height={460}
-            className="object-cover w-full h-full"
+            className="object-cover rounded w-full h-full"
           />
         </div>
       </div>
 
       {/* Business Register Section */}
       <div className="w-full flex flex-col md:flex-row items-center gap-4 px-4 py-6 bg-[#1c1f2b]" id="register-business">
-        {/* Text Content */}
-        <div className="flex-1 px-4">
-          <h3 className="text-2xl md:text-3xl font-semibold">
-            Register Your Business Now
-          </h3>
-          <p className="text-white/80 mt-2">
-            No setup cost. Easy dashboard. Local visibility guaranteed.
-          </p>
-          <p className="text-white/80 mt-2">
-            <strong>Let Your Business Stand Out in the Crowd</strong>
-            <br />
-            Register your shop, salon, gym, or service with{" "}
-            <span className="text-blue-400 font-semibold">AassPass</span> and
-            connect with local customers instantly.
-          </p>
-          <button href="/Account/user-login" className="mt-4 px-6 py-3 hover:bg-green-400 border-green-400 border-2 transition rounded-md hover:text-white text-green-400 font-medium">
-            Get Started for Free
-          </button>
-        </div>
+       <div className="flex-1 px-4">
+  <div className="flex flex-col gap-3">
+    <h3 className="text-2xl md:text-3xl font-semibold">
+      Register Your Business Now
+    </h3>
+
+    <p className="text-white/80">
+      No setup cost. Easy dashboard. Local visibility guaranteed.
+    </p>
+
+    <p className="text-white/80">
+      <strong>Let Your Business Stand Out in the Crowd</strong>
+      <br />
+      Register your shop, salon, gym, or service with{" "}
+      <span className="text-blue-400 font-semibold">AassPass</span> and
+      connect with local customers instantly.
+    </p>
+
+   <Link
+  href="/Account/user-login"
+  className="w-max cursor-pointer px-6 py-3 hover:bg-green-400 border-green-400 border-2 transition rounded-md hover:text-white text-green-400 font-medium"
+>
+  Get Started for Free
+</Link>
+  </div>
+</div>
+
 
         {/* Image */}
         <div className="w-full md:w-[560px] h-[360px]">
@@ -105,7 +118,7 @@ export default function BestPriceDeals() {
             alt="Register Business with AassPass"
             width={500}
             height={360}
-            className="object-cover w-full h-full"
+            className="object-cover rounded w-full h-full"
           />
         </div>
       </div>

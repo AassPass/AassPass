@@ -7,7 +7,7 @@ import { PERMISSIONS } from '@/libs/permissions';
 import { hasPermission } from '@/libs/hasPermisson';
 import colors from '@/libs/colors';
 
-const Sidebar = ({ activeComponent, setActiveComponent }) => {
+const Sidebar = ({ activeComponent, setActiveComponent ,setSidebarOpen}) => {
     const { role } = useRole();
     const router = useRouter();
     const [menuItems, setMenuItems] = useState([]);
@@ -65,7 +65,7 @@ const Sidebar = ({ activeComponent, setActiveComponent }) => {
     const activeIndex = menuItems.findIndex((item) => item.name === activeComponent);
 
     return (
-        <div className="flex md:flex-col md:flex-nowrap justify-start md:justify-between items-center gap-2 w-full p-2">
+        <div className="flex flex-col md:flex-nowrap justify-start md:justify-between items-center gap-6 w-full p-2">
             {/* Navigation */}
             <nav className="relative flex flex-col gap-2 w-full">
                 {/* Animated Active Highlight */}
@@ -82,20 +82,27 @@ const Sidebar = ({ activeComponent, setActiveComponent }) => {
                 {/* Buttons */}
                 {menuItems.map(({ name, label }) => (
                     <button
-                        key={name}
-                        onClick={() => handleMenuClick(name)}
-                        className="relative z-10 w-full text-left px-4 py-2 text-sm font-medium text-white transition-all duration-300 ease-in-out"
-                    >
-                        {label}
-                    </button>
+  key={name}
+  onClick={() => {
+    handleMenuClick(name);
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false); // Close sidebar only on mobile
+    }
+  }}
+  className="relative z-10 w-full text-left px-4 py-2 text-sm font-medium text-white transition-all duration-300 ease-in-out"
+>
+  {label}
+</button>
+
+
                 ))}
             </nav>
 
             {/* Logout */}
-            <div className="md:mt-6 w-full">
+            <div className="mt-6 w-full">
                 <button
                     onClick={handleLogout}
-                    className="font-semibold text-xs md:text-sm px-2 md:px-5 py-1.5 md:py-2 text-white whitespace-nowrap w-full rounded transition-all duration-300"
+                    className="font-semibold text-xs  px-5 py-2 text-white whitespace-nowrap w-full rounded transition-all duration-300"
                     style={{ backgroundColor: '#ef4444' }} // Tailwind red-500
                 >
                     Logout

@@ -17,14 +17,16 @@ const permissions = {
         // PERMISSIONS.DELETE_BUSINESS
     ],
     ADMIN: [
+        PERMISSIONS.BLOCK_AD,
         PERMISSIONS.EDIT_ADS,
         PERMISSIONS.DELETE_ADS,
         PERMISSIONS.VERIFY_ADS,
+        PERMISSIONS.BLOCK_AD 
         // PERMISSIONS.VERIFY_KYC            // ✅ Optional: Give to admin too
     ],
     USER: [
         PERMISSIONS.CREATE_PROFILE,
-        PERMISSIONS.BLOCK_AD ,
+       
         PERMISSIONS.CREATE_USER,
         PERMISSIONS.USER_CREATE_BUSINESS,
         PERMISSIONS.ADD_ADS,
