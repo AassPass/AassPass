@@ -222,7 +222,7 @@ const token = localStorage.getItem('token')
       </div>
   
 <form
-  className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 items-start"
+  className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 items-center"
    onSubmit={(e) => handleSubmit(e, 'published')}
 >
   {/* Left Column: Independent/Common Fields */}

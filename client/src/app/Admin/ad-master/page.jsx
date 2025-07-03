@@ -32,7 +32,7 @@ const fetchAds = async () => {
   try {
     let url;
 
-    if (role === 'Super Admin' || role === 'Admin') {
+    if (role === 'SUPER_ADMIN' || role === 'ADMIN') {
       // Fetch all ads for admin roles
       url = `${BACKEND_BUSINESS_URL}/ads`;
     } else {
