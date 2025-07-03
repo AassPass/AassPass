@@ -37,7 +37,7 @@ export default function AdForm({ setAds }) {
     images: {},
     metadata: {},
   });
-
+const today = new Date().toISOString().split('T')[0]; 
   const [previewImages, setPreviewImages] = useState([]);
   const [imageSlot, setImageSlot] = useState(null);
 
@@ -239,9 +239,23 @@ const token = localStorage.getItem('token')
       </select>
     </div>
    
-     <Input name="visibleFrom" type="date" value={form.visibleFrom} label="Visible From" onChange={handleChange} />
-      <Input name="visibleTo" type="date" value={form.visibleTo} label="Visible To" onChange={handleChange} />
+    <Input
+  name="visibleFrom"
+  type="date"
+  value={form.visibleFrom}
+  label="Visible From"
+  onChange={handleChange}
+  min={today}
+/>
 
+<Input
+  name="visibleTo"
+  type="date"
+  value={form.visibleTo}
+  label="Visible To"
+  onChange={handleChange}
+  min={today}
+/>
   
  <div className="col-span-2" >
   <input
@@ -253,32 +267,36 @@ const token = localStorage.getItem('token')
     />
 
     <div className="grid grid-cols-2 gap-2">
-      {[0, 1].map((i) => (
-        <div
-          key={i}
-          onClick={() => openFileDialog(i)}
-          className="relative cursor-pointer rounded border-dashed border-2 border-gray-400 bg-white flex items-center justify-center overflow-hidden"
-          style={{ aspectRatio: '3 / 2' }}
-        >
-          {previewImages[i] ? (
-            <img src={previewImages[i]} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <FiPlus className="text-gray-400 text-4xl" />
-          )}
-        </div>
-      ))}
-      <div
-        onClick={() => openFileDialog(2)}
-        className="col-span-2 relative cursor-pointer rounded border-dashed border-2 border-gray-400 bg-white flex items-center justify-center overflow-hidden"
-        style={{ aspectRatio: '4 / 1' }}
-      >
-        {previewImages[2] ? (
-          <img src={previewImages[2]} alt="" className="w-full h-full object-cover" />
-        ) : (
-          <FiPlus className="text-gray-400 text-6xl" />
-        )}
-      </div>
+  {/* Banner at index 0 */}
+  <div
+    onClick={() => openFileDialog(0)}
+    className="col-span-2 relative cursor-pointer rounded border-dashed border-2 border-gray-400 bg-white flex items-center justify-center overflow-hidden"
+    style={{ aspectRatio: '4 / 1' }}
+  >
+    {previewImages[0] ? (
+      <img src={previewImages[0]} alt="Banner Preview" className="w-full h-full object-cover" />
+    ) : (
+      <FiPlus className="text-gray-400 text-6xl" />
+    )}
+  </div>
+
+  {/* Small images at index 1 and 2 */}
+  {[1, 2].map((i) => (
+    <div
+      key={i}
+      onClick={() => openFileDialog(i)}
+      className="relative cursor-pointer rounded border-dashed border-2 border-gray-400 bg-white flex items-center justify-center overflow-hidden"
+      style={{ aspectRatio: '3 / 2' }}
+    >
+      {previewImages[i] ? (
+        <img src={previewImages[i]} alt={`Preview ${i}`} className="w-full h-full object-cover" />
+      ) : (
+        <FiPlus className="text-gray-400 text-4xl" />
+      )}
     </div>
+  ))}
+</div>
+
  </div>
    
     
@@ -294,13 +312,13 @@ const token = localStorage.getItem('token')
       >
         Cancel
       </button>
-      <button
+      {/* <button
         type="button"
         onClick={() => handleSubmit('draft')}
         className="px-4 py-2 border-yellow-400 hover:text-white border-2 rounded cursor-pointer text-yellow-400 hover:bg-yellow-400"
       >
         Save as Draft
-      </button>
+      </button> */}
       <button
         type="submit"
         className="px-4 py-2 border-blue-400 border-2 text-blue-400 hover:text-white cursor-pointer rounded hover:bg-blue-400"

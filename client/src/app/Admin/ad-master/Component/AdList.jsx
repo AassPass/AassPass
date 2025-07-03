@@ -104,13 +104,13 @@ const AdList = ({ ads, setAds, editingAd, setIsAdEditing, setEditingAd }) => {
               <th className="py-3 px-6 border-b border border-blue-700 whitespace-nowrap">Start Date</th>
               <th className="py-3 px-6 border-b border border-blue-700 whitespace-nowrap">End Date</th>
               <th className="py-3 px-6 border-b border border-blue-700 whitespace-nowrap">Stage</th>
-              <th className="py-3 px-6 border-b border border-blue-700 whitespace-nowrap">Active</th>
+           
               <th className="py-3 px-6 border-b border border-blue-700 whitespace-nowrap">Status</th>
-              <th className="py-3 px-6 border-b border border-blue-700 whitespace-nowrap">Reset</th>
+
               {hasPermission(role, PERMISSIONS.BLOCK_AD) && (
                 <th className="py-3 px-6 border-b border border-blue-400 whitespace-nowrap">Block</th>
               )}
-              <th className="py-3 px-6 border-b border border-blue-400 whitespace-nowrap">Edit</th>
+              
             </tr>
           </thead>
           <tbody>
@@ -134,32 +134,7 @@ const AdList = ({ ads, setAds, editingAd, setIsAdEditing, setEditingAd }) => {
 </td>
                     <td className="py-3 px-6 border border-blue-400 whitespace-nowrap">{ad.stage}</td>
 
-                    {/* Active toggle */}
-                    <td className="py-3 px-6 border border-blue-400">
-                      <label className="inline-flex relative items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
-                          checked={ad.isActive}
-                          onChange={() => handleToggle(ad)}
-                          disabled={loadingAdIds.has(ad.id)}
-                        />
-                        <div
-                          className={`w-11 h-6 rounded-full transition-colors ${
-                            loadingAdIds.has(ad.id)
-                              ? 'bg-gray-300'
-                              : ad.isActive
-                              ? 'bg-green-500 peer-checked:bg-green-500'
-                              : 'bg-gray-400 peer-checked:bg-green-500'
-                          } peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300`}
-                        />
-                        <div
-                          className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${
-                            ad.isActive ? 'translate-x-full' : ''
-                          }`}
-                        />
-                      </label>
-                    </td>
+                  
 
                     {/* Status */}
                     <td className="py-3 px-6 border border-blue-400">
@@ -171,16 +146,7 @@ const AdList = ({ ads, setAds, editingAd, setIsAdEditing, setEditingAd }) => {
                     </td>
 
                     {/* Reset */}
-                    <td className="py-3 px-6 border border-blue-400">
-                      {isExpired(ad.endDate) && (
-                        <button
-                          onClick={() => handleResetAd(ad)}
-                          className="text-xs bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-1 rounded"
-                        >
-                          Reset
-                        </button>
-                      )}
-                    </td>
+                  
 
                     {/* Block */}
                     {hasPermission(role, PERMISSIONS.BLOCK_AD) && (
@@ -199,19 +165,7 @@ const AdList = ({ ads, setAds, editingAd, setIsAdEditing, setEditingAd }) => {
                       </td>
                     )}
 
-                    {/* Edit */}
-                    <td className="py-3 px-6 border border-blue-400">
-                      <button
-                        onClick={() => {
-                          setEditingAd(ad);
-                          setIsAdEditing(true);
-                        }}
-                        className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full"
-                        title="Edit Ad"
-                      >
-                        <FiEdit size={18} />
-                      </button>
-                    </td>
+               
                   </tr>
                 ))}
               </>

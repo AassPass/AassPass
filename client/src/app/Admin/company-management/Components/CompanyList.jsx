@@ -147,8 +147,8 @@ const CompanyList = ({
   };
 
   return (
-    <div className="overflow-x-auto  border-gray-300 bg-white">
-      <table className="min-w-full text-sm table-auto border-collapse">
+    <div className="overflow-x-auto max-w-full border border-gray-300 bg-white">
+      <table className="min-w-[1200px] table-auto border-collapse text-sm">
         <thead className="bg-blue-400 sticky top-0 z-10">
           <tr>
             <th className="border px-2 py-2 w-[80px]">ID</th>

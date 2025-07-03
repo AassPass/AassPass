@@ -70,7 +70,7 @@ const fetchAds = async () => {
 }, []);
 
   return (
-    <div className="flex flex-col h-full p-6 items-center overflow-hidden">
+    <div className="flex flex-col gap-2 px-4 py-2 w-full max-w-[1200px] mx-auto">
       <div className="mb-4">
         <AdListing
           ads={ads}

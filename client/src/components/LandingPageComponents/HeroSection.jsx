@@ -127,8 +127,8 @@ useEffect(() => {
                     animate={{ x: 0, opacity: 1, rotate: 0 }}
                     transition={{ duration: 0.8, ease: 'easeOut' }}
                 >
-                  <div className="flex flex-col gap-4" style={{ minHeight: '240px' }}>
-    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+                  <div className="flex flex-col gap-4 min-h-[200px] lg:min-h-[240px] ">
+    <h2 className="text-2xl md:text-2xl lg:text-3xl font-bold leading-tight">
         <AnimatePresence mode="wait">
             <motion.span
                 key={headings[headingIndex].title}

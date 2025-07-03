@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import { FaFacebookF, FaTwitter, FaInstagram, FaEnvelope, FaPhoneAlt } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#0b161c] text-white px-6 w-full py-10">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 text-sm">
+    <footer className="bg-[#0b161c] text-white px-6 w-full pt-10">
+      {/* Main Footer */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 text-sm pb-10 border-b border-white/10">
         {/* Brand & Tagline */}
         <div>
           <h2 className="text-xl font-bold text-blue-400">AassPass</h2>
@@ -45,53 +46,45 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Social Icons */}
-      <div className="mt-10 flex justify-center space-x-6 text-white text-xl">
-        <a
-          href="https://facebook.com/yourpage"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Facebook"
-          className="hover:text-blue-600 transition-colors"
-        >
-          <FaFacebookF />
-        </a>
-
-        <a
-          href="https://twitter.com/yourhandle"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Twitter"
-          className="hover:text-blue-400 transition-colors"
-        >
-          <FaTwitter />
-        </a>
-
-        <a
-          href="https://instagram.com/yourhandle"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Instagram"
-          className="hover:text-pink-500 transition-colors"
-        >
-          <FaInstagram />
-        </a>
-
-        <a
-          href="https://linkedin.com/in/yourprofile"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="LinkedIn"
-          className="hover:text-blue-700 transition-colors"
-        >
-          <FaLinkedinIn />
-        </a>
+      {/* Website Social & Contact */}
+      <div className="mt-8 flex flex-col items-center space-y-4 text-white text-sm">
+        <div className="flex gap-6 text-xl">
+          <a href="https://facebook.com/yourpage" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-blue-600 transition-colors">
+            <FaFacebookF />
+          </a>
+          <a href="https://twitter.com/yourhandle" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="hover:text-blue-400 transition-colors">
+            <FaTwitter />
+          </a>
+          <a href="https://instagram.com/yourhandle" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-pink-500 transition-colors">
+            <FaInstagram />
+          </a>
+          <a href="mailto:lokaly.map@gmail.com" target="_blank" rel="noopener noreferrer" aria-label="Email" className="hover:text-red-400 transition-colors">
+            <FaEnvelope />
+          </a>
+          <a href="tel:+919599165532" target="_blank" rel="noopener noreferrer" aria-label="Phone" className="hover:text-green-400 transition-colors">
+            <FaPhoneAlt />
+          </a>
+        </div>
+        <p className="text-white/60 text-xs text-center">Email: lokaly.map@gmail.com | Phone: +91-12345-67890</p>
       </div>
 
-      {/* Bottom Divider */}
-      <div className="mt-10 border-t border-white/10 pt-6 text-center text-white/60 text-xs">
-        Made with ❤️ in your city – connect with your local world on{" "}
+      <div className="mt-6 text-center text-white/60 text-xs border-t border-white/10 pt-4">
+        Made in your city – connect with your local world on{" "}
         <span className="text-blue-400 font-semibold">AassPass</span>.
+      </div>
+      {/* Bottom Tagline */}
+
+      {/* Developer Credit - final line */}
+      <div className="mt-3 text-center text-white/40 text-[11px] pb-4">
+        Developed with ❤️ by{" "}
+        <a
+          href="https://instagram.com/webjuncture"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-purple-400 hover:underline"
+        >
+          @webjuncture
+        </a>
       </div>
     </footer>
   );

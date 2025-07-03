@@ -41,23 +41,23 @@ export default function FeatureImageSwitcher({ features }) {
   return (
     <div className="flex flex-col md:flex-row">
       {/* Image */}
-      <div className="w-full max-w-full">
+      <div className="w-full max-w-full p-4">
         <img
           id="feature-image"
           ref={imgRef}
-          className="w-full h-full object-cover"
+          className="w-full rounded h-full object-cover"
           src={features[0].image}
           alt={features[0].title}
         />
       </div>
 
       {/* Feature List */}
-      <div className="w-full  flex flex-col gap-2 px-4 py-6" id="feature-list">
+      <div className="w-full  flex flex-col gap-2 p-4" id="feature-list">
         {features.map((feature, i) => (
           <div
             key={feature.id}
             ref={(el) => (itemsRef.current[i] = el)}
-            className="feature-item flex gap-4 items-start cursor-pointer p-4 transition hover:bg-white/10"
+            className="feature-item flex rounded gap-4 items-start cursor-pointer p-4 transition hover:bg-white/10"
           >
             {feature.icon}
             <div>
