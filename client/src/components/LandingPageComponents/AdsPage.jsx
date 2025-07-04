@@ -109,7 +109,7 @@ const AutoScrollBanner = ({ banners }) => {
     <div className="overflow-hidden">
       <div className="flex gap-8 animate-scroll-banner w-max">
         {doubledBanners.map((ad, index) => (
-          <div key={`${ad.id}-${index}`} className="w-[80vw] flex-shrink-0 text-start">
+          <div key={`${ad.id}-${index}`} className="w-[60vw] flex-shrink-0 text-start">
             <div className="aspect-[3/1]">
               <img
                 src={ad.image}

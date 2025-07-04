@@ -1,3 +1,4 @@
+import lottie from 'lottie-web';
 const labelToEnumKeyMap = {
   "Retail Store": "RETAIL_STORE",
   "Restaurant / Café": "RESTAURANT_CAFE",
@@ -59,19 +60,34 @@ const iconMap = {
   OTHER: '/icons/others.svg',
 };
 
-export function createCustomImageMarker(businessTypeLabel) {
-  // const enumKey = labelToEnumKeyMap[businessTypeLabel] || "OTHER";
-  const iconSrc = iconMap[businessTypeLabel];
+export function createCustomImageMarker(businessTypeLabel, index = Math.random()) {
+  const iconSrc = iconMap[businessTypeLabel] || iconMap.OTHER;
   const bgColor = bgColorMap[businessTypeLabel] || "#F0F0F0";
-  // console.log(businessTypeLabel);
+  const sparkleId = `sparkle-${index.toString().replace('.', '')}`;
 
   const el = document.createElement("div");
   el.className = "custom-image-marker";
   el.innerHTML = `
+    <div class="sparkle-lottie" id="${sparkleId}"></div>
     <div class="marker-image-wrapper" style="padding: 6px; background-color: ${bgColor};">
       <img src="${iconSrc}" alt="${businessTypeLabel}" style="width: 100%; height: 100%; object-fit: contain;" />
     </div>
   `;
+
+  // After adding to DOM, trigger the Lottie animation
+  setTimeout(() => {
+    const container = document.getElementById(sparkleId);
+    if (container) {
+      lottie.loadAnimation({
+        container,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: '/animation/fireworks.json', // make sure to place this file in public/lottie/
+      });
+    }
+  }, 0);
+
   return el;
 }
 
