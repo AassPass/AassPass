@@ -74,113 +74,57 @@ const AdsPage = () => {
 
 // ⬇️ Reusable auto-scroll for normal ads
 const AutoScrollRow = ({ ads }) => {
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    let scrollAmount = 0;
-    const speed = 1.5;
-
-    const step = () => {
-      scrollAmount += speed;
-      container.scrollLeft = scrollAmount;
-
-      if (scrollAmount >= container.scrollWidth / 2) {
-        scrollAmount = 0;
-        container.scrollLeft = 0;
-      }
-
-      requestAnimationFrame(step);
-    };
-
-    container.innerHTML += container.innerHTML; // duplicate for infinite scroll
-    requestAnimationFrame(step);
-
-    return () => cancelAnimationFrame(step);
-  }, []);
+  const doubledAds = [...ads, ...ads , ...ads,...ads]; // duplicate for infinite scroll
 
   return (
-    <div
-      ref={containerRef}
-      className="overflow-x-hidden whitespace-nowrap flex gap-8 px-4"
-      style={{ scrollBehavior: 'auto' }}
-    >
-      {[...ads, ...ads].map((ad, index) => (
-        <div
-  key={`${ad.id}-${index}`}
-  className=" max-w-[200px] md:max-w-[300px] space-y-1  flex-shrink-0 "
->
-  <div className="w-full aspect-[3/2]">
-    <img
-      src={ad.image}
-      alt={ad.title}
-      className="w-full h-full object-cover rounded-2xl"
-    />
-  </div>
-  <h2 className=" text-sm text-start">{ad.title}</h2>
-  
-</div>
-
-      ))}
+    <div className="overflow-hidden">
+      <div className="flex gap-4 animate-scroll-row w-max">
+        {doubledAds.map((ad, index) => (
+          <div
+            key={`${ad.id}-${index}`}
+            className="max-w-[200px] md:max-w-[300px] space-y-1 flex-shrink-0"
+          >
+            <div className="w-full aspect-[3/2]">
+              <img
+                src={ad.image}
+                alt={ad.title}
+                className="w-full h-full object-cover rounded-2xl"
+              />
+            </div>
+            <h2 className="text-sm text-start">{ad.title}</h2>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
+
+
 
 // ⬇️ Reusable auto-scroll for banner ads
 const AutoScrollBanner = ({ banners }) => {
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    let scrollAmount = 0;
-    const speed = 2;
-
-    const step = () => {
-      scrollAmount += speed;
-      container.scrollLeft = scrollAmount;
-
-      if (scrollAmount >= container.scrollWidth / 2) {
-        scrollAmount = 0;
-        container.scrollLeft = 0;
-      }
-
-      requestAnimationFrame(step);
-    };
-
-    container.innerHTML += container.innerHTML;
-    requestAnimationFrame(step);
-
-    return () => cancelAnimationFrame(step);
-  }, []);
+  const doubledBanners = [...banners, ...banners,...banners,...banners];
 
   return (
-    <div
-      ref={containerRef}
-      className="overflow-x-hidden whitespace-nowrap flex gap-8 px-4"
-      style={{ scrollBehavior: 'auto' }}
-    >
-      {[...banners, ...banners].map((ad, index) => (
-      <div
-  key={`${ad.id}-${index}`}
-  className="w-[80vw] text-start flex-shrink-0"
->
-  <div className="aspect-[3/1]">
-    <img
-      src={ad.image}
-      alt={ad.title}
-      className="w-full h-full object-cover rounded-2xl"
-    />
-  </div>
-  <h2 className=" text-sm text-start">{ad.title}</h2>
-</div>
-
-      ))}
+    <div className="overflow-hidden">
+      <div className="flex gap-8 animate-scroll-banner w-max">
+        {doubledBanners.map((ad, index) => (
+          <div key={`${ad.id}-${index}`} className="w-[80vw] flex-shrink-0 text-start">
+            <div className="aspect-[3/1]">
+              <img
+                src={ad.image}
+                alt={ad.title}
+                className="w-full h-full object-cover rounded-2xl"
+              />
+            </div>
+            <h2 className="text-sm text-start">{ad.title}</h2>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
+
+
 
 export default AdsPage;

@@ -6,6 +6,37 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@keyframes scrollRow {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scrollBanner {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-row {
+  animation: scrollRow 4s linear infinite;
+}
+
+.animate-scroll-banner {
+  animation: scrollBanner 5s linear infinite;
+}
+
+.group:hover .animate-scroll-row,
+.group:hover .animate-scroll-banner {
+  animation-play-state: paused;
+}
+
 .right-arrow::before {
   content: "";
   position: absolute;
