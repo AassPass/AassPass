@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import { useRole } from '@/Context/RoleContext';
 
 // Dynamic imports
 const Sidebar = dynamic(() => import('./Sidebar'), { ssr: false });
@@ -21,6 +22,7 @@ export default function Page() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
+  const { role } = useRole();
 
   // Load activeComponent and check auth
   useEffect(() => {

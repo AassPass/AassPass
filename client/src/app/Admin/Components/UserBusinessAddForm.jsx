@@ -68,6 +68,18 @@ export default function UserBusinessAddForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
+
+    // Convert socialLinks object to array of { platform, link }
+    const socialLinksArray = Object.entries(form.socialLinks)
+      .filter(([_, link]) => link.trim() !== '') // Optional: skip empty links
+      .map(([platform, link]) => ({ platform, link }));
+
+    // Construct final payload
+    const payload = {
+      ...form,
+      socialLinks: socialLinksArray,
+    };
+
     try {
       const res = await fetch(`${BACKEND_USER_URL}/business`, {
         method: 'POST',
@@ -75,7 +87,7 @@ export default function UserBusinessAddForm() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -87,6 +99,7 @@ export default function UserBusinessAddForm() {
       alert('Error: ' + err.message);
     }
   };
+
 
   return (
     <form

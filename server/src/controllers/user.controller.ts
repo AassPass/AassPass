@@ -169,6 +169,7 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
     } = req.body;
 
     const user = req.user;
+    // console.log(socialLinks);
 
     if(!user) {
       return res.status(400).json({message: "You do not have the access token is missing"});
@@ -176,7 +177,7 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
 
     // console.log('RegisterBusiness Request Body:', req.body);
     // Validate required fields
-    if (!businessName || !phoneNumber || !emailAddress || !address || !gstNumber || !businessType || !latitude || !longitude) {
+    if (!businessName || !phoneNumber || !emailAddress || !address || !businessType || !latitude || !longitude) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 

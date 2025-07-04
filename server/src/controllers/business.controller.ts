@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 import { promisify } from "util";
 import { adCategoryMap } from "../utils/lib";
-import { AdCategory, AdImageType } from "@prisma/client";
+import { AdCategory, AdImageType, VerificationStatus } from "@prisma/client";
 const unlinkAsync = promisify(fs.unlink);
 
 
@@ -28,7 +28,7 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
       ...rest
     } = req.body;
 
-    console.log(req.body);
+    // console.log(req.body);
 
     const reset = rawReset === 'true' || rawReset === true;
     const businessId = req.user?.businessId;
@@ -149,7 +149,8 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
         stage,
         reset, // ✅ now it's always a Boolean
         businessId: business.id,
-        metadata,
+        verificationStatus: VerificationStatus.VERIFIED,
+        metadata
       },
     });
 

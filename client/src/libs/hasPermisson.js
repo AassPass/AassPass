@@ -13,7 +13,8 @@ const permissions = {
         PERMISSIONS.BLACKLIST_ADS,
         PERMISSIONS.VERIFY_KYC,
         PERMISSIONS.VERIFY_AD,      
-        PERMISSIONS.BLOCK_AD  // ✅ NEW
+        PERMISSIONS.BLOCK_AD,  // ✅ NEW
+        PERMISSIONS.ADD_ADS,
         // PERMISSIONS.DELETE_BUSINESS
     ],
     ADMIN: [
@@ -21,10 +22,20 @@ const permissions = {
         PERMISSIONS.EDIT_ADS,
         PERMISSIONS.DELETE_ADS,
         PERMISSIONS.VERIFY_ADS,
-        PERMISSIONS.BLOCK_AD 
+        PERMISSIONS.BLOCK_AD, 
+        PERMISSIONS.ADD_ADS,
         // PERMISSIONS.VERIFY_KYC            // ✅ Optional: Give to admin too
     ],
     USER: [
+        PERMISSIONS.CREATE_PROFILE,
+       
+        PERMISSIONS.CREATE_USER,
+        PERMISSIONS.USER_CREATE_BUSINESS,
+        PERMISSIONS.ADD_ADS,
+        PERMISSIONS.EDIT_ADS,
+        PERMISSIONS.DELETE_USER_ADS
+    ],
+    OWNER: [
         PERMISSIONS.CREATE_PROFILE,
        
         PERMISSIONS.CREATE_USER,
