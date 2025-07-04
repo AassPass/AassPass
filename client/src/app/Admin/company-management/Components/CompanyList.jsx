@@ -4,11 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useRole } from '@/Context/RoleContext';
 import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
-<<<<<<< HEAD
+
 import { BACKEND_URL } from '@/Utils/backendUrl';
-=======
-import { BACKEND_URL } from '@/app/Utils/backendUrl';
->>>>>>> backup-my-changes
+
 import { FaEdit } from 'react-icons/fa';
 import {
   FaLinkedin,
@@ -149,8 +147,8 @@ const CompanyList = ({
   };
 
   return (
-    <div className="overflow-x-auto  border-gray-300 bg-white">
-      <table className="min-w-full text-sm table-auto border-collapse">
+    <div className="overflow-x-auto max-w-full border border-gray-300 bg-white">
+      <table className="min-w-[1200px] table-auto border-collapse text-sm">
         <thead className="bg-blue-400 sticky top-0 z-10">
           <tr>
             <th className="border px-2 py-2 w-[80px]">ID</th>

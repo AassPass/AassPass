@@ -2,27 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useMap } from './useMap';
-// import { enumKeyToLabelMap } from '@/constants/enumLabels';
-
-const enumKeyToLabelMap = {
-  "RETAIL_STORE": "Retail Store",
-  "RESTAURANT_CAFE": "Restaurant / Café",
-  "SALON_SPA": "Salon / Spa",
-  "GYM_FITNESS": "Gym / Fitness Center",
-  "MEDICAL_HEALTH": "Medical / Health Store",
-  "SERVICE_PROVIDER": "Service Provider",
-  "FREELANCER_CONSULTANT": "Freelancer / Consultant",
-  "EVENT_ORGANIZER": "Event Organizer",
-  "EDUCATION_COACHING": "Education / Coaching",
-  "HOME_BASED": "Home-based Business",
-  "REAL_ESTATE_RENTALS": "Real Estate / Rentals",
-  "COURIER_DELIVERY": "Courier / Delivery",
-  "AUTOMOBILE_SERVICES": "Automobile Services",
-  "PET_SERVICES": "Pet Services",
-  "NGO_COMMUNITY": "NGO / Community Org.",
-  "SHOP_STORE_OFFICE": "Shop/Store/Office",
-  "OTHER": "Other",
-};
+import {
+  Drawer,
+  DrawerContent,
+} from "@/components/ui/drawer"
+import AdView from './AdView';
+import { enumKeyToLabelMap } from '@/lib/utils';
 
 export default function MapContainer({ businesses, userLocation, setBusinesses }) {
   const mapRef = useRef(null);
@@ -31,12 +16,19 @@ export default function MapContainer({ businesses, userLocation, setBusinesses }
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showAll, setShowAll] = useState(false);
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedBusiness, setSelectedBusiness] = useState(null);
+
   const { initializeMap, updateMarkersByCategory } = useMap({
     mapRef,
     businesses,
     userLocation,
     selectedCategory,
-    setBusinesses
+    setBusinesses,
+    open: (business) => {
+      setSelectedBusiness(business);
+      setDrawerOpen(true);
+    }
   });
 
   const allCategories = Object.keys(enumKeyToLabelMap);
@@ -62,6 +54,11 @@ export default function MapContainer({ businesses, userLocation, setBusinesses }
 
   return (
     <>
+        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} direction="right">
+          <DrawerContent side="right" className="w-full max-w-sm h-full p-4 overflow-y-auto bg-gradient-to-r from-[#2b509c] to-[#3a1e90]">
+            <AdView selectedBusiness={selectedBusiness}/>
+          </DrawerContent>
+        </Drawer>
         <div ref={mapRef} className="w-full h-screen" />
         {/* Filter Buttons */}
         <div

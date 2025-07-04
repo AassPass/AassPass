@@ -64,7 +64,7 @@ export default function Faq() {
   };
 
   return (
-    <section id="faq" className="w-full px-4 py-10 flex justify-center bg-gray-50">
+    <section id="faq" className="w-full px-4 py-10 flex justify-center bg-gray-200">
       <div className="w-full max-w-6xl">
         <h1 className="text-3xl font-bold text-center mb-12 text-gray-800">
           Frequently Asked Questions
@@ -76,17 +76,18 @@ export default function Faq() {
               For Users – Lokaly Map
             </h2>
             {userFaqs.map((item, i) => (
-              <details
-                key={i}
-                className="mb-3 border rounded-lg bg-white shadow overflow-hidden"
-              >
-                <summary className="cursor-pointer px-5 py-3 text-gray-800 font-medium hover:bg-gray-100 transition">
-                  {item.q}
-                </summary>
-                <div className="px-5 py-3 text-gray-700 whitespace-pre-line text-sm leading-relaxed">
-                  {item.a}
-                </div>
-              </details>
+             <details
+  key={i}
+  className="mb-3 border rounded-lg bg-white shadow overflow-hidden transition duration-300"
+>
+  <summary className="cursor-pointer px-5 py-3 text-gray-800 font-medium hover:bg-gray-100 transition">
+    {item.q}
+  </summary>
+  <div className="faq-content px-5 py-3 text-gray-700 whitespace-pre-line text-sm leading-relaxed">
+    {item.a}
+  </div>
+</details>
+
             ))}
           </div>
 
@@ -96,16 +97,18 @@ export default function Faq() {
             </h2>
             {businessFaqs.map((item, i) => (
               <details
-                key={i}
-                className="mb-3 border rounded-lg bg-white shadow overflow-hidden"
-              >
-                <summary className="cursor-pointer px-5 py-3 text-gray-800 font-medium hover:bg-gray-100 transition">
-                  {item.q}
-                </summary>
-                <div className="px-5 py-3 text-gray-700 whitespace-pre-line text-sm leading-relaxed">
-                  {item.a}
-                </div>
-              </details>
+  key={i}
+  className="mb-3 border rounded-lg bg-white shadow overflow-hidden transition duration-300"
+>
+  <summary className="cursor-pointer px-5 py-3 text-gray-800 font-medium hover:bg-gray-100 transition">
+    {item.q}
+  </summary>
+  <div className="faq-content px-5 py-3 text-gray-700 whitespace-pre-line text-sm leading-relaxed">
+    {item.a}
+  </div>
+</details>
+
+
             ))}
           </div>
         </div>

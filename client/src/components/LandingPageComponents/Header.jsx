@@ -7,7 +7,7 @@ import colors from '@/libs/colors';
 
 const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/#lokaly-map', label: 'Lokaly Map' },
+    { href: '/lokalymap', label: 'Lokaly Map' },
     { href: '/Account/user-login', label: 'Register Your Business' },
     { href: '/ads-plan', label: 'Ads Plan' },
     { href: '/about-us', label: 'About Us' },

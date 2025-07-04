@@ -27,7 +27,7 @@ function Home() {
         <AnimatedSection index={2}><BestPriceDeals /></AnimatedSection>
         <AnimatedSection index={3}><EventListing /></AnimatedSection>
         <AnimatedSection index={4}><Faq /></AnimatedSection>
-<ContactUs/>
+{/* <ContactUs/> */}
 <Footer/>
 
       </main>

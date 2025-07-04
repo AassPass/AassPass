@@ -1,5 +1,6 @@
 'use client';
 
+import { useRole } from '@/Context/RoleContext';
 import { BACKEND_USER_URL } from '@/Utils/backendUrl';
 import React, { useState } from 'react';
 import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
@@ -16,6 +17,15 @@ const inputClass = 'w-full border border-gray-300 rounded px-3 py-2 text-sm';
 const labelClass = 'block text-sm font-medium text-gray-700';
 
 export default function UserBusinessAddForm() {
+  const {role}=useRole();
+  if (role === 'OWNER') {
+  return (
+    <div className="text-blue-400 text-center font-bold">
+      You have already created a business. Contact us to update it.
+    </div>
+  );
+}
+
   const [form, setForm] = useState({
     businessName: '',
     phoneNumber: '',

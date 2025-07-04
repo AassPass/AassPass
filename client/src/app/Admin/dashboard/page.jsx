@@ -50,7 +50,7 @@ export default function Dashboard() {
         <div className="w-full bg-white p-6 md:p-10 mt-6 rounded-xl shadow text-black">
             <h2 className="text-3xl font-semibold mb-6 tracking-wide">Dashboard</h2>
 
-            <div className="flex flex-col md:flex-row gap-4 mb-8 items-end">
+            {/* <div className="flex flex-col md:flex-row gap-4 mb-8 items-end">
                 <div className="flex flex-col">
                     <label className="text-sm font-medium mb-1">From Date</label>
                     <input
@@ -93,7 +93,7 @@ export default function Dashboard() {
                     <h3 className="text-sm font-medium">Active Offers</h3>
                     <p className="text-2xl font-bold text-yellow-600 mt-2">{summary.activeOffers}</p>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }
