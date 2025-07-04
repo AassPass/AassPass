@@ -5,38 +5,10 @@ import mapboxglModule from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import { createCustomImageMarker } from './CustomImageMarker';
 import { getNearbyBusinesses } from '@/services/mapApi';
-
-function distanceBetweenTwoCoord(coord1, coord2) {
-  const R = 6371000; // Earth's radius in meters
-  const toRadians = (deg) => (deg * Math.PI) / 180;
-
-  const lat1 = toRadians(coord1.lat);
-  const lat2 = toRadians(coord2.lat);
-  const deltaLat = toRadians(coord2.lat - coord1.lat);
-  const deltaLng = toRadians(coord2.lng - coord1.lng);
-
-  const a =
-    Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-    Math.cos(lat1) *
-      Math.cos(lat2) *
-      Math.sin(deltaLng / 2) *
-      Math.sin(deltaLng / 2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return R * c; // Distance in meters
-}
-
-function debounce(func, delay) {
-  let timeout;
-  return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), delay);
-  };
-}
+import { debounce, distanceBetweenTwoCoord } from '@/lib/utils';
 
 
-export const useMap = ({ mapRef, businesses, userLocation, selectedCategory, setBusinesses }) => {
+export const useMap = ({ mapRef, businesses, userLocation, selectedCategory, setBusinesses, open }) => {
   const mapInstanceRef = useRef(null);
   const markersRef = useRef([]);
   const [lastLocation, setLastLocation] = useState({lat:0, lng:0});
@@ -45,16 +17,23 @@ export const useMap = ({ mapRef, businesses, userLocation, selectedCategory, set
     setLastLocation(userLocation);
   }, [userLocation]);
 
-  const addMarkers = (map, data) => {
+  const addMarkers = (map, data, onMarkerClick, mapboxgl) => {
     markersRef.current = data.map((b) => {
       const el = createCustomImageMarker(b.businessType);
-      const marker = new mapboxglModule.Marker(el)
+      el.addEventListener('click', () => {
+        console.log('Marker clicked');
+        console.log(b);
+        onMarkerClick(b);
+      });
+
+      const marker = new mapboxgl.Marker(el)
         .setLngLat([b.longitude, b.latitude])
         .addTo(map);
       marker.businessType = b.businessType;
       return marker;
     });
   };
+
 
   const removeMarkers = () => {
     markersRef.current.forEach((m) => m.remove());
@@ -107,7 +86,7 @@ export const useMap = ({ mapRef, businesses, userLocation, selectedCategory, set
     );
 
     map.on('load', () => {
-      addMarkers(map, businesses);
+      addMarkers(map, businesses, open, mapboxgl);
     });
 
     // Attach to map
@@ -129,7 +108,7 @@ export const useMap = ({ mapRef, businesses, userLocation, selectedCategory, set
 
             userLocation = { lat: center.lat, lng: center.lng };
             removeMarkers();
-            addMarkers(map, response.data);
+            addMarkers(map, response.data, open, mapboxgl);
             setLastLocation(center);
           }
         } catch (error) {

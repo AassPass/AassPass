@@ -6,7 +6,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-
 .right-arrow::before {
   content: "";
   position: absolute;

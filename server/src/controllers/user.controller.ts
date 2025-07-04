@@ -225,7 +225,7 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
       prisma.user.update({
         where: { id: user.id },
         data: {
-          role: 'OWNER', // or UserRole.OWNER if using enum import
+          role: UserRole.OWNER,
         }
       }),
     ]);
