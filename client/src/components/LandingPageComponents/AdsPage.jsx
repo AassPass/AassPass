@@ -62,7 +62,7 @@ const AdsPage = () => {
 
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
+    <div className="max-w-7xl mx-auto py-8 space-y-4">
 
       {groupedAds[0]?.length > 0 && <AutoScrollRow ads={groupedAds[0]} />}
       {groupedAds[1]?.length > 0 && <AutoScrollBanner banners={groupedAds[1]} />}
@@ -104,21 +104,25 @@ const AutoScrollRow = ({ ads }) => {
   return (
     <div
       ref={containerRef}
-      className="overflow-x-hidden whitespace-nowrap flex gap-4 px-4"
+      className="overflow-x-hidden whitespace-nowrap flex gap-8 px-4"
       style={{ scrollBehavior: 'auto' }}
     >
       {[...ads, ...ads].map((ad, index) => (
         <div
-          key={`${ad.id}-${index}`}
-          className="min-w-[250px] md:min-w-[300px] flex-shrink-0 rounded shadow border p-2 bg-white"
-        >
-          <img
-            src={ad.image}
-            alt={ad.title}
-            className="w-full h-40 object-cover rounded"
-          />
-          <h2 className="mt-2 text-lg font-semibold text-center">{ad.title}</h2>
-        </div>
+  key={`${ad.id}-${index}`}
+  className=" max-w-[200px] md:max-w-[300px] space-y-1  flex-shrink-0 "
+>
+  <div className="w-full aspect-[3/2]">
+    <img
+      src={ad.image}
+      alt={ad.title}
+      className="w-full h-full object-cover rounded-2xl"
+    />
+  </div>
+  <h2 className=" text-sm text-start">{ad.title}</h2>
+  
+</div>
+
       ))}
     </div>
   );
@@ -133,7 +137,7 @@ const AutoScrollBanner = ({ banners }) => {
     if (!container) return;
 
     let scrollAmount = 0;
-    const speed = 2.5;
+    const speed = 2;
 
     const step = () => {
       scrollAmount += speed;
@@ -156,21 +160,24 @@ const AutoScrollBanner = ({ banners }) => {
   return (
     <div
       ref={containerRef}
-      className="overflow-x-hidden whitespace-nowrap flex gap-6 px-4"
+      className="overflow-x-hidden whitespace-nowrap flex gap-8 px-4"
       style={{ scrollBehavior: 'auto' }}
     >
       {[...banners, ...banners].map((ad, index) => (
-        <div
-          key={`${ad.id}-${index}`}
-          className="min-w-[300px] md:min-w-[800px] flex-shrink-0 rounded-lg shadow border bg-white"
-        >
-          <img
-            src={ad.image}
-            alt={ad.title}
-            className="w-full h-60 object-cover rounded-t-lg"
-          />
-          <h2 className="p-4 text-xl font-bold text-center">{ad.title}</h2>
-        </div>
+      <div
+  key={`${ad.id}-${index}`}
+  className="w-[80vw] text-start flex-shrink-0"
+>
+  <div className="aspect-[3/1]">
+    <img
+      src={ad.image}
+      alt={ad.title}
+      className="w-full h-full object-cover rounded-2xl"
+    />
+  </div>
+  <h2 className=" text-sm text-start">{ad.title}</h2>
+</div>
+
       ))}
     </div>
   );
