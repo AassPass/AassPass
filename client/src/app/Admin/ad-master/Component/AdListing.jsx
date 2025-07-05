@@ -31,6 +31,9 @@ const Input = ({ label, ...props }) => (
 );
 
 export default function AdForm({ setAds }) {
+  const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   const [form, setForm] = useState({
     title: "",
     adType: "",
@@ -67,26 +70,31 @@ export default function AdForm({ setAds }) {
   };
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const compressed = await compressImage(file, 1);
-      const url = URL.createObjectURL(compressed);
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-      setPreviewImages((prev) => {
-        const arr = [...prev];
-        arr[imageSlot] = url;
-        return arr;
-      });
+  setUploadingImage(true);
+  try {
+    const compressed = await compressImage(file, 1);
+    const url = URL.createObjectURL(compressed);
 
-      setForm((prev) => ({
-        ...prev,
-        images: { ...prev.images, [imageSlot]: compressed },
-      }));
-    } catch {
-      alert("Image compression failed.");
-    }
-  };
+    setPreviewImages((prev) => {
+      const arr = [...prev];
+      arr[imageSlot] = url;
+      return arr;
+    });
+
+    setForm((prev) => ({
+      ...prev,
+      images: { ...prev.images, [imageSlot]: compressed },
+    }));
+  } catch {
+    alert("Image compression failed.");
+  } finally {
+    setUploadingImage(false);
+  }
+};
+
 
   useEffect(() => {
     return () => previewImages.forEach((url) => URL.revokeObjectURL(url));
@@ -393,54 +401,58 @@ export default function AdForm({ setAds }) {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const fd = new FormData();
-    const {
-      title,
-      adType,
-      visibleFrom,
-      visibleTo,
-      stage,
-      reset,
-      metadata,
-      images,
-    } = form;
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true); // Start loading
+  const fd = new FormData();
+  const {
+    title,
+    adType,
+    visibleFrom,
+    visibleTo,
+    stage,
+    reset,
+    metadata,
+    images,
+  } = form;
 
-    fd.append("title", title);
-    fd.append("adType", adType);
-    fd.append("visibleFrom", visibleFrom);
-    fd.append("visibleTo", visibleTo);
-    fd.append("stage", stage);
-    fd.append("reset", reset.toString());
+  fd.append("title", title);
+  fd.append("adType", adType);
+  fd.append("visibleFrom", visibleFrom);
+  fd.append("visibleTo", visibleTo);
+  fd.append("stage", stage);
+  fd.append("reset", reset.toString());
 
-    Object.entries(metadata).forEach(([k, v]) => fd.append(k, v));
-    Object.values(images).forEach((file) => fd.append("images", file));
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch(`${BACKEND_BUSINESS_URL}/new-ad`, {
-        method: "POST",
-        credentials: "include",
-        body: fd,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  Object.entries(metadata).forEach(([k, v]) => fd.append(k, v));
+  Object.values(images).forEach((file) => fd.append("images", file));
+  const token = localStorage.getItem("token");
+  try {
+    const res = await fetch(`${BACKEND_BUSINESS_URL}/new-ad`, {
+      method: "POST",
+      credentials: "include",
+      body: fd,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (!res.ok) {
-        showToast(data.message || "Failed to create ad", "error");
-        return;
-      }
-
-      showToast("Ad created successfully!", "success");
-      setAds?.((prev) => [data.ad, ...prev]);
-    } catch (err) {
-      console.error(err);
-      showToast("Error submitting form", "error");
+    if (!res.ok) {
+      showToast(data.message || "Failed to create ad", "error");
+      return;
     }
-  };
+
+    showToast("Ad created successfully!", "success");
+    setAds?.((prev) => [data.ad, ...prev]);
+  } catch (err) {
+    console.error(err);
+    showToast("Error submitting form", "error");
+  } finally {
+    setLoading(false); // Stop loading
+  }
+};
+
 
   return (
     <div className="border bg-white rounded-2xl shadow-md text-gray-800 max-w-5xl mx-auto">
@@ -575,12 +587,37 @@ export default function AdForm({ setAds }) {
       >
         Save as Draft
       </button> */}
-            <button
-              type="submit"
-              className="px-4 py-2 border-blue-400 border-2 text-blue-400 hover:text-white cursor-pointer rounded hover:bg-blue-400"
-            >
-              Publish
-            </button>
+         <button
+  type="submit"
+  className="px-4 py-2 border-blue-400 border-2 text-blue-400 hover:text-white cursor-pointer rounded hover:bg-blue-400 flex items-center justify-center min-w-[100px]"
+  disabled={loading}
+>
+  {loading ? (
+    <svg
+      className="animate-spin h-5 w-5 text-blue-400"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+      />
+    </svg>
+  ) : (
+    "Publish"
+  )}
+</button>
+
           </div>
         </div>
 

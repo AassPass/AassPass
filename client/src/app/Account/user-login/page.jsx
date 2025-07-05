@@ -12,6 +12,7 @@ import { showToast } from "@/Utils/toastUtil";
 export default function Page() {
   const router = useRouter();
   const { setRole, setBusinessId } = useRole();
+const [showVerificationMessage, setShowVerificationMessage] = useState(false);
 
   const [isSignup, setIsSignup] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -29,7 +30,7 @@ export default function Page() {
   setLoading(true);
   try {
     const data = await loginUser({ email, password });
-console.log(data)
+
     setBusinessId(data.businessId);
     setRole(data.role);
     localStorage.setItem("token", data.token);
@@ -64,16 +65,18 @@ const handleSignup = async (e) => {
   }
 
   setLoading(true);
-  try {
-    await signupUser({ email, password, name });
-    showToast('Signup successful. Please verify your email.', 'success');
-    setIsSignup(false);
-  } catch (err) {
-    showToast(err.message || "Signup failed", 'error');
-    console.error(err.message || "Signup failed");
-  } finally {
-    setLoading(false);
-  }
+ try {
+  await signupUser({ email, password, name });
+  showToast('Signup successful. Please verify your email.', 'success');
+  setShowVerificationMessage(true); // Show UI message
+  setIsSignup(false); // Switch to login form
+} catch (err) {
+  showToast(err.message || "Signup failed", 'error');
+  console.error(err.message || "Signup failed");
+} finally {
+  setLoading(false);
+}
+
 };
 
 
@@ -85,11 +88,17 @@ const handleSignup = async (e) => {
   backgroundRepeat: 'no-repeat',
   backgroundPosition: 'center',
 }}>
-      <form
-        onSubmit={isSignup ? handleSignup : handleLogin}
-        className="w-full max-w-md p-8 rounded shadow-md"
-        style={{ backgroundColor: colors.background, color: colors.text }}
-      >
+{showVerificationMessage && (
+  <div className="absolute top-8 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded shadow-md max-w-md w-full text-center">
+    Signup successful! Please check your email to verify your account before logging in.
+  </div>
+)}
+<form
+  key={isSignup ? "signup" : "login"}  // This forces React to remount the form when mode changes
+  onSubmit={isSignup ? handleSignup : handleLogin}
+  className="w-full max-w-md p-8 rounded shadow-md"
+  style={{ backgroundColor: colors.background, color: colors.text }}
+>
         <h2
           className="text-2xl font-semibold mb-6 text-center"
           style={{ color: colors.primary }}
@@ -166,7 +175,10 @@ const handleSignup = async (e) => {
           <span
             className="cursor-pointer hover:underline"
             style={{ color: colors.primaryText }}
-            onClick={() => setIsSignup(!isSignup)}
+         onClick={() => {
+  setIsSignup(!isSignup);
+  setShowVerificationMessage(false); // clear message when switching
+}}
           >
             {isSignup ? "Login here" : "Sign up here"}
           </span>
