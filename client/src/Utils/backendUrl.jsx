@@ -1,5 +1,5 @@
-// const BaseUrl = 'https://api.aasspass.co.in';
-const BaseUrl = 'http://192.168.1.4:5000';
+const BaseUrl = 'https://api.aasspass.co.in';
+// const BaseUrl = 'http://192.168.1.4:5000';
 // const BaseUrl = 'http://localhost:5000';
 
 export const BACKEND_URL = `${BaseUrl}/super-admin`;
