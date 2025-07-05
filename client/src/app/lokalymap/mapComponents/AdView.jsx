@@ -46,21 +46,21 @@ export default function AdView({ selectedBusiness }) {
             <Separator />
             {selectedBusiness.ads.map((ad) => (
                 <Card key={ad.id} className="border shadow-sm max-w-full overflow-x-hidden p-2">
-                    {ad.images?.length > 0 && (
+                    {/* {ad.images?.length > 0 && (
                     <ScrollArea className="w-full whitespace-nowrap rounded-md border">
                         <div className="flex w-max space-x-4 p-2">
-                        {ad.images.map((img, index) => (
-                            <img
-                            key={index}
-                            src={img.url}
-                            alt={`Ad Image ${index + 1}`}
-                            className="h-40 w-auto max-w-xs shrink-0 rounded-md object-cover"
-                            />
-                        ))}
+                          {ad.images.map((imgage, index) => (
+                              <img
+                              key={index}
+                              src={imgage.url}
+                              alt={`Ad Image ${index + 1}`}
+                              className="h-40 w-auto max-w-xs shrink-0 rounded-md object-cover"
+                              />
+                          ))}
                         </div>
                         <ScrollBar orientation="horizontal" />
                     </ScrollArea>
-                    )}
+                    )} */}
                 <CardHeader>
                   <CardTitle className="text-base">{ad.title}</CardTitle>
                   <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">

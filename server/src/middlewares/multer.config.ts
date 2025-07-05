@@ -4,4 +4,10 @@ import multer from "multer";
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-export default upload;
+const businessImageUpload = upload.fields([
+  { name: 'profilePicture', maxCount: 1 },
+  { name: 'bannerPicture', maxCount: 1 }
+]);
+
+
+export { upload, businessImageUpload };

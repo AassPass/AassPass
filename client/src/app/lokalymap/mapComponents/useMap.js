@@ -92,9 +92,9 @@ export const useMap = ({ mapRef, businesses, userLocation, selectedCategory, set
     // Attach to map
     map.on('moveend', debounce(async () => {
       const center = map.getCenter();
-      console.log("Map center moved to:", center);
+      // console.log("Map center moved to:", center);
 
-      if (distanceBetweenTwoCoord(lastLocation, center) > 500) {
+      if (distanceBetweenTwoCoord(lastLocation, center) > 1000) {
         try {
           const response = await getNearbyBusinesses({
             lat: center.lat,

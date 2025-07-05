@@ -254,32 +254,32 @@ p {
 /* Default (mobile) speed */
 @media (max-width: 767px) {
   .animate-scroll-row {
-    animation-duration: 5s;
+    animation-duration: 17s;
   }
 
   .animate-scroll-banner {
-    animation-duration: 8s;
+    animation-duration: 20s;
   }
 }
 
 /* Medium devices (tablet and up) */
 @media (min-width: 768px) {
   .animate-scroll-row {
-    animation-duration:10s;
+    animation-duration:12s;
   }
 
   .animate-scroll-banner {
-    animation-duration: 15s;
+    animation-duration: 17s;
   }
 }
 
 /* Large screens */
 @media (min-width: 1024px) {
   .animate-scroll-row {
-    animation-duration: 8s;
+    animation-duration: 11s;
   }
 
   .animate-scroll-banner {
-    animation-duration: 18s;
+    animation-duration: 21s;
   }
 }

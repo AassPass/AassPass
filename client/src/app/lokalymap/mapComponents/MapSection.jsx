@@ -29,16 +29,16 @@ const MapSection = () => {
   useEffect(() => {
     const lat = 28.676853;
     const lng = 77.260113;
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        // setUserLocation({longitude: lng, latitude: lat});
-      },
-      (error) => {
-        console.error("Error getting user location:", error);
-      }
-    );
+    // navigator.geolocation.getCurrentPosition(
+    //   (position) => {
+    //     const lat = position.coords.latitude;
+    //     const lng = position.coords.longitude;
+    //     // setUserLocation({longitude: lng, latitude: lat});
+    //   },
+    //   (error) => {
+    //     console.error("Error getting user location:", error);
+    //   }
+    // );
     fetchData(lat, lng);
     
   }, []);
@@ -73,7 +73,7 @@ const MapSection = () => {
               animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="w-full h-full overflow-hidden shadow-lg">
+              <div className="flex justify-center items-center w-full h-full overflow-hidden shadow-lg">
                 <MapContainer businesses={businesses} setBusinesses={setBusinesses} userLocation={userLocation} />
               </div>
             </motion.div>

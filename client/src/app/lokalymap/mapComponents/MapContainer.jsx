@@ -8,10 +8,12 @@ import {
 } from "@/components/ui/drawer"
 import AdView from './AdView';
 import { enumKeyToLabelMap } from '@/lib/utils';
+import { useDrawerDirection } from './useDrawerDirection';
 
 export default function MapContainer({ businesses, userLocation, setBusinesses }) {
   const mapRef = useRef(null);
   const categoryBoxRef = useRef(null);
+  const drawerDirection = useDrawerDirection()
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showAll, setShowAll] = useState(false);
@@ -54,8 +56,8 @@ export default function MapContainer({ businesses, userLocation, setBusinesses }
 
   return (
     <>
-        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} direction="right">
-          <DrawerContent side="right" className="w-full max-w-sm h-full p-4 overflow-y-auto bg-gradient-to-r from-[#2b509c] to-[#3a1e90]">
+        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} direction={drawerDirection}>
+          <DrawerContent side="right" className="w-full max-w-md h-full p-4 overflow-y-auto bg-gradient-to-r from-[#2b509c] to-[#3a1e90]">
             <AdView selectedBusiness={selectedBusiness}/>
           </DrawerContent>
         </Drawer>

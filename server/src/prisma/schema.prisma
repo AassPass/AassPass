@@ -68,6 +68,8 @@ model Business {
   businessName       String
   ownerName          String?
   phoneNumber        String?
+  profilePicture     String?
+  bannerPicture      String?
   emailAddress       String             @unique
   address            String?
   verificationStatus VerificationStatus
