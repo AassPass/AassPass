@@ -169,7 +169,6 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
     } = req.body;
 
     const user = req.user;
-    // console.log(socialLinks);
 
     if(!user) {
       return res.status(400).json({message: "You do not have the access token is missing"});
