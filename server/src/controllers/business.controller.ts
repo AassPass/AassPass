@@ -32,6 +32,9 @@ export const CreateAd = async (req: Request, res: Response): Promise<any> => {
 
     const reset = rawReset === 'true' || rawReset === true;
     const businessId = req.user?.businessId;
+    if(!businessId){
+      console.error("business Id not found");
+    }
     const files = req.files as Express.Multer.File[];
 
     if (!title || !adType || !visibleFrom || !visibleTo || !stage)

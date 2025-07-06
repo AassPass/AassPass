@@ -2,7 +2,7 @@ import { Router } from "express";
 import { CreateAd, DeleteAd, UpdateAd } from "../controllers/business.controller";
 import { userAuth } from "../middlewares/userAuth.middlewares";
 import { GetAds } from "../controllers/admin.controller";
-import upload from "../middlewares/multer.config";
+import { upload } from "../middlewares/multer.config";
 
 
 const BusinessRouter = Router();

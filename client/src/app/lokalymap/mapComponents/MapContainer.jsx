@@ -8,10 +8,12 @@ import {
 } from "@/components/ui/drawer"
 import AdView from './AdView';
 import { enumKeyToLabelMap } from '@/lib/utils';
+import { useDrawerDirection } from './useDrawerDirection';
 
 export default function MapContainer({ businesses, userLocation, setBusinesses }) {
   const mapRef = useRef(null);
   const categoryBoxRef = useRef(null);
+  const drawerDirection = useDrawerDirection()
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showAll, setShowAll] = useState(false);
@@ -54,58 +56,61 @@ export default function MapContainer({ businesses, userLocation, setBusinesses }
 
   return (
     <>
-        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} direction="right">
-          <DrawerContent side="right" className="w-full max-w-sm h-full p-4 overflow-y-auto bg-gradient-to-r from-[#2b509c] to-[#3a1e90]">
+        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} direction={drawerDirection}>
+          <DrawerContent side="right" className="w-full max-w-md h-full p-4 overflow-y-auto bg-gradient-to-r from-[#2b509c] to-[#3a1e90]">
             <AdView selectedBusiness={selectedBusiness}/>
           </DrawerContent>
         </Drawer>
-        <div ref={mapRef} className="w-full h-screen" />
+        <div ref={mapRef} className="w-full h-[100dvh]" />
         {/* Filter Buttons */}
         <div
-            ref={categoryBoxRef}
-            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex gap-2 bg-white px-4 py-2 rounded-xl shadow-md flex-wrap justify-center"
+          ref={categoryBoxRef}
+          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex gap-2 bg-white px-2 py-1 rounded-xl shadow-md flex-wrap justify-center max-w-[95%]"
         >
-            {selectedCategory ? (
+          {selectedCategory ? (
             <>
-                <button
+              <button
                 key={selectedCategory}
                 onClick={() => setSelectedCategory(selectedCategory)}
-                className="px-3 py-1 rounded-full text-sm font-medium bg-blue-600 text-white"
-                >
+                className="px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-600 text-white"
+              >
                 {enumKeyToLabelMap[selectedCategory]}
-                </button>
-                <button
+              </button>
+              <button
                 onClick={() => {
-                    setSelectedCategory(null);
-                    setShowAll(false);
+                  setSelectedCategory(null);
+                  setShowAll(false);
                 }}
-                className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-600 hover:bg-red-200"
-                >
+                className="px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-red-100 text-red-600 hover:bg-red-200"
+              >
                 Clear
-                </button>
+              </button>
             </>
-            ) : (
+          ) : (
             <>
-                {visibleCategories.map((categoryKey) => (
-                <button
+              {visibleCategories
+                .slice(0, showAll ? visibleCategories.length : (window.innerWidth < 640 ? 4 : 8))
+                .map((categoryKey) => (
+                  <button
                     key={categoryKey}
                     onClick={() => setSelectedCategory(categoryKey)}
-                    className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
-                >
+                    className="px-2 py-1 rounded-full text-xs sm:text-sm font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
+                  >
                     {enumKeyToLabelMap[categoryKey]}
-                </button>
+                  </button>
                 ))}
-                {allCategories.length > 6 && (
+              {allCategories.length > (window.innerWidth < 640 ? 4 : 8) && (
                 <button
-                    onClick={() => setShowAll(!showAll)}
-                    className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
+                  onClick={() => setShowAll(!showAll)}
+                  className="px-2 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                 >
-                    {showAll ? 'Hide categories' : '...'}
+                  {showAll ? 'Hide' : '...'}
                 </button>
-                )}
+              )}
             </>
-            )}
+          )}
         </div>
+
     </>
   );
 }

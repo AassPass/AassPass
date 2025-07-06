@@ -1,10 +1,14 @@
 import { Request, Response } from "express";
 import { prisma } from "../utils/prisma";
-import { VerificationStatus, SubscriptionType, BusinessType, Role, UserRole } from '@prisma/client';
-import { businessTypeMap, generatePassword } from "../utils/lib";
-// import bcrypt from "bcrypt";
+import { VerificationStatus, SubscriptionType, BusinessType, UserRole } from '@prisma/client';
+import { businessTypeMap } from "../utils/lib";
 import jwt from "jsonwebtoken";
 import { config } from "dotenv";
+import { uploadImage } from "../services/imageStore";
+import fs from "fs";
+import path from "path";
+import { promisify } from "util";
+const unlinkAsync = promisify(fs.unlink);
 
 
 config();
@@ -169,14 +173,11 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
     } = req.body;
 
     const user = req.user;
-    // console.log(socialLinks);
 
     if(!user) {
       return res.status(400).json({message: "You do not have the access token is missing"});
     }
 
-    // console.log('RegisterBusiness Request Body:', req.body);
-    // Validate required fields
     if (!businessName || !phoneNumber || !emailAddress || !address || !businessType || !latitude || !longitude) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
@@ -189,17 +190,37 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
       return res.status(404).json({message: "No user found. Token is probably wrong. Please again log in"});
     }
 
-    // Generate a unique businessId
     const businessId = `BUS-${Date.now()}`;
     const prismaBusinessType = businessTypeMap[businessType as keyof typeof businessTypeMap] || undefined;
 
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
-    // Create the business
+    let profilePictureUrl: string | undefined;
+    let bannerPictureUrl: string | undefined;
+
+    const saveAndUpload = async (file: Express.Multer.File): Promise<string> => {
+      const tempPath = path.join(__dirname, "../../tmp", file.originalname);
+      fs.writeFileSync(tempPath, file.buffer);
+      const imageUrl = await uploadImage(tempPath); // assumes this works with file path
+      await unlinkAsync(tempPath);
+      return imageUrl;
+    };
+
+    if (files["profilePicture"]?.[0]) {
+      profilePictureUrl = await saveAndUpload(files["profilePicture"][0]);
+    }
+
+    if (files["bannerPicture"]?.[0]) {
+      bannerPictureUrl = await saveAndUpload(files["bannerPicture"][0]);
+    }
+
     const [newBusiness, updatedUser] = await prisma.$transaction([
       prisma.business.create({
         data: {
           businessId,
           businessName,
+          profilePicture: profilePictureUrl || null,
+          bannerPicture: bannerPictureUrl || null,
           ownerName: owner.name,
           ownerId: user.id,
           phoneNumber,
