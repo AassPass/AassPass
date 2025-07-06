@@ -4,6 +4,7 @@ import { FiPlus } from "react-icons/fi";
 import { compressImage } from "@/Utils/imageCompresson";
 import { showToast } from "@/Utils/toastUtil";
 import { BACKEND_BUSINESS_URL } from "@/Utils/backendUrl";
+import { validateAdForm } from "@/Utils/validations";
 
 const adTypes = [
   "Deals & Discounts",
@@ -16,24 +17,33 @@ const adTypes = [
   "Contests & Giveaways",
 ];
 
-const Input = ({ label, ...props }) => (
+const Input = ({ label, error, ...props }) => (
   <div className="max-w-xs">
     {label && (
-      <label className="block text-xs font-medium text-gray-700 mb-1">
+      <label className="block text-xs font-medium text-gray-700">
         {label}
       </label>
     )}
     <input
       {...props}
-      className="w-full px-2 py-1 text-sm rounded border border-gray-300 text-black h-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className={`w-full px-2 py-1 text-sm rounded border ${
+        error ? "border-red-500" : "border-gray-300"
+      } text-black h-8 focus:outline-none focus:ring-2 ${
+        error ? "focus:ring-red-500" : "focus:ring-blue-500"
+      }`}
     />
+    <p className="text-xs h-4 text-red-500">
+      {error || "\u00A0" /* non-breaking space */}
+    </p>
   </div>
 );
 
+
+
 export default function AdForm({ setAds }) {
   const [loading, setLoading] = useState(false);
-  const [uploadingImage, setUploadingImage] = useState(false);
-
+  const [errors,setErrors] = useState({})
+const [uploadingImages, setUploadingImages] = useState({});
   const [form, setForm] = useState({
     title: "",
     adType: "",
@@ -69,11 +79,12 @@ export default function AdForm({ setAds }) {
     document.getElementById("imageUploadInput").click();
   };
 
-  const handleImageUpload = async (e) => {
+ const handleImageUpload = async (e) => {
   const file = e.target.files?.[0];
   if (!file) return;
 
-  setUploadingImage(true);
+  setUploadingImages(prev => ({ ...prev, [imageSlot]: true }));
+
   try {
     const compressed = await compressImage(file, 1);
     const url = URL.createObjectURL(compressed);
@@ -91,7 +102,8 @@ export default function AdForm({ setAds }) {
   } catch {
     alert("Image compression failed.");
   } finally {
-    setUploadingImage(false);
+    setUploadingImages(prev => ({ ...prev, [imageSlot]: false }));
+     e.target.value = null; 
   }
 };
 
@@ -100,309 +112,118 @@ export default function AdForm({ setAds }) {
     return () => previewImages.forEach((url) => URL.revokeObjectURL(url));
   }, [previewImages]);
 
-  const renderMetadataFields = () => {
-    const { adType } = form;
-    const md = form.metadata;
+  const renderMetadataFields = (errors = {}) => {
+  const { adType } = form;
+  const md = form.metadata;
 
-    switch (adType) {
-      case "Deals & Discounts":
-        return (
-          <>
-            <Input
-              name="description"
-              value={md.description || ""}
-              label="Description"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="discountPercentage"
-              type="number"
-              value={md.discountPercentage || ""}
-              label="Discount %"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="validTill"
-              type="date"
-              value={md.validTill || ""}
-              label="Valid Till"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="terms"
-              value={md.terms || ""}
-              label="Terms"
-              onChange={handleMetadataChange}
-            />
-          </>
-        );
-      case "Events":
-        return (
-          <>
-            <Input
-              name="description"
-              value={md.description || ""}
-              label="Description"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="organizerName"
-              value={md.organizerName || ""}
-              label="Organizer Name"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="location"
-              value={md.location || ""}
-              label="Event Location"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="time"
-              value={md.time || ""}
-              label="Time"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="rsvp"
-              value={md.rsvp || ""}
-              label="RSVP Info"
-              onChange={handleMetadataChange}
-            />
-          </>
-        );
-      case "Services":
-        return (
-          <>
-            <Input
-              name="description"
-              value={md.description || ""}
-              label="Description"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="serviceType"
-              value={md.serviceType || ""}
-              label="Service Type"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="contact"
-              value={md.contact || ""}
-              label="Contact"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="radius"
-              value={md.radius || ""}
-              label="Service Radius"
-              onChange={handleMetadataChange}
-            />
-          </>
-        );
-      case "Products for Sale":
-        return (
-          <>
-            <Input
-              name="description"
-              value={md.description || ""}
-              label="Description"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="price"
-              type="number"
-              value={md.price || ""}
-              label="Price"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="quantityAvailable"
-              type="number"
-              value={md.quantityAvailable || ""}
-              label="Quantity Available"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="deliveryOption"
-              value={md.deliveryOption || ""}
-              label="Delivery Option"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="condition"
-              value={md.condition || ""}
-              label="Condition"
-              onChange={handleMetadataChange}
-            />
-          </>
-        );
-      case "Job Openings":
-        return (
-          <>
-            <Input
-              name="jobDescription"
-              value={md.jobDescription || ""}
-              label="Job Description"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="jobType"
-              value={md.jobType || ""}
-              label="Job Type"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="salary"
-              value={md.salary || ""}
-              label="Salary"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="hours"
-              value={md.hours || ""}
-              label="Hours"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="location"
-              value={md.location || ""}
-              label="Location"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="qualifications"
-              value={md.qualifications || ""}
-              label="Qualifications"
-              onChange={handleMetadataChange}
-            />
-          </>
-        );
-      case "Rentals & Properties":
-        return (
-          <>
-            <Input
-              name="description"
-              value={md.description || ""}
-              label="Description"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="sizeOrArea"
-              value={md.sizeOrArea || ""}
-              label="Size / Area"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="rent"
-              value={md.rent || ""}
-              label="Rent"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="amenities"
-              value={md.amenities || ""}
-              label="Amenities"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="contact"
-              value={md.contact || ""}
-              label="Contact"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="availableFrom"
-              type="date"
-              value={md.availableFrom || ""}
-              label="Available From"
-              onChange={handleMetadataChange}
-            />
-          </>
-        );
-      case "Announcements":
-        return (
-          <>
-            <Input
-              name="description"
-              value={md.description || ""}
-              label="Description"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="announcementType"
-              value={md.announcementType || ""}
-              label="Type"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="importanceLevel"
-              value={md.importanceLevel || ""}
-              label="Importance Level"
-              onChange={handleMetadataChange}
-            />
-          </>
-        );
-      case "Contests & Giveaways":
-        return (
-          <>
-            <Input
-              name="description"
-              value={md.description || ""}
-              label="Description"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="participationRules"
-              value={md.participationRules || ""}
-              label="Participation Rules"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="winnerAnnouncementDate"
-              type="date"
-              value={md.winnerAnnouncementDate || ""}
-              label="Winner Announcement Date"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="rules"
-              value={md.rules || ""}
-              label="Rules"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="endDate"
-              type="date"
-              value={md.endDate || ""}
-              label="End Date"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="eligibility"
-              value={md.eligibility || ""}
-              label="Eligibility"
-              onChange={handleMetadataChange}
-            />
-            <Input
-              name="prize"
-              value={md.prize || ""}
-              label="Prize"
-              onChange={handleMetadataChange}
-            />
-          </>
-        );
-      default:
-        return (
-          <p className="text-sm italic text-gray-500">
-            Select an ad type to continue
-          </p>
-        );
-    }
-  };
+  switch (adType) {
+    case "Deals & Discounts":
+      return (
+        <>
+          <Input name="description" value={md.description || ""} label="Description" onChange={handleMetadataChange} error={errors.description} />
+          <Input name="discountPercentage" type="number" value={md.discountPercentage || ""} label="Discount %" onChange={handleMetadataChange} error={errors.discountPercentage} />
+          <Input name="validTill" type="date" value={md.validTill || ""} label="Valid Till" onChange={handleMetadataChange} error={errors.validTill} />
+          <Input name="terms" value={md.terms || ""} label="Terms" onChange={handleMetadataChange} error={errors.terms} />
+        </>
+      );
+
+    case "Events":
+      return (
+        <>
+          <Input name="description" value={md.description || ""} label="Description" onChange={handleMetadataChange} error={errors.description} />
+          <Input name="organizerName" value={md.organizerName || ""} label="Organizer Name" onChange={handleMetadataChange} error={errors.organizerName} />
+          <Input name="location" value={md.location || ""} label="Event Location" onChange={handleMetadataChange} error={errors.location} />
+          <Input name="time" value={md.time || ""} label="Time" onChange={handleMetadataChange} error={errors.time} />
+          <Input name="rsvp" value={md.rsvp || ""} label="RSVP Info" onChange={handleMetadataChange} error={errors.rsvp} />
+        </>
+      );
+
+    case "Services":
+      return (
+        <>
+          <Input name="description" value={md.description || ""} label="Description" onChange={handleMetadataChange} error={errors.description} />
+          <Input name="serviceType" value={md.serviceType || ""} label="Service Type" onChange={handleMetadataChange} error={errors.serviceType} />
+          <Input name="contact" value={md.contact || ""} label="Contact" onChange={handleMetadataChange} error={errors.contact} />
+          <Input name="radius" value={md.radius || ""} label="Service Radius" onChange={handleMetadataChange} error={errors.radius} />
+        </>
+      );
+
+    case "Products for Sale":
+      return (
+        <>
+          <Input name="description" value={md.description || ""} label="Description" onChange={handleMetadataChange} error={errors.description} />
+          <Input name="price" type="number" value={md.price || ""} label="Price" onChange={handleMetadataChange} error={errors.price} />
+          <Input name="quantityAvailable" type="number" value={md.quantityAvailable || ""} label="Quantity Available" onChange={handleMetadataChange} error={errors.quantityAvailable} />
+          <Input name="deliveryOption" value={md.deliveryOption || ""} label="Delivery Option" onChange={handleMetadataChange} error={errors.deliveryOption} />
+          <Input name="condition" value={md.condition || ""} label="Condition" onChange={handleMetadataChange} error={errors.condition} />
+        </>
+      );
+
+    case "Job Openings":
+      return (
+        <>
+          <Input name="jobDescription" value={md.jobDescription || ""} label="Job Description" onChange={handleMetadataChange} error={errors.jobDescription} />
+          <Input name="jobType" value={md.jobType || ""} label="Job Type" onChange={handleMetadataChange} error={errors.jobType} />
+          <Input name="salary" value={md.salary || ""} label="Salary" onChange={handleMetadataChange} error={errors.salary} />
+          <Input name="hours" value={md.hours || ""} label="Hours" onChange={handleMetadataChange} error={errors.hours} />
+          <Input name="location" value={md.location || ""} label="Location" onChange={handleMetadataChange} error={errors.location} />
+          <Input name="qualifications" value={md.qualifications || ""} label="Qualifications" onChange={handleMetadataChange} error={errors.qualifications} />
+        </>
+      );
+
+    case "Rentals & Properties":
+      return (
+        <>
+          <Input name="description" value={md.description || ""} label="Description" onChange={handleMetadataChange} error={errors.description} />
+          <Input name="sizeOrArea" value={md.sizeOrArea || ""} label="Size / Area" onChange={handleMetadataChange} error={errors.sizeOrArea} />
+          <Input name="rent" value={md.rent || ""} label="Rent" onChange={handleMetadataChange} error={errors.rent} />
+          <Input name="amenities" value={md.amenities || ""} label="Amenities" onChange={handleMetadataChange} error={errors.amenities} />
+          <Input name="contact" value={md.contact || ""} label="Contact" onChange={handleMetadataChange} error={errors.contact} />
+          <Input name="availableFrom" type="date" value={md.availableFrom || ""} label="Available From" onChange={handleMetadataChange} error={errors.availableFrom} />
+        </>
+      );
+
+    case "Announcements":
+      return (
+        <>
+          <Input name="description" value={md.description || ""} label="Description" onChange={handleMetadataChange} error={errors.description} />
+          <Input name="announcementType" value={md.announcementType || ""} label="Type" onChange={handleMetadataChange} error={errors.announcementType} />
+          <Input name="importanceLevel" value={md.importanceLevel || ""} label="Importance Level" onChange={handleMetadataChange} error={errors.importanceLevel} />
+        </>
+      );
+
+    case "Contests & Giveaways":
+      return (
+        <>
+          <Input name="description" value={md.description || ""} label="Description" onChange={handleMetadataChange} error={errors.description} />
+          <Input name="participationRules" value={md.participationRules || ""} label="Participation Rules" onChange={handleMetadataChange} error={errors.participationRules} />
+          <Input name="winnerAnnouncementDate" type="date" value={md.winnerAnnouncementDate || ""} label="Winner Announcement Date" onChange={handleMetadataChange} error={errors.winnerAnnouncementDate} />
+          <Input name="rules" value={md.rules || ""} label="Rules" onChange={handleMetadataChange} error={errors.rules} />
+          <Input name="endDate" type="date" value={md.endDate || ""} label="End Date" onChange={handleMetadataChange} error={errors.endDate} />
+          <Input name="eligibility" value={md.eligibility || ""} label="Eligibility" onChange={handleMetadataChange} error={errors.eligibility} />
+          <Input name="prize" value={md.prize || ""} label="Prize" onChange={handleMetadataChange} error={errors.prize} />
+        </>
+      );
+
+    default:
+      return (
+        <p className="text-sm italic text-gray-500">
+          Select an ad type to continue
+        </p>
+      );
+  }
+};
+
 
  const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+  const validationErrors = validateAdForm(form);
+  setErrors(validationErrors);
+
+  if (Object.keys(validationErrors).length > 0) {
+    showToast("Please fix the errors before submitting", "error");
+    return;
+  }
   setLoading(true); // Start loading
   const fd = new FormData();
   const {
@@ -466,49 +287,61 @@ export default function AdForm({ setAds }) {
       >
         {/* Left Column: Independent/Common Fields */}
         <div className="grid grid-cols-2 gap-2">
-          <Input
-            name="title"
-            value={form.title}
-            label="Ad Title"
-            onChange={handleChange}
-          />
+        <Input
+  name="title"
+  value={form.title}
+  label="Ad Title"
+  onChange={handleChange}
+  error={errors.title}
+/>
 
-          <div className="max-w-xs">
-            <label className="block text-xs font-medium text-gray-700 ">
-              Ad Type
-            </label>
-            <select
-              name="adType"
-              value={form.adType}
-              onChange={handleChange}
-              className="w-full max-w-xs p-2 border text-sm rounded"
-            >
-              <option value="">Select Ad Type</option>
-              {adTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="max-w-xs">
+  <label className="block text-xs font-medium text-gray-700 ">Ad Type</label>
+  <select
+    name="adType"
+    value={form.adType}
+    onChange={handleChange}
+    className={`w-full p-2 border text-sm rounded ${
+      errors.adType ? "border-red-500" : "border-gray-300"
+    }`}
+  >
+    <option value="">Select Ad Type</option>
+    {adTypes.map((type) => (
+      <option key={type} value={type}>
+        {type}
+      </option>
+    ))}
+  </select>
+  <p className={`text-xs mt-1 h-4 ${errors.adType ? "text-red-500" : "invisible"}`}>
+  {errors.adType || "placeholder"}
+</p>
+</div>
+<div>
+  <Input
+  name="visibleFrom"
+  type="date"
+  value={form.visibleFrom}
+  label="Visible From"
+  onChange={handleChange}
+  min={today}
+  error={errors.visibleFrom}
+/>
 
-          <Input
-            name="visibleFrom"
-            type="date"
-            value={form.visibleFrom}
-            label="Visible From"
-            onChange={handleChange}
-            min={today}
-          />
+</div>
+<div>
+       <Input
+  name="visibleTo"
+  type="date"
+  value={form.visibleTo}
+  label="Visible To"
+  onChange={handleChange}
+  min={today}
+  error={errors.visibleTo}
+/>
 
-          <Input
-            name="visibleTo"
-            type="date"
-            value={form.visibleTo}
-            label="Visible To"
-            onChange={handleChange}
-            min={today}
-          />
+</div>
+
+
 
           <div className="col-span-2">
             <input
@@ -522,40 +355,89 @@ export default function AdForm({ setAds }) {
             <div className="grid grid-cols-2 gap-2">
               {/* Banner at index 0 */}
               <div
-                onClick={() => openFileDialog(0)}
-                className="col-span-2 relative cursor-pointer rounded border-dashed border-2 border-gray-400 bg-white flex items-center justify-center overflow-hidden"
-                style={{ aspectRatio: "4 / 1" }}
-              >
-                {previewImages[0] ? (
-                  <img
-                    src={previewImages[0]}
-                    alt="Banner Preview"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <FiPlus className="text-gray-400 text-6xl" />
-                )}
-              </div>
+  onClick={() => openFileDialog(0)}
+  className="col-span-2 relative cursor-pointer rounded border-dashed border-2 border-gray-400 bg-white flex items-center justify-center overflow-hidden"
+  style={{ aspectRatio: "4 / 1" }}
+>
+  {uploadingImages[0] ? (
+    <svg
+      className="animate-spin h-8 w-8 text-blue-500"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+      />
+    </svg>
+  ) : previewImages[0] ? (
+    <img
+      src={previewImages[0]}
+      alt="Banner Preview"
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <FiPlus className="text-gray-400 text-6xl" />
+  )}
+</div>
+
 
               {/* Small images at index 1 and 2 */}
-              {[1, 2].map((i) => (
-                <div
-                  key={i}
-                  onClick={() => openFileDialog(i)}
-                  className="relative cursor-pointer rounded border-dashed border-2 border-gray-400 bg-white flex items-center justify-center overflow-hidden"
-                  style={{ aspectRatio: "3 / 2" }}
-                >
-                  {previewImages[i] ? (
-                    <img
-                      src={previewImages[i]}
-                      alt={`Preview ${i}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <FiPlus className="text-gray-400 text-4xl" />
-                  )}
-                </div>
-              ))}
+            {[1, 2].map((i) => (
+  <div
+    key={i}
+    onClick={() => openFileDialog(i)}
+    className="relative cursor-pointer rounded border-dashed border-2 border-gray-400 bg-white flex items-center justify-center overflow-hidden"
+    style={{ aspectRatio: "3 / 2" }}
+  >
+    {uploadingImages[i] ? (
+      <svg
+        className="animate-spin h-6 w-6 text-blue-500"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+        />
+      </svg>
+    ) : previewImages[i] ? (
+      <img
+        src={previewImages[i]}
+        alt={`Preview ${i}`}
+        className="w-full h-full object-cover"
+      />
+    ) : (
+      <FiPlus className="text-gray-400 text-4xl" />
+    )}
+    
+  </div>
+  
+))}
+<p className={`text-xs mt-1 h-4 ${errors.images ? "text-red-500" : "invisible"}`}>
+  {errors.images || "placeholder"}
+</p>
+
             </div>
           </div>
 
@@ -627,7 +509,7 @@ export default function AdForm({ setAds }) {
             Additional Details
           </h4>
           <div className="grid grid-cols-2 gap-2">
-            {renderMetadataFields() || (
+            {renderMetadataFields(errors) || (
               <p className="text-xs text-gray-400 italic">
                 Select an Ad Type to see more
               </p>

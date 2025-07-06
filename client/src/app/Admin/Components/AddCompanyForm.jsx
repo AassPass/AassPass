@@ -227,63 +227,84 @@ const newBusiness = {
         {/* Column 1 */}
         <div className="space-y-4">
           <div className="max-w-xs">
-            <label className={labelClass}>Business Name *</label>
-            <input
-              type="text"
-              name="businessName"
-              value={formData.businessName}
-              onChange={handleChange}
-              className={inputClass}
-              required
-            />
+            <label className={labelClass} htmlFor="businessName">
+            Business Name <span className="text-red-600">*</span>
+          </label>
+          <input
+            id="businessName"
+            name="businessName"
+            type="text"
+            value={formData.businessName}
+            onChange={handleChange}
+            className={inputClass}
+            required
+            autoComplete="organization"
+          />
           </div>
 
           <div className="max-w-xs">
-            <label className={labelClass}>Owner Name</label>
-            <input
-              type="text"
-              name="ownerName"
-              value={formData.ownerName}
-              onChange={handleChange}
-              className={inputClass}
-            />
+           <label className={labelClass} htmlFor="ownerName">
+            Owner Name
+          </label>
+          <input
+            id="ownerName"
+            name="ownerName"
+            type="text"
+            value={formData.ownerName}
+            onChange={handleChange}
+            className={inputClass}
+            autoComplete="name"
+          />
           </div>
 
           <div className="max-w-xs">
-  <label className={labelClass}>Phone Number *</label>
-  <input
-    type="tel"
-    name="phoneNumber"
-    value={formData.phoneNumber}
-    onChange={handleChange}
-    className={inputClass}
-    required
-  />
-  {errors.phoneNumber && (
-    <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>
-  )}
+ <label className={labelClass} htmlFor="phoneNumber">
+            Phone Number <span className="text-red-600">*</span>
+          </label>
+          <input
+            id="phoneNumber"
+            name="phoneNumber"
+            type="tel"
+            value={formData.phoneNumber}
+            onChange={handleChange}
+            className={`${inputClass} ${errors.phoneNumber ? "border-red-500" : ""}`}
+            required
+            placeholder="+91XXXXXXXXXX"
+            autoComplete="tel"
+          />
+ 
 </div>
 
           <div className="max-w-xs">
-            <label className={labelClass}>Email Address</label>
-            <input
-              type="email"
-              name="emailAddress"
-              value={formData.emailAddress}
-              onChange={handleChange}
-              className={inputClass}
-            />
+            <label className={labelClass} htmlFor="emailAddress">
+            Email Address
+          </label>
+          <input
+            id="emailAddress"
+            name="emailAddress"
+            type="email"
+            value={formData.emailAddress}
+            onChange={handleChange}
+            className={inputClass}
+            autoComplete="email"
+            placeholder="you@example.com"
+          />
           </div>
 
           <div className="max-w-xs">
-            <label className={labelClass}>Address</label>
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              className={inputClass}
-            />
+             <label className={labelClass} htmlFor="address">
+            Address
+          </label>
+          <input
+            id="address"
+            name="address"
+            type="text"
+            value={formData.address}
+            onChange={handleChange}
+            className={inputClass}
+            placeholder="Street, City, State, ZIP"
+            autoComplete="street-address"
+          />
           </div>
 
           <div className="flex flex-col md:flex-row gap-3">
@@ -343,28 +364,35 @@ const newBusiness = {
             </div>
 
             <div className="max-w-xs">
-  <label className={labelClass}>GST Number</label>
-  <input
-    type="text"
-    name="gstNumber"
-    value={formData.gstNumber}
-    onChange={handleChange}
-    className={inputClass}
-  />
+  <label className={labelClass} htmlFor="gstNumber">
+              GST Number
+            </label>
+            <input
+              id="gstNumber"
+              name="gstNumber"
+              type="text"
+              value={formData.gstNumber}
+              onChange={handleChange}
+              className={`${inputClass} ${errors.gstNumber ? "border-red-500" : ""}`}
+              placeholder="22AAAAA0000A1Z5"
+            />
   {errors.gstNumber && (
     <p className="text-red-500 text-xs mt-1">{errors.gstNumber}</p>
   )}
 </div>
 
             <div className="max-w-xs">
-              <label className={labelClass}>Business Type *</label>
-              <select
-                name="businessType"
-                value={formData.businessType}
-                onChange={handleChange}
-                className={inputClass}
-                required
-              >
+                 <label className={labelClass} htmlFor="businessType">
+            Business Type <span className="text-red-600">*</span>
+          </label>
+          <select
+            id="businessType"
+            name="businessType"
+            value={formData.businessType}
+            onChange={handleChange}
+            className={inputClass}
+            required
+          >
                 <option value="">Select</option>
                 {businessTypes.map((type, index) => (
                   <option key={index} value={type}>
