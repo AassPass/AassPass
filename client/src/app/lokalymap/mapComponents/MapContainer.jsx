@@ -9,6 +9,7 @@ import {
 import AdView from './AdView';
 import { enumKeyToLabelMap } from '@/lib/utils';
 import { useDrawerDirection } from './useDrawerDirection';
+import CategoryFilter from './CategoryFilter';
 
 export default function MapContainer({ businesses, userLocation, setBusinesses }) {
   const mapRef = useRef(null);
@@ -63,7 +64,14 @@ export default function MapContainer({ businesses, userLocation, setBusinesses }
         </Drawer>
         <div ref={mapRef} className="w-full h-[100dvh]" />
         {/* Filter Buttons */}
-        <div
+        <CategoryFilter
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          visibleCategories={visibleCategories}
+          allCategories={allCategories}
+          enumKeyToLabelMap={enumKeyToLabelMap}
+        />
+        {/* <div
           ref={categoryBoxRef}
           className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex gap-2 bg-white px-2 py-1 rounded-xl shadow-md flex-wrap justify-center max-w-[95%]"
         >
@@ -109,7 +117,7 @@ export default function MapContainer({ businesses, userLocation, setBusinesses }
               )}
             </>
           )}
-        </div>
+        </div> */}
 
     </>
   );

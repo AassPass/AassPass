@@ -31,32 +31,50 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
 
     const adminId = req.admin?.id;
 
-    // console.log('RegisterBusiness Request Body:', req.body);
-    // Validate required fields
     if (!businessName || !ownerName || !phoneNumber || !emailAddress || !address || !gstNumber || !businessType) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
-    
-    const password = generatePassword();
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
-    const owner = await prisma.user.create({
-      data: {
-        name: ownerName,
-        email: emailAddress,
-        mobile: phoneNumber,
-        password: hashedPassword,
-      }
+
+    // Check if user already exists
+    let owner = await prisma.user.findUnique({
+      where: { email: emailAddress },
+      include: { businesses: true },
     });
-    
-    const verificationToken = jwt.sign(
+
+    let generatedPassword: string | null = null;
+
+    if (owner) {
+      // If user exists and already has a business
+      if (owner.businesses.length > 0) {
+        return res.status(400).json({ message: 'User already has a registered business' });
+      }
+    } else {
+      // If user doesn't exist, create one
+      generatedPassword = generatePassword();
+      const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+
+      owner = await prisma.user.create({
+        data: {
+          name: ownerName,
+          email: emailAddress,
+          mobile: phoneNumber,
+          password: hashedPassword,
+        },
+        include: {
+          businesses: true,
+        }
+      });
+
+
+      const verificationToken = jwt.sign(
         { id: owner.id, email: emailAddress },
         jwtSecret,
         { expiresIn: "1d" }
-    );
-    
-    await sendVerificationEmail(emailAddress, verificationToken);
-    
+      );
+
+      await sendVerificationEmail(emailAddress, verificationToken);
+    }
+
     // Generate a unique businessId
     const businessId = `BUS-${Date.now()}`;
 
@@ -90,15 +108,23 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
       }
     });
 
-    await sendUserIDPasswordEmail(emailAddress, password);
-    console.log(newBusiness);
+    // Only send credentials if the user was newly created
+    if (generatedPassword) {
+      await sendUserIDPasswordEmail(emailAddress, generatedPassword);
+    }
 
-    return res.status(201).json({ message: 'Business registered successfully', business: newBusiness, generatedPassword: password });
+    return res.status(201).json({
+      message: 'Business registered successfully',
+      business: newBusiness,
+      ...(generatedPassword && { generatedPassword }),
+    });
+
   } catch (error: any) {
     console.error('RegisterBusiness Error:', error);
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
+
 
 const UpdateBusiness = async (req: Request, res: Response): Promise<any> => {
   try {
