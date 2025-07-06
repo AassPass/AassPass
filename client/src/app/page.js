@@ -10,7 +10,6 @@ import { memo } from 'react';
 import AnimatedSection from '@/components/common/AnimatedSection';
 import AdsPage from '@/components/LandingPageComponents/AdsPage';
 import Footer from '@/components/LandingPageComponents/Footer';
-import ContactUs from '@/components/LandingPageComponents/ContactUs';
 
 function Home() {
   return (

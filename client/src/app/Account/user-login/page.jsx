@@ -102,7 +102,7 @@ const validateStrongPassword = (password) => {
       setRole(data.role);
       localStorage.setItem("token", data.token);
       showToast("Login successful!", "success");
-      router.push("/Admin");
+      router.push("/");
     } catch (err) {
       if (
         err.message ===

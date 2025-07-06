@@ -1,8 +1,9 @@
 'use client';
 
 import { useRole } from '@/Context/RoleContext';
+import { useUser } from '@/Context/userContext';
 import { BACKEND_USER_URL } from '@/Utils/backendUrl';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
 
 const businessTypeOptions = [
@@ -18,15 +19,11 @@ const labelClass = 'block text-sm font-medium text-gray-700';
 
 export default function UserBusinessAddForm() {
   const {role}=useRole();
-  if (role === 'OWNER') {
-  return (
-    <div className="text-blue-400 text-center font-bold">
-      You have already created a business. Contact us to update it.
-    </div>
-  );
-}
-const [errors, setErrors] = useState({});
+  const {userData}=useUser();
+  
 
+const [errors, setErrors] = useState({});
+const errorClass = 'text-red-500 text-sm mt-1'; 
 const validateForm = () => {
   const newErrors = {};
 
@@ -51,7 +48,7 @@ const validateForm = () => {
   const [form, setForm] = useState({
     businessName: '',
     phoneNumber: '',
-    emailAddress: '',
+    emailAddress: userData?.email || '',
     address: '',
     gstNumber: '',
     businessType: '',
@@ -60,6 +57,28 @@ const validateForm = () => {
     longitude: '',
     socialLinks: { instagram: '', facebook: '', twitter: '' },
   });
+  useEffect(() => {
+    if (userData && userData.businesses && userData.businesses.length > 0) {
+      const business = userData.businesses[0]; // Assuming we want to edit the first business
+      setForm((prevForm) => ({
+        ...prevForm,
+        businessName: business.businessName || '',
+        phoneNumber: business.phoneNumber || '',
+        emailAddress: business.emailAddress || userData.email,  // Keep user's email
+        address: business.address || '',
+        gstNumber: business.gstNumber || '',
+        businessType: business.businessType || '',
+        websiteLink: business.websiteLink || '',
+        latitude: business.latitude || '',
+        longitude: business.longitude || '',
+        socialLinks: {
+          instagram: business.socialLinks.instagram || '',
+          facebook: business.socialLinks.facebook || '',
+          twitter: business.socialLinks.twitter || '',
+        },
+      }));
+    }
+  }, [userData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -104,6 +123,7 @@ const validateForm = () => {
     };
 
     try {
+      console.log(payload)
       const res = await fetch(`${BACKEND_USER_URL}/business`, {
         method: 'POST',
         headers: {
@@ -116,14 +136,14 @@ const validateForm = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to save');
 
-      alert('Business saved successfully!');
+      
       localStorage.setItem('token', data.token);
     } catch (err) {
       alert('Error: ' + err.message);
     }
   };
 
-
+ const isFormEditable = !userData;
   return (
     <form
       onSubmit={handleSubmit}
@@ -147,6 +167,7 @@ const validateForm = () => {
               value={form.businessName}
               onChange={handleChange}
               className={inputClass}
+              readOnly={!isFormEditable} 
             />
             {errors.businessName && <div className={errorClass}>{errors.businessName}</div>}
           </div>
@@ -160,22 +181,25 @@ const validateForm = () => {
               value={form.phoneNumber}
               onChange={handleChange}
               className={inputClass}
+              readOnly={!isFormEditable} 
             />
             {errors.phoneNumber && <div className={errorClass}>{errors.phoneNumber}</div>}
           </div>
 
           {/* Email */}
           <div className="max-w-xs">
-            <label className={labelClass}>Email Address</label>
-            <input
-              type="email"
-              name="emailAddress"
-              value={form.emailAddress}
-              onChange={handleChange}
-              className={inputClass}
-            />
-            {errors.emailAddress && <div className={errorClass}>{errors.emailAddress}</div>}
-          </div>
+  <label className={labelClass}>Email Address</label>
+  <input
+    type="email"
+    name="emailAddress"
+    value={form.emailAddress}
+    onChange={handleChange}  // This is still necessary, but won't change the value of email
+    className={inputClass}
+    readOnly={!isFormEditable} 
+    
+  />
+  {errors.emailAddress && <div className={errorClass}>{errors.emailAddress}</div>}
+</div>
 
           {/* Address */}
           <div className="max-w-xs">
@@ -186,6 +210,7 @@ const validateForm = () => {
               value={form.address}
               onChange={handleChange}
               className={inputClass}
+              readOnly={!isFormEditable} 
             />
           </div>
 
@@ -198,6 +223,7 @@ const validateForm = () => {
               value={form.gstNumber}
               onChange={handleChange}
               className={inputClass}
+              readOnly={!isFormEditable} 
             />
           </div>
         </div>
@@ -205,21 +231,23 @@ const validateForm = () => {
         {/* Right Column */}
         <div className="space-y-4">
           {/* Business Type */}
-          <div className="max-w-xs">
-            <label className={labelClass}>Business Type *</label>
-            <select
-              name="businessType"
-              value={form.businessType}
-              onChange={handleChange}
-              className={inputClass}
-            >
-              <option value="">Select Business Type</option>
-              {businessTypeOptions.map((type) => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
-            {errors.businessType && <div className={errorClass}>{errors.businessType}</div>}
-          </div>
+         <div className="max-w-xs">
+  <label className={labelClass}>Business Type *</label>
+  <select
+    name="businessType"
+    value={form.businessType}
+    onChange={handleChange}
+    className={`${inputClass} ${!isFormEditable ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : ''}`}
+    disabled={!isFormEditable}  // Disable the select field when form is not editable
+  >
+    <option value="">Select Business Type</option>
+    {businessTypeOptions.map((type) => (
+      <option key={type} value={type}>{type}</option>
+    ))}
+  </select>
+  {errors.businessType && <div className={errorClass}>{errors.businessType}</div>}
+</div>
+
 
           {/* Website */}
           <div className="max-w-xs">
@@ -230,6 +258,7 @@ const validateForm = () => {
               value={form.websiteLink}
               onChange={handleChange}
               className={inputClass}
+              readOnly={!isFormEditable} 
             />
           </div>
 
@@ -243,6 +272,7 @@ const validateForm = () => {
                 value={form.latitude}
                 onChange={handleChange}
                 className={inputClass}
+                readOnly={!isFormEditable} 
               />
             </div>
             <div className="max-w-xs">
@@ -253,16 +283,19 @@ const validateForm = () => {
                 value={form.longitude}
                 onChange={handleChange}
                 className={inputClass}
+                readOnly={!isFormEditable} 
               />
             </div>
             <div className="max-w-xs flex items-end">
               <button
-                type="button"
-                onClick={handleUseLocation}
-                className="text-sm bg-blue-400 hover:bg-blue-600 cursor-pointer text-white px-4 py-1 rounded w-full"
-              >
-                Use My Location
-              </button>
+  type="button"
+  onClick={handleUseLocation}
+  className={`text-xs px-2 md:px-4 py-1 rounded w-full 
+    ${!isFormEditable ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-400 hover:bg-blue-600 text-white cursor-pointer'}`}
+  disabled={!isFormEditable} // Disable button if form is not editable
+>
+  Use My Location
+</button>
             </div>
           </div>
 
@@ -284,6 +317,7 @@ const validateForm = () => {
                     value={form.socialLinks[name]}
                     onChange={handleSocialLinkChange}
                     className={inputClass}
+                    readOnly={!isFormEditable} 
                   />
                 </div>
               ))}
@@ -293,34 +327,47 @@ const validateForm = () => {
       </div>
 
       {/* Footer */}
-      <div className="flex justify-end gap-4 border-t px-6 py-4">
-        <button
-          type="submit"
-          className="px-6 py-2 rounded hover:bg-blue-500 cursor-pointer border-2 border-blue-400 text-blue-500 hover:text-white text-sm font-bold transition-colors duration-200"
-        >
-          Submit
-        </button>
-        <button
-          type="reset"
-          onClick={() =>
-            setForm({
-              businessName: '',
-              phoneNumber: '',
-              emailAddress: '',
-              address: '',
-              gstNumber: '',
-              businessType: '',
-              websiteLink: '',
-              latitude: '',
-              longitude: '',
-              socialLinks: { instagram: '', facebook: '', twitter: '' },
-            })
-          }
-          className="px-6 py-2 rounded border-2 cursor-pointer text-sm font-bold text-gray-600 border-gray-400 hover:bg-gray-400 hover:text-white transition-colors duration-200"
-        >
-          Reset
-        </button>
-      </div>
+    <div className="flex justify-between gap-4 border-t px-6 py-4">
+      {!isFormEditable && ( <p className='text-xs'>Contact us to update the business details</p>)}
+ 
+  <div className='flex gap-2'>
+    {/* Submit Button */}
+    <button
+      type="submit"
+      className={`px-3 py-1 md:px-6 md:py-2 rounded border-2 text-sm font-bold transition-colors duration-200 
+        ${!isFormEditable ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-500 border-blue-400 text-white hover:bg-blue-600 cursor-pointer hover:text-white'}`}
+      disabled={!isFormEditable} // Disable if form is not editable
+    >
+      Submit
+    </button>
+    
+    {/* Reset Button */}
+    <button
+      type="reset"
+      onClick={() =>
+        setForm({
+          businessName: '',
+          phoneNumber: '',
+          emailAddress: '',
+          address: '',
+          gstNumber: '',
+          businessType: '',
+          websiteLink: '',
+          latitude: '',
+          longitude: '',
+          socialLinks: { instagram: '', facebook: '', twitter: '' },
+        })
+      }
+      className={`px-6 py-2 rounded border-2 cursor-pointer text-sm font-bold text-gray-600 border-gray-400 transition-colors duration-200 
+        ${!isFormEditable ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'hover:bg-gray-400 hover:text-white'}`}
+      disabled={!isFormEditable} // Disable if form is not editable
+    >
+      Reset
+    </button>
+  </div>
+</div>
+
+
     </form>
   );
 }

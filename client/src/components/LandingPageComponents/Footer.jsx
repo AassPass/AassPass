@@ -75,7 +75,7 @@ export default function Footer() {
       {/* Bottom Tagline */}
 
       {/* Developer Credit - final line */}
-      <div className="mt-3 text-center text-white/40 text-[11px] pb-4">
+      <div className="mt-3 text-center text-white/40 text-[11px] space-x-2 pb-4">
         Developed with ❤️ by{" "}
         <a
           href="https://instagram.com/webjuncture"
@@ -84,6 +84,15 @@ export default function Footer() {
           className="text-purple-400 hover:underline"
         >
           @webjuncture
+        </a>
+        
+          <a
+          href="https://anujkumar-two.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-purple-400 hover:underline"
+        >
+          @anujKumar
         </a>
       </div>
     </footer>

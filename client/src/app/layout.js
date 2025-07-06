@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "AasPass",
+  title: "AassPass",
   description: "Find what interesting happeing around you",
 };
 

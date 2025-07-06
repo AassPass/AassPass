@@ -104,7 +104,8 @@ if (loadingUser || !userData) {
               </h1>
               <p className="text-md sm:text-xl text-gray-600">{userData.email}</p>
               <p className="text-sm text-gray-500">
-                📞 {userData.mobile || "No mobile number"}
+                📞 {userData?.businesses[0]?.
+phoneNumber || "No mobile number"}
               </p>
               <p className="text-sm text-gray-500">🛡️ Role: {userData.role}</p>
             </div>

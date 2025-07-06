@@ -258,7 +258,7 @@ const [uploadingImages, setUploadingImages] = useState({});
     });
 
     const data = await res.json();
-
+console.log(data)
     if (!res.ok) {
       showToast(data.message || "Failed to create ad", "error");
       return;
@@ -270,6 +270,18 @@ const [uploadingImages, setUploadingImages] = useState({});
     console.error(err);
     showToast("Error submitting form", "error");
   } finally {
+      setForm({
+        title: "",
+        adType: "",
+        visibleFrom: "",
+        visibleTo: "",
+        stage: "SAVED",
+        reset: false,
+        images: {},
+        metadata: {},
+      });
+      setPreviewImages([]);
+      setImageSlot(null);
     setLoading(false); // Stop loading
   }
 };
@@ -282,7 +294,7 @@ const [uploadingImages, setUploadingImages] = useState({});
       </div>
 
       <form
-        className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 items-center"
+        className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6"
         onSubmit={(e) => handleSubmit(e, "published")}
       >
         {/* Left Column: Independent/Common Fields */}
@@ -441,70 +453,64 @@ const [uploadingImages, setUploadingImages] = useState({});
             </div>
           </div>
 
-          <div className="md:col-span-2 flex justify-center space-x-3 w-full ">
-            <button
-              type="button"
-              onClick={() => {
-                setForm({
-                  title: "",
-                  adType: "",
-                  visibleFrom: "",
-                  visibleTo: "",
-                  stage: "SAVED",
-                  reset: false,
-                  images: {},
-                  metadata: {},
-                });
-                setPreviewImages([]);
-                setImageSlot(null);
-              }}
-              className="px-4 py-2 border-gray-300 border-2 hover:text-white text-gray-300 rounded hover:bg-gray-300 cursor-pointer"
-            >
-              Cancel
-            </button>
-            {/* <button
-        type="button"
-        onClick={() => handleSubmit('draft')}
-        className="px-4 py-2 border-yellow-400 hover:text-white border-2 rounded cursor-pointer text-yellow-400 hover:bg-yellow-400"
-      >
-        Save as Draft
-      </button> */}
-         <button
-  type="submit"
-  className="px-4 py-2 border-blue-400 border-2 text-blue-400 hover:text-white cursor-pointer rounded hover:bg-blue-400 flex items-center justify-center min-w-[100px]"
-  disabled={loading}
->
-  {loading ? (
-    <svg
-      className="animate-spin h-5 w-5 text-blue-400"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-      />
-    </svg>
-  ) : (
-    "Publish"
-  )}
-</button>
+         <div className="md:col-span-2 flex justify-center space-x-3 w-full ">
+  <button
+    type="button"
+    onClick={() => {
+      setForm({
+        title: "",
+        adType: "",
+        visibleFrom: "",
+        visibleTo: "",
+        stage: "SAVED",
+        reset: false,
+        images: {},
+        metadata: {},
+      });
+      setPreviewImages([]);
+      setImageSlot(null);
+    }}
+    className="px-4 py-2 border-gray-300 border-2 hover:text-white text-gray-300 rounded hover:bg-gray-300 cursor-pointer hidden md:block"
+  >
+    Cancel
+  </button>
 
-          </div>
+  <button
+    type="submit"
+    className="px-4 py-2 border-blue-400 border-2 text-blue-400 hover:text-white cursor-pointer rounded hover:bg-blue-400 flex items-center justify-center min-w-[100px] hidden md:block"
+    disabled={loading}
+  >
+    {loading ? (
+      <svg
+        className="animate-spin h-5 w-5 text-blue-400"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+        />
+      </svg>
+    ) : (
+      "Publish"
+    )}
+  </button>
+</div>
+
         </div>
 
         {/* Right Column: Category-Specific Extra Fields + Image Upload */}
-        <div className="p-6 rounded-md border max-h-[700px] overflow-y-auto space-y-2">
+        <div className="p-6 rounded-md border overflow-y-auto space-y-2">
           <h4 className="text-xs font-semibold text-gray-600 mb-4">
             Additional Details
           </h4>
@@ -516,6 +522,60 @@ const [uploadingImages, setUploadingImages] = useState({});
             )}
           </div>
         </div>
+        <div className="md:col-span-2 flex justify-center space-x-3 w-full ">
+  <button
+    type="button"
+    onClick={() => {
+      setForm({
+        title: "",
+        adType: "",
+        visibleFrom: "",
+        visibleTo: "",
+        stage: "SAVED",
+        reset: false,
+        images: {},
+        metadata: {},
+      });
+      setPreviewImages([]);
+      setImageSlot(null);
+    }}
+    className="px-4 py-2 border-gray-300 border-2 hover:text-white text-gray-300 rounded hover:bg-gray-300 cursor-pointer block md:hidden"
+  >
+    Cancel
+  </button>
+
+  <button
+    type="submit"
+    className="px-4 py-2 border-blue-400 border-2 text-blue-400 hover:text-white cursor-pointer rounded hover:bg-blue-400 flex items-center justify-center min-w-[100px] block md:hidden"
+    disabled={loading}
+  >
+    {loading ? (
+      <svg
+        className="animate-spin h-5 w-5 text-blue-400"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+        />
+      </svg>
+    ) : (
+      "Publish"
+    )}
+  </button>
+</div>
+
       </form>
     </div>
   );

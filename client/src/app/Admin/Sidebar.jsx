@@ -93,7 +93,7 @@ const Sidebar = ({ activeComponent, setActiveComponent ,setSidebarOpen}) => {
       setSidebarOpen(false); // Close sidebar only on mobile
     }
   }}
-  className="relative z-10 w-full text-left px-4 py-2 text-sm font-medium text-white transition-all duration-300 ease-in-out"
+  className="relative z-10 w-full cursor-pointer text-left px-4 py-2 text-sm font-medium text-white transition-all duration-300 ease-in-out"
 >
   {label}
 </button>
@@ -106,7 +106,7 @@ const Sidebar = ({ activeComponent, setActiveComponent ,setSidebarOpen}) => {
             <div className="mt-6 w-full">
                 <button
                     onClick={handleLogout}
-                    className="font-semibold text-xs  px-5 py-2 text-white whitespace-nowrap w-full rounded transition-all duration-300"
+                    className="font-semibold cursor-pointer text-xs  px-5 py-2 text-white whitespace-nowrap w-full rounded transition-all duration-300"
                     style={{ backgroundColor: '#ef4444' }} // Tailwind red-500
                 >
                     Logout

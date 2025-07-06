@@ -6,12 +6,14 @@ import Link from 'next/link';
 import { Button } from '../Button';
 import colors from '@/libs/colors';
 import { useRole } from '@/Context/RoleContext';
+import { FaUser } from 'react-icons/fa'; // Import Profile Icon
 
 const HeaderClientActions = ({ navLinks }) => {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const { role, logout } = useRole();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     // Detect login state
     useEffect(() => {
@@ -26,13 +28,13 @@ const HeaderClientActions = ({ navLinks }) => {
         return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
 
-
     const toggleMenu = () => setOpen(!open);
+    const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
     const handleAuthAction = () => {
         if (isLoggedIn) {
             logout();
-            router.push('/Account/user-login'); // redirect to login after logout
+            router.push('/'); // redirect to login after logout
         } else {
             router.push('/Account/user-login');
         }
@@ -40,16 +42,62 @@ const HeaderClientActions = ({ navLinks }) => {
     };
 
     return (
-        <div className="flex items-center gap-2 md:gap-4 ">
-            {/* Desktop Button */}
-            <div className="hidden md:flex ">
-                <Button
-                    text={isLoggedIn ? 'Logout' : 'Login'}
-                    color={isLoggedIn ? '#e74c3c' : '#265049'}
-                    aria-label={isLoggedIn ? 'Logout' : 'Login'}
-                    onClick={handleAuthAction}
-                     
-                />
+        <div className="flex items-center gap-2 md:gap-4">
+            {/* Desktop Button or Profile Icon */}
+            <div className="hidden md:flex items-center gap-4">
+                {/* If logged in, show Profile Icon and Dropdown */}
+                {isLoggedIn ? (
+                    <div className="relative">
+                        {/* Profile Icon */}
+                        <button onClick={toggleDropdown} className=" cursor-pointer text-2xl">
+                            <FaUser />
+                        </button>
+
+                        {/* Dropdown Menu for Login/Logout */}
+                        {dropdownOpen && (
+                            <div
+                                className="absolute top-10 right-0 bg-white shadow-md rounded-md w-40 border z-50"
+                                style={{ backgroundColor: colors.background }}
+                            >
+                                <Link
+                                    href="/Admin"
+                                    className="block cursor-pointer px-4 py-2 text-sm text-primary hover:bg-gray-100"
+                                >
+                                    Profile
+                                </Link>
+                                <button
+                                    onClick={handleAuthAction}
+                                    className="block px-4 py-2 cursor-pointer text-sm text-red-500 hover:bg-gray-100 w-full text-left"
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                     <div className="relative">
+                        {/* Profile Icon */}
+                        <button onClick={toggleDropdown} className=" cursor-pointer text-2xl">
+                            <FaUser />
+                        </button>
+
+                        {/* Dropdown Menu for Login/Logout */}
+                        {dropdownOpen && (
+                            <div
+                                className="absolute top-10 right-0 bg-white shadow-md rounded-md w-40 border z-50"
+                                style={{ backgroundColor: colors.background }}
+                            >
+                              
+                                <button
+                                    onClick={handleAuthAction}
+                                    className="block px-4 py-2 cursor-pointer text-sm text-red-500 hover:bg-gray-100 w-full text-left"
+                                >
+                                    Login
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Mobile Toggle Button */}
@@ -63,7 +111,7 @@ const HeaderClientActions = ({ navLinks }) => {
             </button>
 
             {/* Mobile Menu */}
-            {open && (
+             {open && (
                 <div
                     className="absolute top-full left-0 w-full bg-white shadow-lg z-50 md:hidden border-t"
                     style={{ backgroundColor: colors.background }}
@@ -81,7 +129,21 @@ const HeaderClientActions = ({ navLinks }) => {
                                 {link.label}
                             </Link>
                         ))}
+
+                        {/* Conditionally render Admin link if logged in and user is an admin */}
+                        {isLoggedIn && role === 'ADMIN' && (
+                            <Link
+                                href="/admin"
+                                className="text-base font-medium text-blue-600 hover:underline"
+                                aria-label="Admin Dashboard"
+                                onClick={() => setOpen(false)}
+                            >
+                                Admin Dashboard
+                            </Link>
+                        )}
+
                         <div className="mt-4">
+                            {/* Mobile Login or Logout Button */}
                             <Button
                                 text={isLoggedIn ? 'Logout' : 'Login'}
                                 color={isLoggedIn ? '#e74c3c' : '#265049'}
@@ -94,4 +156,5 @@ const HeaderClientActions = ({ navLinks }) => {
         </div>
     );
 };
+
 export default HeaderClientActions;

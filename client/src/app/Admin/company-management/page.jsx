@@ -7,63 +7,7 @@ import CompanyFilter from './Components/CompanyFilter';
 import CompanyList from './Components/CompanyList';
 
 export default function CompanyManagement() {
-    const [companies, setCompanies] = useState([ {
-    businessId: 'b123',
-    businessName: "Joe's Coffee",
-    ownerName: "Joe Smith",
-    phoneNumber: "+1234567890",
-    emailAddress: "joe@example.com",
-    address: "123 Main St, Springfield",
-    subscriptionType: "PREMIUM",
-    gstNumber: "GST1234567",
-    latitude: 40.7128,
-    longitude: -74.0060,
-    websiteLink: "https://joescoffee.com",
-    businessType: "RESTAURANT_CAFE",
-    socialLinks: {
-      instagram: "https://instagram.com/joescoffee",
-      facebook: "https://facebook.com/joescoffee",
-      twitter: "https://twitter.com/joescoffee"
-    }
-  },
-  {
-    businessId: 'b124',
-    businessName: "Tech Solutions",
-    ownerName: "Alice Johnson",
-    phoneNumber: "+1987654321",
-    emailAddress: "alice@techsolutions.com",
-    address: "456 Tech Ave, Silicon Valley",
-    subscriptionType: "STANDARD",
-    gstNumber: "GST7654321",
-    latitude: 37.7749,
-    longitude: -122.4194,
-    websiteLink: "https://techsolutions.com",
-    businessType: "SERVICE_PROVIDER",
-    socialLinks: {
-      instagram: "",
-      facebook: "https://facebook.com/techsolutions",
-      twitter: ""
-    }
-  },
-  {
-    businessId: 'b125',
-    businessName: "Green Fitness",
-    ownerName: "Mark Green",
-    phoneNumber: "+1230984567",
-    emailAddress: "mark@greenfitness.com",
-    address: "789 Fitness Blvd, Austin",
-    subscriptionType: "",
-    gstNumber: "",
-    latitude: 30.2672,
-    longitude: -97.7431,
-    websiteLink: "",
-    businessType: "GYM_FITNESS",
-    socialLinks: {
-      instagram: "https://instagram.com/greenfitness",
-      facebook: "",
-      twitter: "https://twitter.com/greenfitness"
-    }
-  }]);
+    const [companies, setCompanies] = useState([]);
 
     const [editingCompany, setEditingCompany] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
