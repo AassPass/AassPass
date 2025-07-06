@@ -5,7 +5,7 @@ import { BACKEND_USER_URL } from '@/Utils/backendUrl';
 import React, { useEffect, useRef, useState } from 'react';
 
 const Page = () => {
- const { userData, loadingUser } = useUser();
+ const { userData, loadingUser } = useUser(null);
   const [loading] = useState(true);
     const [bannerPreview, setBannerPreview] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
@@ -36,6 +36,9 @@ const bannerInputRef = useRef(null);
       // TODO: upload file to server here or store for submission
     }
   };
+  if (loadingUser || !userData) {
+  return <div>Loading...</div>; // Show loading state or fallback UI
+}
 
  
 

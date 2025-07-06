@@ -12,7 +12,10 @@ const Sidebar = dynamic(() => import('./Sidebar'), { ssr: false });
 const CompanyManagement = dynamic(() => import('./company-management/page'));
 const DashboardContent = dynamic(() => import('./dashboard/page'));
 const UserMaster = dynamic(() => import('./user-master/page'));
-const Profile = dynamic(() => import('./Profile/page'));
+const Profile = dynamic(
+  () => import('./Profile/page'),
+  { ssr: false }
+);
 const AdListing = dynamic(() => import('./ad-master/page'));
 const MapContent = dynamic(() => import('./map/page'));
 const UserBusinessAddForm = dynamic(() => import('./Components/UserBusinessAddForm'));
@@ -64,7 +67,7 @@ export default function Page() {
 
   const ActiveComponent = componentMap[activeComponent] || DashboardContent;
 
-  if (isCheckingAuth) return null;
+  if (isCheckingAuth) return <div>not a valid user</div>;
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-white relative">
