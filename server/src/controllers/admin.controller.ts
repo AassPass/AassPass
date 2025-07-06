@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../utils/prisma";
-import { VerificationStatus, SubscriptionType, BusinessType } from '@prisma/client';
+import { VerificationStatus, SubscriptionType, BusinessType, UserRole } from '@prisma/client';
 import { businessTypeMap, generatePassword } from "../utils/lib";
 import bcrypt from "bcrypt";
 import { sendIDPasswordEmail, sendUserIDPasswordEmail, sendVerificationEmail } from "../services/email.service";
@@ -59,6 +59,7 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
           email: emailAddress,
           mobile: phoneNumber,
           password: hashedPassword,
+          role: UserRole.OWNER,
         },
         include: {
           businesses: true,
@@ -91,7 +92,7 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
         gstNumber,
         websiteLink,
         businessType,
-        verificationStatus: VerificationStatus.PENDING,
+        verificationStatus: VerificationStatus.VERIFIED,
         subscriptionType: SubscriptionType.STANDARD,
         latitude: parseFloat(latitude),
         longitude: parseFloat(longitude),

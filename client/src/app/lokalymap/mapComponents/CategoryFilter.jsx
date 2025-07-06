@@ -13,9 +13,9 @@ export default function CategoryFilter({
   const displayedCategories = allCategories;
 
   return (
-    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 w-[95%]">
+    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 w-[90%] sm:w-[50%]">
       <ScrollArea className="whitespace-nowrap rounded-xl bg-white shadow-md px-2 py-1">
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center pb-2">
           {selectedCategory ? (
             <>
               <button
@@ -46,12 +46,12 @@ export default function CategoryFilter({
                   {enumKeyToLabelMap[categoryKey]}
                 </button>
               ))}
-              {allCategories.length && (
+              {showAll && allCategories.length && (
                 <button
                   onClick={() => setShowAll(!showAll)}
                   className="px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                 >
-                  {showAll ? "Hide" : "..."}
+                  Hide
                 </button>
               )}
             </>

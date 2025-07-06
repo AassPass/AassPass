@@ -64,17 +64,8 @@ export const useMap = ({ mapRef, businesses, userLocation, selectedCategory, set
       zoom: 12,
     });
 
-    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-    map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
-    map.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: true,
-        showUserHeading: true,
-      }),
-      'top-right'
-    );
-
+    // map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    // map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
     map.addControl(
       new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
@@ -84,6 +75,16 @@ export const useMap = ({ mapRef, businesses, userLocation, selectedCategory, set
       }),
       'top-left'
     );
+    
+    map.addControl(
+      new mapboxgl.GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        trackUserLocation: true,
+        showUserHeading: true,
+      }),
+      'top-left'
+    );
+
 
     map.on('load', () => {
       addMarkers(map, businesses, open, mapboxgl);
