@@ -1,4 +1,5 @@
 import lottie from 'lottie-web';
+
 const labelToEnumKeyMap = {
   "Retail Store": "RETAIL_STORE",
   "Restaurant / Café": "RESTAURANT_CAFE",
@@ -39,7 +40,6 @@ const bgColorMap = {
   OTHER: "#CBD5E0",                // soft gray-blue
 };
 
-
 const iconMap = {
   RETAIL_STORE: '/icons/retail_store.svg',
   RESTAURANT_CAFE: '/icons/restaurant_cafe.svg',
@@ -68,26 +68,12 @@ export function createCustomImageMarker(businessTypeLabel, index = Math.random()
   const el = document.createElement("div");
   el.className = "custom-image-marker";
   el.innerHTML = `
-    // <div class="sparkle-lottie" id="${sparkleId}"></div>
     <div class="marker-image-wrapper" style="padding: 6px; background-color: ${bgColor};">
       <img src="${iconSrc}" alt="${businessTypeLabel}" style="width: 100%; height: 100%; object-fit: contain;" />
     </div>
   `;
 
-  // After adding to DOM, trigger the Lottie animation
-  setTimeout(() => {
-    const container = document.getElementById(sparkleId);
-    if (container) {
-      lottie.loadAnimation({
-        container,
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        path: '/animation/fireworks.json', // make sure to place this file in public/lottie/
-      });
-    }
-  }, 0);
+  // Removed sparkle (Lottie animation) related code
 
   return el;
 }
-
