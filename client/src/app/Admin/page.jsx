@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { useRole } from '@/Context/RoleContext';
+import { useUser } from '@/Context/userContext';
 
 // Dynamic imports
 const Sidebar = dynamic(() => import('./Sidebar'), { ssr: false });
@@ -21,23 +22,28 @@ export default function Page() {
   const [isMounted, setIsMounted] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+   const { fetchUserData } = useUser(); 
   const router = useRouter();
   const { role } = useRole();
 
   // Load activeComponent and check auth
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/');
-    } else {
+   useEffect(() => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    router.push('/');
+  } else {
+    (async () => {
+      await fetchUserData(); // Wait for user data to load before proceeding
       const savedComponent = localStorage.getItem('activeComponent');
       if (savedComponent) {
         setActiveComponent(savedComponent);
       }
       setIsMounted(true);
       setIsCheckingAuth(false);
-    }
-  }, [router]);
+    })();
+  }
+}, []);
+
 
   useEffect(() => {
     if (isMounted) {

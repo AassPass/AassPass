@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 
 import { useRole } from "@/Context/RoleContext";
 import { BACKEND_BUSINESS_URL, BACKEND_USER_URL } from "@/Utils/backendUrl";
+import { useUser } from "@/Context/userContext";
 
 const AdList = dynamic(() => import("./Component/AdList"), { ssr: false });
 const AdListing = dynamic(() => import("./Component/AdListing"), {
@@ -18,7 +19,7 @@ export default function page() {
   const [isAdEditing, setIsAdEditing] = useState(false);
 
   const [publishedCount, setPublishedCount] = useState(0); // 👈 track published ads count
-
+const {userData} =useUser()
   const { businessId, role } = useRole(); // 👈 include role
   const fetchedRef = useRef(false);
 
@@ -32,51 +33,37 @@ export default function page() {
 
     fetchedRef.current = true;
 
-    const fetchAds = async () => {
-      try {
-        let url;
-        const token = localStorage.getItem("token"); // or get it from wherever you store it
+ const fetchAds = async () => {
+  const token = localStorage.getItem("token");
 
-        if (role === "SUPER_ADMIN" || role === "ADMIN") {
-          // Fetch all ads for admin roles
-          url = `${BACKEND_BUSINESS_URL}/ads`;
-          console.log(url);
-          const res = await fetch(url, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // <-- send token here
-            },
-          });
-  
-          if (!res.ok) throw new Error("Failed to fetch ads");
-  
-          const data = await res.json();
-          console.log(data?.data, "sa");
-          setAds(data?.data || []);
-        } else {
-          url = `${BACKEND_USER_URL}/profile`
-          const res = await fetch(url, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // <-- send token here
-            },
-          });
-  
-          if (!res.ok) throw new Error("Failed to fetch ads");
-  
-          const data = await res.json();
-          console.log(data.user.businesses[0].ads, "sa");
-          setAds(data.user.businesses[0].ads || []);
-        }
+  // Only allow for ADMIN or SUPER_ADMIN
+  if (role !== "ADMIN" && role !== "SUPER_ADMIN") {
+    setAds(userData?.businesses[0]?.ads||[])
+    console.warn("Unauthorized: Ads fetching is only for admins.");
+    return;
+  }
 
-        // Assuming you have a token stored somewhere, e.g., localStorage or context
+  try {
+    const url = `${BACKEND_BUSINESS_URL}/ads`;
+    const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      } catch (error) {
-        console.error("Error fetching ads:", error);
-        setAds([]);
-        setPublishedCount(0);
-      }
-    };
+    if (!res.ok) throw new Error("Failed to fetch ads");
+
+    const data = await res.json();
+    console.log(data?.data, "Fetched ads for admin");
+    setAds(data?.data || []);
+  } catch (error) {
+    console.error("Error fetching ads:", error);
+    setAds([]);
+    setPublishedCount(0);
+  }
+};
+
 
     fetchAds();
   }, []);

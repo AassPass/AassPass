@@ -25,6 +25,28 @@ export default function UserBusinessAddForm() {
     </div>
   );
 }
+const [errors, setErrors] = useState({});
+
+const validateForm = () => {
+  const newErrors = {};
+
+  if (!form.businessName.trim()) newErrors.businessName = 'Business name is required';
+  if (!form.phoneNumber.trim()) newErrors.phoneNumber = 'Phone number is required';
+  if (!/^\d{10}$/.test(form.phoneNumber)) newErrors.phoneNumber = 'Enter a valid 10-digit phone number';
+  if (!form.businessType) newErrors.businessType = 'Business type is required';
+  if (form.emailAddress && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.emailAddress))
+    newErrors.emailAddress = 'Enter a valid email';
+  if (form.websiteLink && !/^https?:\/\/\S+$/.test(form.websiteLink))
+    newErrors.websiteLink = 'Enter a valid URL';
+  if (form.latitude && (form.latitude < -90 || form.latitude > 90))
+    newErrors.latitude = 'Latitude must be between -90 and 90';
+  if (form.longitude && (form.longitude < -180 || form.longitude > 180))
+    newErrors.longitude = 'Longitude must be between -180 and 180';
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
 
   const [form, setForm] = useState({
     businessName: '',
@@ -67,6 +89,7 @@ export default function UserBusinessAddForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+     if (!validateForm()) return;
     const token = localStorage.getItem('token');
 
     // Convert socialLinks object to array of { platform, link }
@@ -113,8 +136,9 @@ export default function UserBusinessAddForm() {
 
       {/* Form Body */}
       <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Column 1 */}
+        {/* Left Column */}
         <div className="space-y-4">
+          {/* Business Name */}
           <div className="max-w-xs">
             <label className={labelClass}>Business Name *</label>
             <input
@@ -123,10 +147,11 @@ export default function UserBusinessAddForm() {
               value={form.businessName}
               onChange={handleChange}
               className={inputClass}
-              required
             />
+            {errors.businessName && <div className={errorClass}>{errors.businessName}</div>}
           </div>
 
+          {/* Phone Number */}
           <div className="max-w-xs">
             <label className={labelClass}>Phone Number *</label>
             <input
@@ -135,10 +160,11 @@ export default function UserBusinessAddForm() {
               value={form.phoneNumber}
               onChange={handleChange}
               className={inputClass}
-              required
             />
+            {errors.phoneNumber && <div className={errorClass}>{errors.phoneNumber}</div>}
           </div>
 
+          {/* Email */}
           <div className="max-w-xs">
             <label className={labelClass}>Email Address</label>
             <input
@@ -148,8 +174,10 @@ export default function UserBusinessAddForm() {
               onChange={handleChange}
               className={inputClass}
             />
+            {errors.emailAddress && <div className={errorClass}>{errors.emailAddress}</div>}
           </div>
 
+          {/* Address */}
           <div className="max-w-xs">
             <label className={labelClass}>Address</label>
             <input
@@ -161,6 +189,7 @@ export default function UserBusinessAddForm() {
             />
           </div>
 
+          {/* GST Number */}
           <div className="max-w-xs">
             <label className={labelClass}>GST Number</label>
             <input
@@ -173,8 +202,9 @@ export default function UserBusinessAddForm() {
           </div>
         </div>
 
-        {/* Column 2 */}
+        {/* Right Column */}
         <div className="space-y-4">
+          {/* Business Type */}
           <div className="max-w-xs">
             <label className={labelClass}>Business Type *</label>
             <select
@@ -182,17 +212,16 @@ export default function UserBusinessAddForm() {
               value={form.businessType}
               onChange={handleChange}
               className={inputClass}
-              required
             >
               <option value="">Select Business Type</option>
               {businessTypeOptions.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
+                <option key={type} value={type}>{type}</option>
               ))}
             </select>
+            {errors.businessType && <div className={errorClass}>{errors.businessType}</div>}
           </div>
 
+          {/* Website */}
           <div className="max-w-xs">
             <label className={labelClass}>Website</label>
             <input
@@ -204,6 +233,7 @@ export default function UserBusinessAddForm() {
             />
           </div>
 
+          {/* Location */}
           <div className="grid grid-cols-3 gap-2">
             <div className="max-w-xs">
               <label className={labelClass}>Latitude</label>
@@ -236,48 +266,33 @@ export default function UserBusinessAddForm() {
             </div>
           </div>
 
+          {/* Social Links */}
           <div className="max-w-xl space-y-4">
             <label className="text-sm font-medium block text-gray-700">Social Links</label>
             <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <FaInstagram className="text-pink-500 text-xl" />
-                <input
-                  type="url"
-                  name="instagram"
-                  placeholder="Instagram URL"
-                  value={form.socialLinks.instagram}
-                  onChange={handleSocialLinkChange}
-                  className={inputClass}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <FaFacebookF className="text-blue-600 text-xl" />
-                <input
-                  type="url"
-                  name="facebook"
-                  placeholder="Facebook URL"
-                  value={form.socialLinks.facebook}
-                  onChange={handleSocialLinkChange}
-                  className={inputClass}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <FaTwitter className="text-sky-500 text-xl" />
-                <input
-                  type="url"
-                  name="twitter"
-                  placeholder="Twitter URL"
-                  value={form.socialLinks.twitter}
-                  onChange={handleSocialLinkChange}
-                  className={inputClass}
-                />
-              </div>
+              {[
+                { name: 'instagram', icon: <FaInstagram className="text-pink-500 text-xl" />, placeholder: 'Instagram URL' },
+                { name: 'facebook', icon: <FaFacebookF className="text-blue-600 text-xl" />, placeholder: 'Facebook URL' },
+                { name: 'twitter', icon: <FaTwitter className="text-sky-500 text-xl" />, placeholder: 'Twitter URL' },
+              ].map(({ name, icon, placeholder }) => (
+                <div key={name} className="flex items-center gap-2">
+                  {icon}
+                  <input
+                    type="url"
+                    name={name}
+                    placeholder={placeholder}
+                    value={form.socialLinks[name]}
+                    onChange={handleSocialLinkChange}
+                    className={inputClass}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Form Footer */}
+      {/* Footer */}
       <div className="flex justify-end gap-4 border-t px-6 py-4">
         <button
           type="submit"

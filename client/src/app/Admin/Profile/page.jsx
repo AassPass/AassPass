@@ -1,60 +1,93 @@
 'use client';
 
+import { useUser } from '@/Context/userContext';
 import { BACKEND_USER_URL } from '@/Utils/backendUrl';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const Page = () => {
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
+ const { userData, loadingUser } = useUser();
+  const [loading] = useState(true);
+    const [bannerPreview, setBannerPreview] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
+const bannerInputRef = useRef(null);
+  const logoInputRef = useRef(null);
 
-  async function fetchUserData() {
-    const token = localStorage.getItem('token');
-    try {
-      const response = await fetch(`${BACKEND_USER_URL}/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setUserData(data.user);
-        setLoading(false);
-      } else {
-        console.error(`Error fetching user data: ${response.status}`);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
+  
+
+ 
+  // Handle banner image selection
+  const handleBannerChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setBannerPreview(previewUrl);
+
+      // TODO: upload file to server here or store for submission
     }
-  }
+  };
 
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  // Handle logo image selection
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setLogoPreview(previewUrl);
 
-  if (loading || !userData) {
-    return <div className="text-center py-10">Loading user data...</div>;
-  }
+      // TODO: upload file to server here or store for submission
+    }
+  };
+
+ 
 
   return (
     <div className="w-full max-w-[1200px] bg-gray-100 font-sans antialiased flex flex-col items-center">
       <div className="w-full overflow-hidden">
         {/* Banner Section */}
-        <div className="relative w-full h-16 sm:h-48 md:h-32 bg-gray-300">
+          <div
+          className="relative w-full h-16 sm:h-48 md:h-32 bg-gray-300 cursor-pointer"
+          onClick={() => bannerInputRef.current.click()}
+        >
           <img
-            src="https://placehold.co/1200x400/808080/FFFFFF?text=Company+Banner"
+            src={
+              bannerPreview ||
+              "https://placehold.co/1200x400/808080/FFFFFF?text=Company+Banner"
+            }
             alt="Company Banner"
             className="w-full h-full object-cover"
           />
+          {/* Hidden input for banner */}
+          <input
+            type="file"
+            accept="image/*"
+            ref={bannerInputRef}
+            className="hidden"
+            onChange={handleBannerChange}
+          />
         </div>
 
-        {/* Profile Image and Info Section */}
-        <div className="relative px-6 pb-6">
+       <div className="relative px-6 pb-6">
           {/* Profile Image */}
-          <div className="absolute -top-16 left-6 md:left-8 w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-blue-500 border-4 border-white shadow-md overflow-hidden">
+          <div
+            className="absolute -top-16 left-6 md:left-8 w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-blue-500 border-4 border-white shadow-md overflow-hidden cursor-pointer"
+            onClick={() => logoInputRef.current.click()}
+          >
             <img
-              src={`https://placehold.co/128x128/3B82F6/FFFFFF?text=${userData.name?.charAt(0) || 'U'}`}
+              src={
+                logoPreview ||
+                `https://placehold.co/128x128/3B82F6/FFFFFF?text=${
+                  userData.name?.charAt(0) || "U"
+                }`
+              }
               alt="Profile"
               className="w-full h-full object-cover"
+            />
+            {/* Hidden input for logo */}
+            <input
+              type="file"
+              accept="image/*"
+              ref={logoInputRef}
+              className="hidden"
+              onChange={handleLogoChange}
             />
           </div>
 
@@ -65,35 +98,60 @@ const Page = () => {
               <h1 className="text-xl font-extrabold text-gray-900 mb-1">
                 {userData.name}
               </h1>
-              <p className="text-md sm:text-xl text-gray-600">
-                {userData.email}
-              </p>
+              <p className="text-md sm:text-xl text-gray-600">{userData.email}</p>
               <p className="text-sm text-gray-500">
-                📞 {userData.mobile || 'No mobile number'}
+                📞 {userData.mobile || "No mobile number"}
               </p>
-              <p className="text-sm text-gray-500">
-                🛡️ Role: {userData.role}
-              </p>
+              <p className="text-sm text-gray-500">🛡️ Role: {userData.role}</p>
             </div>
 
             {/* Verified Status */}
-            {userData.emailVerified && (
-              <div className="flex items-center gap-2 bg-green-100 text-green-700 px-1 md:px-4 md:py-2 font-semibold text-sm sm:text-base shadow-sm">
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-                <span className="text-[8px] md:text-md">Verified Business</span>
-              </div>
-            )}
+         {userData.businesses?.[0]?.verificationStatus === "PENDING" && (
+  <div className="flex items-center gap-2 bg-yellow-100 text-yellow-700 px-1 md:px-4 md:py-2 font-semibold text-sm sm:text-base shadow-sm">
+    <svg
+      className="w-5 h-5 animate-spin"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      ></circle>
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 11-8 8z"
+      ></path>
+    </svg>
+    <span className="text-[8px] md:text-md">Verification Pending</span>
+  </div>
+)}
+
+{userData.businesses?.[0]?.verificationStatus === "VERIFIED" && (
+  <div className="flex items-center gap-2 bg-green-100 text-green-700 px-1 md:px-4 md:py-2 font-semibold text-sm sm:text-base shadow-sm">
+    <svg
+      className="w-5 h-5"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fillRule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+        clipRule="evenodd"
+      ></path>
+    </svg>
+    <span className="text-[8px] md:text-md">Verified Business</span>
+  </div>
+)}
+
+
           </div>
         </div>
       </div>
