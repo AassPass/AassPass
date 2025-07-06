@@ -31,7 +31,7 @@ const RegisterBusiness = async (req: Request, res: Response): Promise<any> => {
 
     const adminId = req.admin?.id;
 
-    if (!businessName || !ownerName || !phoneNumber || !emailAddress || !address || !gstNumber || !businessType) {
+    if (!businessName || !ownerName || !phoneNumber || !emailAddress || !address || !businessType) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
