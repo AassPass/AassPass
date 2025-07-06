@@ -74,7 +74,7 @@ const AdsPage = () => {
 
 // ⬇️ Reusable auto-scroll for normal ads
 const AutoScrollRow = ({ ads }) => {
-  const doubledAds = [...ads, ...ads , ...ads,...ads]; // duplicate for infinite scroll
+  const doubledAds = [...ads]; // duplicate for infinite scroll
 
   return (
     <div className="overflow-hidden">
@@ -103,7 +103,7 @@ const AutoScrollRow = ({ ads }) => {
 
 // ⬇️ Reusable auto-scroll for banner ads
 const AutoScrollBanner = ({ banners }) => {
-  const doubledBanners = [...banners, ...banners,...banners,...banners];
+  const doubledBanners = [...banners];
 
   return (
     <div className="overflow-hidden">
