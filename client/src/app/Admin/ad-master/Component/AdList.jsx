@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRole } from '@/Context/RoleContext';
 import { hasPermission } from '@/libs/hasPermisson';
 import { PERMISSIONS } from '@/libs/permissions';
-import { FiEdit, FiLock, FiUnlock } from 'react-icons/fi';
-import { BACKEND_BUSINESS_URL } from '@/Utils/backendUrl';
+import { FiCheck, FiEdit, FiLock, FiUnlock } from 'react-icons/fi';
+import { BACKEND_ADMIN_URL, BACKEND_BUSINESS_URL } from '@/Utils/backendUrl';
 
 const AdList = ({ ads, setAds, editingAd, setIsAdEditing, setEditingAd }) => {
   const [loadingAdIds, setLoadingAdIds] = useState(new Set());
@@ -16,83 +16,40 @@ const AdList = ({ ads, setAds, editingAd, setIsAdEditing, setEditingAd }) => {
     return endDate < today;
   }
 
-  async function toggleAdStatus(adId, newStatus) {
-    try {
-      const response = await fetch(`${BACKEND_BUSINESS_URL}/ad/${adId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isActive: newStatus }),
-      });
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  }
 
-  async function handleToggle(ad) {
-    if (loadingAdIds.has(ad.adId)) return;
 
-    const newStatus = !ad.isActive;
 
-    setAds(prev =>
-      prev.map(a => (a.adId === ad.adId ? { ...a, isActive: newStatus } : a))
-    );
+async function handleBlock(ad, newStatus) {
+  const token = localStorage.getItem('token');
 
-    setLoadingAdIds(prev => new Set(prev).add(ad.adId));
-
-    const result = await toggleAdStatus(ad.adId, newStatus);
-
-    if (!result) {
-      // rollback
-      setAds(prev =>
-        prev.map(a => (a.adCode === ad.adCode ? { ...a, isActive: ad.isActive } : a))
-      );
-    }
-
-    setLoadingAdIds(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(ad.adCode);
-      return newSet;
+  try {
+    const response = await fetch(`${BACKEND_ADMIN_URL}/ads/${ad.adId}/change-status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status: newStatus }),
     });
+
+    if (!response.ok) throw new Error('Failed to update status');
+
+    const result = await response.json();  // { message: "...", data: { ...updated ad... } }
+    const updatedAd = result.data;
+
+    setAds(prev => prev.map(a => (a.adId === ad.adId ? { ...a, ...updatedAd } : a)));
+  } catch (error) {
+    console.error('Error updating ad status:', error);
   }
+}
 
-  async function handleBlock(ad) {
-    try {
-      const response = await fetch(`/api/ads/${ad.adCode}/block`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isBlocked: !ad.isBlocked }),
-      });
 
-      if (!response.ok) throw new Error('Block/Unblock failed');
 
-      const updated = await response.json();
-      setAds(prev => prev.map(a => (a.adCode === ad.adCode ? { ...a, ...updated } : a)));
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
-  async function handleResetAd(ad) {
-    try {
-      const response = await fetch(`/api/ads/${ad.adCode}/reset`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reset: true }),
-      });
 
-      if (!response.ok) throw new Error('Reset failed');
-
-      const updated = await response.json();
-      setAds(prev => prev.map(a => (a.adCode === ad.adCode ? { ...a, ...updated } : a)));
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
+useEffect(() => {
+  console.log('Ads updated:', ads);
+}, [ads]);
   return (
     <div className="flex-1 overflow-auto rounded bg-white">
       <div className="max-w-[1200px]">
@@ -113,64 +70,81 @@ const AdList = ({ ads, setAds, editingAd, setIsAdEditing, setEditingAd }) => {
               
             </tr>
           </thead>
-          <tbody>
-            {ads.length === 0 ? (
-              <tr>
-                <td colSpan="10" className="text-center py-4 text-black">
-                  No ads added yet.
-                </td>
-              </tr>
-            ) : (
-              <>
-                {ads.map(ad => (
-                  <tr key={ad.id} className="text-black text-sm border-t text-center">
-                    <td className="py-3 px-6 border border-blue-400 whitespace-nowrap">{ad.adId}</td>
-                    <td className="py-3 px-6 border border-blue-400 whitespace-nowrap">{ad.title}</td>
-                    <td className="py-3 px-6 border border-blue-400 whitespace-nowrap">
-  {new Date(ad.visibleFrom).toLocaleDateString()}
-</td>
-<td className="py-3 px-6 border border-blue-400 whitespace-nowrap">
-  {new Date(ad.visibleTo).toLocaleDateString()}
-</td>
-                    <td className="py-3 px-6 border border-blue-400 whitespace-nowrap">{ad.stage}</td>
+        <tbody>
+  {ads.length === 0 ? (
+    <tr>
+      <td colSpan="10" className="text-center py-4 text-black">
+        No ads added yet.
+      </td>
+    </tr>
+  ) : (
+    ads.map(ad => (
+      <tr key={ad.id} className="text-black text-sm border-t text-center">
+        <td className="py-3 px-6 border border-blue-400 whitespace-nowrap">{ad.adId}</td>
+        <td className="py-3 px-6 border border-blue-400 whitespace-nowrap">{ad.title}</td>
+        <td className="py-3 px-6 border border-blue-400 whitespace-nowrap">
+          {new Date(ad.visibleFrom).toLocaleDateString()}
+        </td>
+        <td className="py-3 px-6 border border-blue-400 whitespace-nowrap">
+          {new Date(ad.visibleTo).toLocaleDateString()}
+        </td>
+        <td className="py-3 px-6 border border-blue-400 whitespace-nowrap">{ad.stage}</td>
 
-                  
+        {/* Status */}
+        <td className="py-3 px-6 border border-blue-400">
+          {isExpired(ad.visibleTo) ? (
+            <span className="text-red-600 font-medium">Expired</span>
+          ) : (
+            <span className="text-green-600">{ad.verificationStatus}</span>
+          )}
+        </td>
 
-                    {/* Status */}
-                    <td className="py-3 px-6 border border-blue-400">
-                      {isExpired(ad.visibleTo) ? (
-                        <span className="text-red-600 font-medium">Expired</span>
-                      ) : (
-                        <span className="text-green-600">Active</span>
-                      )}
-                    </td>
+        {/* Block */}
+    
+{hasPermission(role, PERMISSIONS.BLOCK_AD) && (
+  <td className="py-3 px-6 border border-blue-400 flex justify-center gap-2">
 
-                    {/* Reset */}
-                  
+    {/* Verify Button */}
+    <button
+      onClick={() => handleBlock(ad, 'VERIFIED')}
+      disabled={ad.verificationStatus === 'VERIFIED'}
+      className={`p-2 rounded-full text-white flex items-center justify-center ${
+        ad.verificationStatus === 'VERIFIED' 
+          ? 'bg-green-600 cursor-default' 
+          : ad.verificationStatus === 'REJECTED' 
+            ? 'bg-gray-400 cursor-not-allowed' 
+            : 'bg-gray-600 hover:bg-green-700'
+      }`}
+      title="Verify Ad"
+    >
+      {ad.verificationStatus === 'VERIFIED' ? <FiCheck size={18} /> : <FiUnlock size={18} />}
+    </button>
 
-                    {/* Block */}
-                    {hasPermission(role, PERMISSIONS.BLOCK_AD) && (
-                      <td className="py-3 px-6 border border-blue-400">
-                        <button
-                          onClick={() => handleBlock(ad)}
-                          className={`p-2 rounded-full ${
-                            ad.isBlocked
-                              ? 'bg-green-600 hover:bg-green-700'
-                              : 'bg-red-600 hover:bg-red-700'
-                          } text-white`}
-                          title={ad.isBlocked ? 'Unblock Ad' : 'Block Ad'}
-                        >
-                          {ad.isBlocked ? <FiUnlock size={18} /> : <FiLock size={18} />}
-                        </button>
-                      </td>
-                    )}
+    {/* Block Button */}
+    <button
+      onClick={() => handleBlock(ad, 'REJECTED')}
+      disabled={ad.verificationStatus === 'REJECTED'}
+      className={`p-2 rounded-full text-white flex items-center justify-center ${
+        ad.verificationStatus === 'REJECTED' 
+          ? 'bg-red-600 cursor-default' 
+          : ad.verificationStatus === 'VERIFIED' 
+            ? 'bg-gray-400 cursor-not-allowed' 
+            : 'bg-gray-600 hover:bg-red-700'
+      }`}
+      title="Block Ad"
+    >
+      <FiLock size={18} />
+    </button>
+  </td>
+)}
 
-               
-                  </tr>
-                ))}
-              </>
-            )}
-          </tbody>
+
+
+      </tr>
+    ))
+  )}
+</tbody>
+
         </table>
       </div>
     </div>

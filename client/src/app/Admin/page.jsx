@@ -33,6 +33,7 @@ export default function Page() {
     router.push('/');
   } else {
     (async () => {
+      if(role==='OWNER')
       await fetchUserData(); // Wait for user data to load before proceeding
       const savedComponent = localStorage.getItem('activeComponent');
       if (savedComponent) {
@@ -42,7 +43,7 @@ export default function Page() {
       setIsCheckingAuth(false);
     })();
   }
-}, []);
+}, [router, fetchUserData]);
 
 
   useEffect(() => {
