@@ -6,15 +6,11 @@ import { useState, useRef } from "react";
 export default function CategoryFilter({
   selectedCategory,
   setSelectedCategory,
-  visibleCategories,
   allCategories,
   enumKeyToLabelMap,
 }) {
   const [showAll, setShowAll] = useState(false);
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
-
-  const limit = isMobile ? 4 : 8;
-  const displayedCategories = showAll ? visibleCategories : visibleCategories.slice(0, limit);
+  const displayedCategories = allCategories;
 
   return (
     <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 w-[95%]">
@@ -50,7 +46,7 @@ export default function CategoryFilter({
                   {enumKeyToLabelMap[categoryKey]}
                 </button>
               ))}
-              {allCategories.length > limit && (
+              {allCategories.length && (
                 <button
                   onClick={() => setShowAll(!showAll)}
                   className="px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"

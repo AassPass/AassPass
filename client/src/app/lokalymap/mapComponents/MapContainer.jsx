@@ -35,7 +35,7 @@ export default function MapContainer({ businesses, userLocation, setBusinesses }
   });
 
   const allCategories = Object.keys(enumKeyToLabelMap);
-  const visibleCategories = showAll ? allCategories : allCategories.slice(0, 6);
+  // const visibleCategories = showAll ? allCategories : allCategories.slice(0, 6);
 
   useEffect(() => {
     initializeMap();
@@ -67,7 +67,6 @@ export default function MapContainer({ businesses, userLocation, setBusinesses }
         <CategoryFilter
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
-          visibleCategories={visibleCategories}
           allCategories={allCategories}
           enumKeyToLabelMap={enumKeyToLabelMap}
         />
