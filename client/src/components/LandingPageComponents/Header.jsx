@@ -12,6 +12,7 @@ const navLinks = [
     { href: '/ads-plan', label: 'Ads Plan' },
     { href: '/about-us', label: 'About Us' },
     { href: '/#faq', label: 'FAQ' },
+    {href:'/Admin',label:'Admin'}
 ];
 
 export default function Header() {

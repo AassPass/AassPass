@@ -14,7 +14,8 @@ const Sidebar = ({ activeComponent, setActiveComponent ,setSidebarOpen}) => {
 
     // Set menu items based on role permissions
     useEffect(() => {
-        const items = [{ name: 'dashboard', label: 'Dashboard' }];
+        const items = [    { name: 'home', label: 'Home' }, // Add Home to the menu
+            { name: 'dashboard', label: 'Dashboard' },];
         
          if (hasPermission(role, PERMISSIONS.CREATE_PROFILE)) {
             items.push({ name: 'profile', label: 'Profile' });
@@ -51,6 +52,9 @@ const Sidebar = ({ activeComponent, setActiveComponent ,setSidebarOpen}) => {
     const handleMenuClick = (name) => {
         setActiveComponent(name);
         localStorage.setItem('activeComponent', name);
+         if (name === 'home') {
+            router.push('/'); // Navigate to home when Home is clicked
+        }
     };
 
     const handleLogout = () => {
