@@ -215,6 +215,7 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
     }
 
     const [newBusiness, updatedUser] = await prisma.$transaction([
+
       prisma.business.create({
         data: {
           businessId,

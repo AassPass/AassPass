@@ -115,6 +115,7 @@ const UserRegister = async (req: Request, res: Response): Promise<any> => {
                 email,
                 password: hashedPassword,
                 name,
+                emailVerified: true,
                 role: UserRole.USER
             }
         });
@@ -125,7 +126,7 @@ const UserRegister = async (req: Request, res: Response): Promise<any> => {
             { expiresIn: "1d" }
         );
 
-        await sendVerificationEmail(email, verificationToken);
+        // await sendVerificationEmail(email, verificationToken);
 
         res.status(201).json({ message: "User registered successfully", userId: user.id});
 
