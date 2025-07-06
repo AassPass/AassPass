@@ -1,8 +1,8 @@
 "use client";
 
 import { useUser } from "@/Context/userContext";
-import { BACKEND_USER_URL } from "@/Utils/backendUrl";
-import React, { useEffect, useRef, useState } from "react";
+// import { BACKEND_USER_URL } from "@/Utils/backendUrl";
+import React, { useRef, useState } from "react";
 
 const Page = () => {
   const { userData, loadingUser } = useUser(null);
@@ -33,10 +33,10 @@ const Page = () => {
       // TODO: upload file to server here or store for submission
     }
   };
-  console.log(userData);
-  // if (loadingUser || !userData) {
-  //   return <div>Loading...</div>; // Show loading state or fallback UI
-  // }
+  // console.log(userData);
+  if (loadingUser || !userData) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="w-full max-w-[1200px] bg-gray-100 font-sans antialiased flex flex-col items-center">
@@ -101,8 +101,7 @@ const Page = () => {
                 {userData.email}
               </p>
               <p className="text-sm text-gray-500">
-                📞 {userData?.businesses[0]?.
-phoneNumber || "No mobile number"}
+                📞 {userData?.businesses[0]?.phoneNumber || "No mobile number"}
               </p>
               <p className="text-sm text-gray-500">🛡️ Role: {userData.role}</p>
             </div>
