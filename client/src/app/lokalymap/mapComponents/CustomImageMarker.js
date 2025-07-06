@@ -68,7 +68,7 @@ export function createCustomImageMarker(businessTypeLabel, index = Math.random()
   const el = document.createElement("div");
   el.className = "custom-image-marker";
   el.innerHTML = `
-    <div class="sparkle-lottie" id="${sparkleId}"></div>
+    // <div class="sparkle-lottie" id="${sparkleId}"></div>
     <div class="marker-image-wrapper" style="padding: 6px; background-color: ${bgColor};">
       <img src="${iconSrc}" alt="${businessTypeLabel}" style="width: 100%; height: 100%; object-fit: contain;" />
     </div>
