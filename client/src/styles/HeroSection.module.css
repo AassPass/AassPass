@@ -1,0 +1,62 @@
+.hero-heading-wrapper {
+  position: relative;
+  height: 140px;
+  width: 100%;
+  overflow: hidden;
+  background-color: red;
+}
+
+.heading-group {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  animation: fadeCycle 16s infinite ease-in-out;
+}
+
+.heading-group:nth-child(2) {
+  animation-delay: 8s;
+}
+
+.typing {
+  font-size: 1.5rem;
+  font-weight: bold;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid black;
+  width: 0;
+  animation: typing 4s steps(40, end) forwards, blink 0.7s step-end infinite;
+  animation-delay: 1s;
+}
+
+.subline-1,
+.subline-2 {
+  font-size: 1rem;
+  color: #666;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid black;
+  width: 0;
+  animation: typing 4s steps(40, end) forwards, blink 0.7s step-end infinite;
+  animation-delay: 5s;
+}
+
+/* Keyframes */
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: black; }
+}
+
+@keyframes fadeCycle {
+  0% { opacity: 0; }
+  5% { opacity: 1; }
+  45% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 0; }
+}

@@ -1,37 +1,66 @@
-// import Banner from "@/components/LandingPageComponents/Banner";
-import HeroSection from "@/components/LandingPageComponents/HeroSection";
+// app/page.jsx or pages/index.jsx (NO 'use client' here)
+
+import dynamic from 'next/dynamic';
 import Header from "@/components/LandingPageComponents/Header";
-// import MapSection from "@/app/lokalymap/mapComponents/MapSection";
-import BestPriceDeals from "@/components/LandingPageComponents/BestPriceDeals";
-import EventListing from "@/components/LandingPageComponents/EventListing";
-import Faq from "@/components/LandingPageComponents/Faq";
-
-import { memo } from 'react';
 import AnimatedSection from '@/components/common/AnimatedSection';
-import AdsPage from '@/components/LandingPageComponents/AdsPage';
-import Footer from '@/components/LandingPageComponents/Footer';
+import HeroSectionWrapper from "@/components/LandingPageComponents/HeroSectionWrapper";
 
-function Home() {
+// Dynamically import client-only components with SSR disabled
+const BestPriceDeals = dynamic(
+  () => import('@/components/LandingPageComponents/BestPriceDeals'),
+ 
+);
+
+const EventListing = dynamic(
+  () => import('@/components/LandingPageComponents/EventListing'),
+  
+);
+
+const Faq = dynamic(
+  () => import('@/components/LandingPageComponents/Faq'),
+ 
+);
+
+const AdsPage = dynamic(
+  () => import('@/components/LandingPageComponents/AdsPage'),
+
+);
+
+const Footer = dynamic(
+  () => import('@/components/LandingPageComponents/Footer'),
+
+);
+
+export default function Home() {
   return (
     <div>
-      {/* <Banner /> */}
-      <main className="flex flex-col items-center overflow-x-hidden  ">
+      <main className="flex flex-col items-center overflow-x-hidden">
+        {/* Static server-rendered components */}
         <Header />
 
         <AnimatedSection index={0}>
-          <HeroSection />
+          <HeroSectionWrapper />
         </AnimatedSection>
-        <AdsPage />
-        {/* <MapSection /> */}
-        <AnimatedSection index={2}><BestPriceDeals /></AnimatedSection>
-        <AnimatedSection index={3}><EventListing /></AnimatedSection>
-        <AnimatedSection index={4}><Faq /></AnimatedSection>
-{/* <ContactUs/> */}
-<Footer/>
 
+        {/* Dynamically loaded client-only components */}
+        <AnimatedSection index={1}>
+          <AdsPage />
+        </AnimatedSection>
+
+        <AnimatedSection index={2}>
+          <BestPriceDeals />
+        </AnimatedSection>
+
+        <AnimatedSection index={3}>
+          <EventListing />
+        </AnimatedSection>
+
+        <AnimatedSection index={4}>
+          <Faq />
+        </AnimatedSection>
+
+        <Footer />
       </main>
     </div>
   );
 }
-
-export default memo(Home);
