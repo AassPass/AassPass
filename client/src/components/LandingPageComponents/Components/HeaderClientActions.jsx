@@ -31,15 +31,18 @@ const HeaderClientActions = ({ navLinks }) => {
     const toggleMenu = () => setOpen(!open);
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
-    const handleAuthAction = () => {
-        if (isLoggedIn) {
-            logout();
-            router.push('/'); // redirect to login after logout
-        } else {
-            router.push('/Account/user-login');
-        }
-        setOpen(false);
-    };
+   const handleAuthAction = () => {
+  if (isLoggedIn) {
+    logout(); // Clears token and other values
+    setIsLoggedIn(false);         // ✅ manually update state
+    setDropdownOpen(false);       // ✅ close dropdown
+    setOpen(false);               // ✅ close mobile menu if open
+    router.push('/');             // ✅ redirect
+  } else {
+    setDropdownOpen(false);
+    router.push('/Account/user-login');
+  }
+};
 
     return (
         <div className="flex items-center gap-2 md:gap-4">
@@ -103,7 +106,7 @@ const HeaderClientActions = ({ navLinks }) => {
             {/* Mobile Toggle Button */}
             <button
                 onClick={toggleMenu}
-                className="md:hidden"
+                className="md:hidden cursor-pointer"
                 aria-label={open ? 'Close menu' : 'Open menu'}
                 title={open ? 'Close menu' : 'Open menu'}
             >
@@ -113,7 +116,7 @@ const HeaderClientActions = ({ navLinks }) => {
             {/* Mobile Menu */}
              {open && (
                 <div
-                    className="absolute top-full left-0 w-full bg-white shadow-lg z-50 md:hidden border-t"
+                    className="absolute  top-full left-0 w-full bg-white shadow-lg z-50 md:hidden border-t"
                     style={{ backgroundColor: colors.background }}
                 >
                     <nav className="flex flex-col p-4 gap-4" aria-label="Mobile navigation">
@@ -131,14 +134,14 @@ const HeaderClientActions = ({ navLinks }) => {
                         ))}
 
                         {/* Conditionally render Admin link if logged in and user is an admin */}
-                        {isLoggedIn && role === 'ADMIN' && (
+                        {isLoggedIn && (
                             <Link
-                                href="/admin"
-                                className="text-base font-medium text-blue-600 hover:underline"
-                                aria-label="Admin Dashboard"
+                                href="/Account/admin"
+                                className="text-base font-medium hover:underline"
+                                aria-label="Profile"
                                 onClick={() => setOpen(false)}
                             >
-                                Admin Dashboard
+                                Profile
                             </Link>
                         )}
 

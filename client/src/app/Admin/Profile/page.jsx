@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/Context/userContext";
-// import { BACKEND_USER_URL } from "@/Utils/backendUrl";
+import { showToast } from "@/Utils/toastUtil";
 import React, { useRef, useState } from "react";
 
 const Page = () => {
@@ -12,28 +12,54 @@ const Page = () => {
   const bannerInputRef = useRef(null);
   const logoInputRef = useRef(null);
 
-  // Handle banner image selection
-  const handleBannerChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setBannerPreview(previewUrl);
+  const uploadImage = async (file, type) => {
+  const formData = new FormData();
+  formData.append("image", file);
+  formData.append("type", type);
+  formData.append("userId", userData._id);
 
-      // TODO: upload file to server here or store for submission
-    }
-  };
+  try {
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
 
-  // Handle logo image selection
-  const handleLogoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setLogoPreview(previewUrl);
+    if (!res.ok) throw new Error("Failed to upload");
 
-      // TODO: upload file to server here or store for submission
-    }
-  };
-  // console.log(userData);
+    const data = await res.json();
+    console.log(`${type} uploaded successfully:`, data);
+
+    showToast(`${type === "logo" ? "Logo" : "Banner"} uploaded successfully`, "success");
+  } catch (err) {
+    console.error(`Error uploading ${type}:`, err);
+    showToast(`Failed to upload ${type}`, "error");
+  }
+};
+
+
+ const handleBannerChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const previewUrl = URL.createObjectURL(file);
+    setBannerPreview(previewUrl);
+    uploadImage(file, "banner");
+  } else {
+    showToast("No banner image selected", "warning");
+  }
+};
+
+const handleLogoChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const previewUrl = URL.createObjectURL(file);
+    setLogoPreview(previewUrl);
+    uploadImage(file, "logo");
+  } else {
+    showToast("No logo image selected", "warning");
+  }
+};
+
+
   if (loadingUser || !userData) {
     return <div>Loading...</div>;
   }
@@ -42,53 +68,99 @@ const Page = () => {
     <div className="w-full max-w-[1200px] bg-gray-100 font-sans antialiased flex flex-col items-center">
       <div className="w-full overflow-hidden">
         {/* Banner Section */}
-        <div
-          className="relative w-full h-16 sm:h-48 md:h-32 bg-gray-300 cursor-pointer"
-          onClick={() => bannerInputRef.current.click()}
-        >
-          <img
-            src={
-              bannerPreview ||
-              "https://placehold.co/1200x400/808080/FFFFFF?text=Company+Banner"
-            }
-            alt="Company Banner"
-            className="w-full h-full object-cover"
-          />
-          {/* Hidden input for banner */}
-          <input
-            type="file"
-            accept="image/*"
-            ref={bannerInputRef}
-            className="hidden"
-            onChange={handleBannerChange}
-          />
-        </div>
+        {/* Banner Section */}
+<div className="relative w-full h-16 sm:h-48 md:h-32 bg-gray-300">
+  <img
+    src={
+      bannerPreview ||
+      "https://placehold.co/1200x400/808080/FFFFFF?text=Company+Banner"
+    }
+    alt="Company Banner"
+    className="w-full h-full object-cover"
+  />
+
+  {/* Edit Icon */}
+  <div
+    className="absolute top-2 right-2 bg-white rounded-full p-1 cursor-pointer shadow-md"
+    onClick={() => bannerInputRef.current.click()}
+  >
+    <svg
+      className="w-5 h-5 text-gray-600"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15.232 5.232l3.536 3.536M9 11l6.293-6.293a1 1 0 011.414 0l2.586 2.586a1 1 0 010 1.414L13 15H9v-4z"
+      />
+    </svg>
+  </div>
+
+  <input
+    type="file"
+    accept="image/*"
+    ref={bannerInputRef}
+    className="hidden"
+    onChange={handleBannerChange}
+  />
+</div>
+
 
         <div className="relative px-6 pb-6">
           {/* Profile Image */}
-          <div
-            className="absolute -top-16 left-6 md:left-8 w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-blue-500 border-4 border-white shadow-md overflow-hidden cursor-pointer"
-            onClick={() => logoInputRef.current.click()}
-          >
-            <img
-              src={
-                logoPreview ||
-                `https://placehold.co/128x128/3B82F6/FFFFFF?text=${
-                  userData.name?.charAt(0) || "U"
-                }`
-              }
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
-            {/* Hidden input for logo */}
-            <input
-              type="file"
-              accept="image/*"
-              ref={logoInputRef}
-              className="hidden"
-              onChange={handleLogoChange}
-            />
-          </div>
+          <div className="relative">
+  {/* Outer Wrapper (no overflow-hidden!) */}
+  <div
+    className="absolute -top-16 left-6 md:left-8 w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-md"
+  >
+    {/* Image wrapper with overflow-hidden to clip image, not icon */}
+    <div className="w-full h-full rounded-full overflow-hidden bg-blue-500">
+      <img
+        src={
+          logoPreview ||
+          `https://placehold.co/128x128/3B82F6/FFFFFF?text=${
+            userData.name?.charAt(0) || "U"
+          }`
+        }
+        alt="Profile"
+        className="w-full h-full object-cover"
+      />
+    </div>
+
+    {/* ✅ Edit Icon — no longer clipped */}
+    <div
+      className="absolute top-1 right-1 z-20 bg-white rounded-full p-1 cursor-pointer shadow-md"
+      onClick={() => logoInputRef.current.click()}
+    >
+      <svg
+        className="w-4 h-4 text-gray-700"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15.232 5.232l3.536 3.536M9 11l6.293-6.293a1 1 0 011.414 0l2.586 2.586a1 1 0 010 1.414L13 15H9v-4z"
+        />
+      </svg>
+    </div>
+
+    <input
+      type="file"
+      accept="image/*"
+      ref={logoInputRef}
+      className="hidden"
+      onChange={handleLogoChange}
+    />
+  </div>
+</div>
+
+
 
           {/* Business Info and Verified Status */}
           <div className="pt-16 sm:pt-12 md:pt-8 pl-0 sm:pl-36 md:pl-40 flex sm:flex-row justify-between items-start sm:items-end">

@@ -33,6 +33,6 @@ export function showToast(message, type = 'info', duration = 3000) {
 
   setTimeout(() => {
     toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 300);
+    setTimeout(() => toast.remove(), 150);
   }, duration);
 }

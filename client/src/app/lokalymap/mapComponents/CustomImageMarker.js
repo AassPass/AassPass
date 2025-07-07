@@ -80,6 +80,7 @@ export function CustomImageMarker({ businessTypeKey }) {
         alignItems: 'center',
         justifyContent: 'center',
         boxShadow: '0 0 4px rgba(0,0,0,0.2)',
+        cursor: 'pointer !important',
       }}
     >
       <Icon style={{ width: 15, height: 15, color: '#000' }} />
