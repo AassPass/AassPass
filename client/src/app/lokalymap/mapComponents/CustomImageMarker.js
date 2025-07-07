@@ -1,79 +1,88 @@
-import lottie from 'lottie-web';
-
-const labelToEnumKeyMap = {
-  "Retail Store": "RETAIL_STORE",
-  "Restaurant / Café": "RESTAURANT_CAFE",
-  "Salon / Spa": "SALON_SPA",
-  "Gym / Fitness Center": "GYM_FITNESS",
-  "Medical / Health Store": "MEDICAL_HEALTH",
-  "Service Provider": "SERVICE_PROVIDER",
-  "Freelancer / Consultant": "FREELANCER_CONSULTANT",
-  "Event Organizer": "EVENT_ORGANIZER",
-  "Education / Coaching": "EDUCATION_COACHING",
-  "Home-based Business": "HOME_BASED",
-  "Real Estate / Rentals": "REAL_ESTATE_RENTALS",
-  "Courier / Delivery": "COURIER_DELIVERY",
-  "Automobile Services": "AUTOMOBILE_SERVICES",
-  "Pet Services": "PET_SERVICES",
-  "NGO / Community Org.": "NGO_COMMUNITY",
-  "Shop/Store/Office": "SHOP_STORE_OFFICE",
-  "Other": "OTHER",
-};
+'use client';
+import React from 'react';
+import {
+  FaStore,
+  FaUtensils,
+  FaSpa,
+  FaDumbbell,
+  FaBriefcaseMedical,
+  FaHandsHelping,
+  FaUserTie,
+  FaCalendarAlt,
+  FaChalkboardTeacher,
+  FaHome,
+  FaBuilding,
+  FaTruck,
+  FaCar,
+  FaPaw,
+  FaUsers,
+  FaShoppingBag,
+  FaQuestionCircle,
+} from 'react-icons/fa';
 
 const bgColorMap = {
-  RETAIL_STORE: "#FFB347",         // bolder orange
-  RESTAURANT_CAFE: "#FF6B6B",      // bolder red-pink
-  SALON_SPA: "#C084FC",            // bolder violet
-  GYM_FITNESS: "#38B2AC",          // teal
-  MEDICAL_HEALTH: "#63B3ED",       // bolder sky blue
-  SERVICE_PROVIDER: "#A0AEC0",     // medium gray
-  FREELANCER_CONSULTANT: "#F6E05E",// rich yellow
-  EVENT_ORGANIZER: "#F687B3",      // vibrant pink
-  EDUCATION_COACHING: "#68D391",   // stronger green
-  HOME_BASED: "#FC8181",           // light red
-  REAL_ESTATE_RENTALS: "#63B3ED",  // sky blue
-  COURIER_DELIVERY: "#ECC94B",     // deeper yellow
-  AUTOMOBILE_SERVICES: "#CBD5E0",  // medium-light gray
-  PET_SERVICES: "#FBB6CE",         // deeper pastel pink
-  NGO_COMMUNITY: "#81E6D9",        // aqua
-  SHOP_STORE_OFFICE: "#A3BFFA",    // bolder lavender-blue
-  OTHER: "#CBD5E0",                // soft gray-blue
+  RETAIL_STORE: "#FF9F1C",          // Warm orange, inviting and energetic
+  RESTAURANT_CAFE: "#EF476F",       // Strong pink/red, appetizing and vibrant
+  SALON_SPA: "#9B5DE5",             // Deep purple, elegant and calm
+  GYM_FITNESS: "#06D6A0",           // Fresh teal, active and healthy vibe
+  MEDICAL_HEALTH: "#118AB2",        // Strong blue, trustworthy and professional
+  SERVICE_PROVIDER: "#8D99AE",      // Cool grayish-blue, neutral and dependable
+  FREELANCER_CONSULTANT: "#FFD166", // Bright yellow, optimistic and creative
+  EVENT_ORGANIZER: "#FF6F91",       // Soft coral, festive and friendly
+  EDUCATION_COACHING: "#06AED5",    // Bright blue, smart and clear
+  HOME_BASED: "#FF8364",            // Warm coral, approachable and cozy
+  REAL_ESTATE_RENTALS: "#3A86FF",   // Vivid blue, reliable and solid
+  COURIER_DELIVERY: "#FFC300",      // Bold yellow, fast and attention grabbing
+  AUTOMOBILE_SERVICES: "#B0BEC5",   // Light steel gray, clean and technical
+  PET_SERVICES: "#FF8FAB",          // Soft pink, friendly and caring
+  NGO_COMMUNITY: "#4CC9F0",         // Light sky blue, open and supportive
+  SHOP_STORE_OFFICE: "#577590",     // Muted blue-gray, professional and stable
+  OTHER: "#9E9E9E",                 // Neutral gray, general catch-all
 };
+
 
 const iconMap = {
-  RETAIL_STORE: '/icons/retail_store.svg',
-  RESTAURANT_CAFE: '/icons/restaurant_cafe.svg',
-  SALON_SPA: '/icons/salon_spa.svg',
-  GYM_FITNESS: '/icons/gym_fitness.svg',
-  MEDICAL_HEALTH: '/icons/medical_health.svg',
-  SERVICE_PROVIDER: '/icons/service_provider.svg',
-  FREELANCER_CONSULTANT: '/icons/freelancer_consultant.svg',
-  EVENT_ORGANIZER: '/icons/event_organizer.svg',
-  EDUCATION_COACHING: '/icons/education_coaching.svg',
-  HOME_BASED: '/icons/home_based_business.svg',
-  REAL_ESTATE_RENTALS: '/icons/real_estate_rentals.svg',
-  COURIER_DELIVERY: '/icons/courier_delivery.svg',
-  AUTOMOBILE_SERVICES: '/icons/automobile_services.svg',
-  PET_SERVICES: '/icons/pet_services.svg',
-  NGO_COMMUNITY: '/icons/ngo.svg',
-  SHOP_STORE_OFFICE: '/icons/store_office.svg',
-  OTHER: '/icons/others.svg',
+  RETAIL_STORE: FaStore,
+  RESTAURANT_CAFE: FaUtensils,
+  SALON_SPA: FaSpa,
+  GYM_FITNESS: FaDumbbell,
+  MEDICAL_HEALTH: FaBriefcaseMedical,
+  SERVICE_PROVIDER: FaHandsHelping,
+  FREELANCER_CONSULTANT: FaUserTie,
+  EVENT_ORGANIZER: FaCalendarAlt,
+  EDUCATION_COACHING: FaChalkboardTeacher,
+  HOME_BASED: FaHome,
+  REAL_ESTATE_RENTALS: FaBuilding,
+  COURIER_DELIVERY: FaTruck,
+  AUTOMOBILE_SERVICES: FaCar,
+  PET_SERVICES: FaPaw,
+  NGO_COMMUNITY: FaUsers,
+  SHOP_STORE_OFFICE: FaShoppingBag,
+  OTHER: FaQuestionCircle,
 };
 
-export function createCustomImageMarker(businessTypeLabel, index = Math.random()) {
-  const iconSrc = iconMap[businessTypeLabel] || iconMap.OTHER;
-  const bgColor = bgColorMap[businessTypeLabel] || "#F0F0F0";
-  const sparkleId = `sparkle-${index.toString().replace('.', '')}`;
+export function CustomImageMarker({ businessTypeKey }) {
+  const enumKey = businessTypeKey || "OTHER";
+  const Icon = iconMap[enumKey] || FaQuestionCircle;
+  const bgColor = bgColorMap[enumKey] || "#CBD5E0";
 
-  const el = document.createElement("div");
-  el.className = "custom-image-marker";
-  el.innerHTML = `
-    <div class="marker-image-wrapper" style="padding: 6px; background-color: ${bgColor};">
-      <img src="${iconSrc}" alt="${businessTypeLabel}" style="width: 100%; height: 100%; object-fit: contain;" />
+  return (
+    <div
+      style={{
+        padding: '6px',
+        backgroundColor: bgColor,
+        borderColor:'#000000',
+        borderWidth:'2px',
+        borderRadius: '100%',
+        width: '30px',
+        height: '30px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 0 4px rgba(0,0,0,0.2)',
+      }}
+    >
+      <Icon style={{ width: 15, height: 15, color: '#000' }} />
     </div>
-  `;
-
-  // Removed sparkle (Lottie animation) related code
-
-  return el;
+  );
 }

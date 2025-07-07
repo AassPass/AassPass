@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import mapboxglModule from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-import { createCustomImageMarker } from './CustomImageMarker';
+
 import { getNearbyBusinesses } from '@/services/mapApi';
 import { debounce, distanceBetweenTwoCoord } from '@/lib/utils';
+import { createCustomImageMarker } from './createCustomImageMarker';
+
 
 
 export const useMap = ({ mapRef, businesses, userLocation, selectedCategory, setBusinesses, open }) => {
