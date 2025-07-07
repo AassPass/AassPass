@@ -1,6 +1,7 @@
 'use client';
 import { GetRandomAds } from '@/services/homeGetAds';
 import React, { useEffect, useRef, useState } from 'react';
+import Image from "next/image";
 
 // const adsData = [
 //   { id: 1, type: 'normal', title: 'Ad 1', image: '/ads/ad1.jpg' },
@@ -85,10 +86,12 @@ const AutoScrollRow = ({ ads }) => {
             className="max-w-[200px] md:max-w-[300px] space-y-1 flex-shrink-0"
           >
             <div className="w-full aspect-[3/2]">
-              <img
+              <Image
                 src={ad.image}
                 alt={ad.title}
                 className="w-full h-full object-cover rounded-2xl"
+                width={300}
+                height={200}
               />
             </div>
             <h2 className="text-sm text-start">{ad.title}</h2>
@@ -111,10 +114,12 @@ const AutoScrollBanner = ({ banners }) => {
         {doubledBanners.map((ad, index) => (
           <div key={`${ad.id}-${index}`} className="w-[60vw] flex-shrink-0 text-start">
             <div className="aspect-[3/1]">
-              <img
+              <Image
                 src={ad.image}
                 alt={ad.title}
                 className="w-full h-full object-cover rounded-2xl"
+                width={300}
+                height={100}
               />
             </div>
             <h2 className="text-sm text-start">{ad.title}</h2>

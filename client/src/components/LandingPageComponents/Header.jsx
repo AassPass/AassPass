@@ -35,7 +35,7 @@ export default function Header() {
                             alt="Aasspass Logo"
                             fill
                             style={{ objectFit: 'contain' }}
-                            priority
+                            priority={true}
                             sizes="(max-width: 768px) 300px, 240px"
                         />
                     </Link>

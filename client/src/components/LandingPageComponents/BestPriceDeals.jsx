@@ -77,6 +77,7 @@ export default function BestPriceDeals() {
             width={650}
             height={460}
             className="object-cover rounded w-full h-full"
+            loading="lazy"
           />
         </div>
       </div>
@@ -116,9 +117,10 @@ export default function BestPriceDeals() {
           <Image
             src="/Check near by deals and offer.jpg"
             alt="Register Business with AassPass"
-            width={500}
-            height={360}
+          width={650}
+            height={460}
             className="object-cover rounded w-full h-full"
+               loading="lazy"
           />
         </div>
       </div>

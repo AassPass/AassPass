@@ -208,7 +208,8 @@ useEffect(() => {
     width={600}
     height={600}
     className="object-contain"
-    priority
+    priority={true}
+    
 />
                 </motion.div>
             </div>
