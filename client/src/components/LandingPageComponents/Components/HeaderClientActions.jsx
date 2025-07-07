@@ -136,7 +136,7 @@ const HeaderClientActions = ({ navLinks }) => {
                         {/* Conditionally render Admin link if logged in and user is an admin */}
                         {isLoggedIn && (
                             <Link
-                                href="/Account/admin"
+                                href="/Admin"
                                 className="text-base font-medium hover:underline"
                                 aria-label="Profile"
                                 onClick={() => setOpen(false)}
