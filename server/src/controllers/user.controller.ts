@@ -59,6 +59,62 @@ export const GetAds = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
+export const UpdateUserInfo = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: User ID missing" });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log(user);
+
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+    let profilePictureUrl: string | undefined;
+    let bannerPictureUrl: string | undefined;
+
+    const saveAndUpload = async (file: Express.Multer.File): Promise<string> => {
+      const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
+      const tempPath = path.join(__dirname, "../../tmp", safeName);
+      fs.writeFileSync(tempPath, file.buffer);
+      const imageUrl = await uploadImage(tempPath);
+      await unlinkAsync(tempPath);
+      return imageUrl;
+    };
+
+    if (files?.profilePicture?.[0]) {
+      profilePictureUrl = await saveAndUpload(files.profilePicture[0]);
+    }
+
+    if (files?.bannerPicture?.[0]) {
+      bannerPictureUrl = await saveAndUpload(files.bannerPicture[0]);
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        profilePicture: profilePictureUrl ?? user.profilePicture,
+        bannerPicture: bannerPictureUrl ?? user.bannerPicture,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Successfully updated profile and banner picture",
+      user: updatedUser,
+    });
+
+  } catch (error) {
+    console.error("Error updating user info:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 
 export const GetUserInfo = async (req: Request, res: Response): Promise<any> => {
   try{
@@ -74,6 +130,8 @@ export const GetUserInfo = async (req: Request, res: Response): Promise<any> => 
         mobile: true,
         emailVerified: true,
         role: true,
+        profilePicture: true,
+        bannerPicture: true,
         businesses: {
           include: {
             socialLinks: true,
@@ -144,7 +202,7 @@ export const GetBusinesses = async (req: Request, res: Response): Promise<any> =
       },
     });
 
-    console.log(businesses);
+    // console.log(businesses);
     res.status(200).json({
       message: "Nearby businesses retrieved successfully",
       data: businesses,
@@ -194,35 +252,12 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
     const businessId = `BUS-${Date.now()}`;
     const prismaBusinessType = businessTypeMap[businessType as keyof typeof businessTypeMap] || undefined;
 
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-
-    let profilePictureUrl: string | undefined;
-    let bannerPictureUrl: string | undefined;
-
-    const saveAndUpload = async (file: Express.Multer.File): Promise<string> => {
-      const tempPath = path.join(__dirname, "../../tmp", file.originalname);
-      fs.writeFileSync(tempPath, file.buffer);
-      const imageUrl = await uploadImage(tempPath); // assumes this works with file path
-      await unlinkAsync(tempPath);
-      return imageUrl;
-    };
-
-    if (files["profilePicture"]?.[0]) {
-      profilePictureUrl = await saveAndUpload(files["profilePicture"][0]);
-    }
-
-    if (files["bannerPicture"]?.[0]) {
-      bannerPictureUrl = await saveAndUpload(files["bannerPicture"][0]);
-    }
-
     const [newBusiness, updatedUser] = await prisma.$transaction([
 
       prisma.business.create({
         data: {
           businessId,
           businessName,
-          profilePicture: profilePictureUrl || null,
-          bannerPicture: bannerPictureUrl || null,
           ownerName: owner.name,
           ownerId: user.id,
           phoneNumber,
@@ -268,3 +303,5 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
     res.status(500).json({ message: "Internal server error" });
   }
 }
+
+// /home/ubuntu/AassPass/server
