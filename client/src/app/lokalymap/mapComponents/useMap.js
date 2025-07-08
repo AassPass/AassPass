@@ -84,7 +84,7 @@ export const useMap = ({
         : userLocation
         ? [userLocation.longitude, userLocation.latitude]
         : [78.9629, 20.5937],
-      zoom: 14,
+      zoom: 12,
     });
 
     // map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
