@@ -4,6 +4,7 @@ import { useUser } from "@/Context/userContext";
 import { showToast } from "@/Utils/toastUtil";
 import React, { useRef, useState } from "react";
 import { BACKEND_USER_URL } from "@/Utils/backendUrl";
+import { compressImage } from "@/Utils/imageCompresson";
 
 const Page = () => {
   const { userData, loadingUser } = useUser(null);
@@ -44,31 +45,29 @@ const Page = () => {
     }
   };
 
-  const handleBannerChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setBannerPreview(previewUrl);
-      uploadImage(file, "bannerPicture");
-    } else {
-      showToast("No banner image selected", "warning");
-    }
-  };
-
-  const handleLogoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setLogoPreview(previewUrl);
-      uploadImage(file, "profilePicture");
-    } else {
-      showToast("No logo image selected", "warning");
-    }
-  };
-
-  if (loadingUser || !userData) {
-    return <div>Loading...</div>;
+  const handleBannerChange = async (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const compressed = await compressImage(file, 0.2);
+    const previewUrl = URL.createObjectURL(compressed);
+    setBannerPreview(previewUrl);
+    uploadImage(compressed, "bannerPicture");
+  } else {
+    showToast("No banner image selected", "warning");
   }
+};
+
+const handleLogoChange = async (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const compressed = await compressImage(file, 0.2);
+    const previewUrl = URL.createObjectURL(compressed);
+    setLogoPreview(previewUrl);
+    uploadImage(compressed, "profilePicture");
+  } else {
+    showToast("No logo image selected", "warning");
+  }
+};
 
   return (
     <div className="w-full max-w-[1200px] bg-gray-100 font-sans antialiased flex flex-col items-center">

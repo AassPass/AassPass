@@ -303,3 +303,5 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
     res.status(500).json({ message: "Internal server error" });
   }
 }
+
+// /home/ubuntu/AassPass/server
