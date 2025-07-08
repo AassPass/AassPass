@@ -44,7 +44,7 @@ const MapSection = () => {
   }, []);
 
   return (
-    <section className="w-full h-full bg-gradient-to-r from-[#0b161c] to-[#201446] text-white min-h-[400px] flex justify-center items-center">
+    <section className="w-full h-screen bg-gradient-to-r from-[#0b161c] to-[#201446] text-white  flex justify-center items-center">
       <div className="w-full h-full flex flex-row gap-4">
         {loading ? (
           <div className="text-center text-lg animate-pulse flex-1 flex items-center justify-center">

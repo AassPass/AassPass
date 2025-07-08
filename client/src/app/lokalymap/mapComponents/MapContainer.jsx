@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useMap } from "./useMap";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import AdView from "./AdView";
 import { enumKeyToLabelMap } from "@/lib/utils";
 import { useDrawerDirection } from "./useDrawerDirection";
@@ -66,14 +66,17 @@ export default function MapContainer({
         onOpenChange={setDrawerOpen}
         direction={drawerDirection}
       >
-        <DrawerContent
-          side="right"
-          className="w-full max-w-md p-4 h-[70dvh] sm:h-screen overflow-y-auto bg-gradient-to-r from-[#2b509c] to-[#3a1e90]"
-        >
-          <AdView selectedBusiness={selectedBusiness} />
-        </DrawerContent>
+     <DrawerContent
+  side="right"
+  className="max-h-screen overflow-auto hide-scrollbar"
+>
+  {/* Visually hidden using Tailwind */}
+  <DrawerTitle className="sr-only">Business Details</DrawerTitle>
+
+  <AdView selectedBusiness={selectedBusiness} />
+</DrawerContent>
       </Drawer>
-      <div ref={mapRef} className="w-full h-[100dvh]" />
+      <div ref={mapRef} className="w-full h-screen" />
       {/* Filter Buttons */}
       <CategoryFilter
         selectedCategory={selectedCategory}

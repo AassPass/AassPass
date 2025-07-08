@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import { useUser } from "@/Context/userContext";
 import { showToast } from "@/Utils/toastUtil";
 import React, { useRef, useState } from "react";
@@ -70,14 +70,15 @@ const handleLogoChange = (e) => {
         {/* Banner Section */}
         {/* Banner Section */}
 <div className="relative w-full h-16 sm:h-48 md:h-32 bg-gray-300">
-  <img
-    src={
-      bannerPreview ||
-      "https://placehold.co/1200x400/808080/FFFFFF?text=Company+Banner"
-    }
-    alt="Company Banner"
-    className="w-full h-full object-cover"
-  />
+ <Image
+  src={
+    bannerPreview
+  }
+  alt="Company Banner"
+  width={1200}
+  height={400}
+  className="w-full h-full object-cover"
+/>
 
   {/* Edit Icon */}
   <div
@@ -118,12 +119,10 @@ const handleLogoChange = (e) => {
   >
     {/* Image wrapper with overflow-hidden to clip image, not icon */}
     <div className="w-full h-full rounded-full overflow-hidden bg-blue-500">
-      <img
+      <Image
         src={
-          logoPreview ||
-          `https://placehold.co/128x128/3B82F6/FFFFFF?text=${
-            userData.name?.charAt(0) || "U"
-          }`
+          logoPreview 
+        
         }
         alt="Profile"
         className="w-full h-full object-cover"
