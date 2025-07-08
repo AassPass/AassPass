@@ -114,7 +114,7 @@ export default function AdView({ selectedBusiness }) {
   if (!selectedBusiness) {
     return <p className="text-center text-gray-400">No business selected.</p>;
   }
-
+console.log(selectedBusiness)
   return (
     <div className="">
       {/* Business Info Card */}
@@ -130,7 +130,7 @@ export default function AdView({ selectedBusiness }) {
           alt="Business Banner"
           layout="fill"
          
-          priority
+          
         />
       </div>
 

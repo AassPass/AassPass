@@ -68,7 +68,7 @@ export default function MapContainer({
       >
      <DrawerContent
   side="right"
-  className="max-h-screen overflow-auto hide-scrollbar"
+  className="h-fit md:h-screen overflow-hidden hide-scrollbar"
 >
   {/* Visually hidden using Tailwind */}
   <DrawerTitle className="sr-only">Business Details</DrawerTitle>
