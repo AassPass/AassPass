@@ -34,7 +34,6 @@ export const useMap = ({
       searchedLocation = { lat, lng };
     }
   }
-  // console.log("searchedLocation", searchedLocation);
 
   useEffect(() => {
     setLastLocation(userLocation);
@@ -88,7 +87,6 @@ export const useMap = ({
       zoom: 14,
     });
 
-    // map.addControl(new mapboxgl.NavigationControl(), 'top-right');
     // map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
     map.addControl(
       new MapboxGeocoder({
@@ -99,6 +97,7 @@ export const useMap = ({
       }),
       "top-left"
     );
+    map.addControl(new mapboxgl.NavigationControl(), 'top-left');
 
     map.addControl(
       new mapboxgl.GeolocateControl({
