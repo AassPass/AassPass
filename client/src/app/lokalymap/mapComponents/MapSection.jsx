@@ -29,22 +29,22 @@ const MapSection = () => {
   useEffect(() => {
     const lat = 28.676853;
     const lng = 77.260113;
-    // navigator.geolocation.getCurrentPosition(
-    //   (position) => {
-    //     const lat = position.coords.latitude;
-    //     const lng = position.coords.longitude;
-    //     // setUserLocation({longitude: lng, latitude: lat});
-    //   },
-    //   (error) => {
-    //     console.error("Error getting user location:", error);
-    //   }
-    // );
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        // setUserLocation({longitude: lng, latitude: lat});
+      },
+      (error) => {
+        console.error("Error getting user location:", error);
+      }
+    );
     fetchData(lat, lng);
     
   }, []);
 
   return (
-    <section className="w-full h-screen bg-gradient-to-r from-[#0b161c] to-[#201446] text-white  flex justify-center items-center">
+    <section className="w-screen h-screen bg-gradient-to-r from-[#0b161c] to-[#201446] text-white min-h-[400px] flex justify-center items-center">
       <div className="w-full h-full flex flex-row gap-4">
         {loading ? (
           <div className="text-center text-lg animate-pulse flex-1 flex items-center justify-center">
