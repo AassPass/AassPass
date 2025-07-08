@@ -72,6 +72,8 @@ export const UpdateUserInfo = async (req: Request, res: Response): Promise<any> 
       return res.status(404).json({ message: "User not found" });
     }
 
+    console.log(user);
+
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
     let profilePictureUrl: string | undefined;
@@ -128,6 +130,8 @@ export const GetUserInfo = async (req: Request, res: Response): Promise<any> => 
         mobile: true,
         emailVerified: true,
         role: true,
+        profilePicture: true,
+        bannerPicture: true,
         businesses: {
           include: {
             socialLinks: true,
@@ -198,7 +202,7 @@ export const GetBusinesses = async (req: Request, res: Response): Promise<any> =
       },
     });
 
-    console.log(businesses);
+    // console.log(businesses);
     res.status(200).json({
       message: "Nearby businesses retrieved successfully",
       data: businesses,
