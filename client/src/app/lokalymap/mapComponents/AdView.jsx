@@ -131,7 +131,7 @@ export default function AdView({ selectedBusiness }) {
   if (!selectedBusiness) {
     return <p className="text-center text-gray-400">No business selected.</p>;
   }
-console.log(selectedBusiness)
+
   return (
     <div className="">
       {/* Business Info Card */}
@@ -141,7 +141,7 @@ console.log(selectedBusiness)
       <div className="relative w-full h-24 bg-gray-200">
         <img
           src={
-            selectedBusiness.coverImage ||
+            selectedBusiness.owner.bannerPicture||
             "https://placehold.co/800x240/808080/FFFFFF?text=Business+Banner"
           }
           alt="Business Banner"
@@ -156,7 +156,7 @@ console.log(selectedBusiness)
         <div className="absolute -top-12 left-4 w-24 h-24 rounded-full border-4 border-white shadow-md bg-white">
           <img
             src={
-              selectedBusiness.logo ||
+              selectedBusiness.owner.profilePicture ||
               "https://placehold.co/96x96/3B82F6/FFFFFF?text=B"
             }
             alt="Business Logo"
