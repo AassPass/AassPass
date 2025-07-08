@@ -1,73 +1,62 @@
 "use client";
-
+import React, { useRef, useState } from "react";
 import { useUser } from "@/Context/userContext";
 import { showToast } from "@/Utils/toastUtil";
-import React, { useRef, useState } from "react";
 import { BACKEND_USER_URL } from "@/Utils/backendUrl";
 import { compressImage } from "@/Utils/imageCompresson";
 import Image from "next/image";
-const Page = () => {
-  const { userData, loadingUser } = useUser(null);
+import { FaImage, FaUserCircle } from "react-icons/fa";
 
+const Page=() => {
+  const { userData } = useUser(null);
   const [bannerPreview, setBannerPreview] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const bannerInputRef = useRef(null);
   const logoInputRef = useRef(null);
 
+  // 🚫 Browser APIs are inside handlers only
   const uploadImage = async (file, fieldName) => {
+    if (typeof window === "undefined") return;
+    const token = localStorage.getItem("token");
+    if (!token) { showToast("Not authenticated", "error"); return; }
+
     const formData = new FormData();
     formData.append(fieldName, file);
 
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch(`${BACKEND_USER_URL}/profile`, {
         method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
-
-      if (!res.ok) throw new Error("Failed to upload");
-
-      const data = await res.json();
-      console.log(`${fieldName} uploaded successfully:`, data);
-
+      if (!res.ok) throw new Error("Upload failed");
       showToast(
-        `${
-          fieldName === "profilePicture" ? "Logo" : "Banner"
-        } uploaded successfully`,
+        `${fieldName === "profilePicture" ? "Logo" : "Banner"} uploaded successfully`,
         "success"
       );
-    } catch (err) {
-      console.error(`Error uploading ${fieldName}:`, err);
+    } catch {
       showToast(`Failed to upload ${fieldName}`, "error");
     }
   };
 
   const handleBannerChange = async (e) => {
-  const file = e.target.files[0];
-  if (file) {
+    const file = e.target.files?.[0];
+    if (!file) return showToast("No banner image selected", "warning");
     const compressed = await compressImage(file, 0.2);
-    const previewUrl = URL.createObjectURL(compressed);
-    setBannerPreview(previewUrl);
+    setBannerPreview(URL.createObjectURL(compressed));
     uploadImage(compressed, "bannerPicture");
-  } else {
-    showToast("No banner image selected", "warning");
-  }
-};
+  };
 
-const handleLogoChange = async (e) => {
-  const file = e.target.files[0];
-  if (file) {
+  const handleLogoChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return showToast("No logo image selected", "warning");
     const compressed = await compressImage(file, 0.2);
-    const previewUrl = URL.createObjectURL(compressed);
-    setLogoPreview(previewUrl);
+    setLogoPreview(URL.createObjectURL(compressed));
     uploadImage(compressed, "profilePicture");
-  } else {
-    showToast("No logo image selected", "warning");
-  }
-};
+  };
+
+  if (!userData) return null;
+
 
   return (
     <div className="w-full max-w-[1200px] bg-gray-100 font-sans antialiased flex flex-col items-center">
@@ -75,15 +64,23 @@ const handleLogoChange = async (e) => {
         {/* Banner Section */}
         {/* Banner Section */}
         <div className="relative w-full h-16 sm:h-48 md:h-32 bg-gray-300">
-          {(bannerPreview || userData.bannerPicture)  && (
-            <Image
-              src={bannerPreview || userData.bannerPicture}
-              alt="Company Banner"
-              width={1200}
-              height={400}
-              className="w-full h-full object-cover"
-            />
-          )}
+        {(bannerPreview || userData.bannerPicture) ? (
+    <Image
+      src={bannerPreview || userData.bannerPicture}
+      alt="Company Banner"
+      width={1200}
+      height={400}
+      className="w-full h-full object-cover"
+      onError={(e) => {
+        // Hide broken image
+        e.currentTarget.style.display = "none";
+      }}
+    />
+  ) : (
+    <div className="flex items-center justify-center w-full h-full bg-gray-300">
+      <FaImage className="text-gray-500" size={48} />
+    </div>
+  )}
 
           {/* Edit Icon */}
           <div
@@ -121,17 +118,23 @@ const handleLogoChange = async (e) => {
             <div className="absolute -top-16 left-6 md:left-8 w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-md">
               {/* Image wrapper with overflow-hidden to clip image, not icon */}
               <div className="w-full h-full rounded-full overflow-hidden bg-blue-500">
-                <div className="w-full h-full rounded-full overflow-hidden bg-blue-500">
-                 {(logoPreview || userData.profilePicture) && (
-  <Image
-    src={logoPreview || userData.profilePicture}
-    alt="Profile"
-    width={128}
-    height={128}
-    className="w-full h-full object-cover"
-  />
-)}
-                </div>
+                <div className="w-full h-full rounded-full overflow-hidden bg-blue-500 flex items-center justify-center">
+  {logoPreview || userData.profilePicture ? (
+    <Image
+      src={logoPreview || userData.profilePicture}
+      alt="Profile"
+      width={128}
+      height={128}
+      className="w-full h-full object-cover"
+      onError={(e) => {
+        // Fallback to icon if image fails to load
+        e.currentTarget.style.display = "none";
+      }}
+    />
+  ) : (
+    <FaUserCircle className="text-gray-200" size={80} />
+  )}
+</div>
               </div>
 
               {/* ✅ Edit Icon — no longer clipped */}
