@@ -51,7 +51,7 @@ export const GetAds = async (req: Request, res: Response): Promise<any> => {
       }
     });
 
-    console.log(ads);
+    // console.log(ads);
     res.status(200).json({ ads });
   } catch (error) {
     console.error("Error fetching random ads:", error);
@@ -72,7 +72,7 @@ export const UpdateUserInfo = async (req: Request, res: Response): Promise<any> 
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log(user);
+    // console.log(user);
 
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
@@ -199,6 +199,12 @@ export const GetBusinesses = async (req: Request, res: Response): Promise<any> =
             images: true,
           },
         },
+        owner: {
+          select: {
+            profilePicture: true,
+            bannerPicture: true,
+          },
+        },
       },
     });
 
@@ -303,5 +309,3 @@ export const CreateBusiness = async (req: Request, res: Response): Promise<any> 
     res.status(500).json({ message: "Internal server error" });
   }
 }
-
-// /home/ubuntu/AassPass/server

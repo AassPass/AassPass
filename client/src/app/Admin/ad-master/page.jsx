@@ -25,7 +25,7 @@ const {userData} =useUser()
 
   useEffect(() => {
     if (fetchedRef.current) return;
-    console.log(businessId, role);
+    // console.log(businessId, role);
 
     // if (role !== 'SUPER_ADMIN' || role !== "ADMIN") return;
 

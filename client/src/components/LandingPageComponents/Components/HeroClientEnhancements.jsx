@@ -4,11 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { getCoordinatesFromQuery } from '@/lib/mapboxGeocode';
 import { useRole } from '@/Context/RoleContext';
+import { useRouter } from 'next/navigation';
 
 const HeroClientEnhancements = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const { setUserLocation } = useRole();
+  const router = useRouter();
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -37,15 +39,18 @@ const HeroClientEnhancements = () => {
     setSuggestions([]);
   };
 
-  const handleEnterSearch = async () => {
-    const coords = await getCoordinatesFromQuery(searchTerm);
-    if (coords) {
-      setUserLocation(coords);
-      setSuggestions([]);
-    } else {
-      alert('Location not found.');
-    }
-  };
+ const handleEnterSearch = async () => {
+  const coords = await getCoordinatesFromQuery(searchTerm);
+  if (coords) {
+    setUserLocation(coords);
+    setSuggestions([]);
+    // console.log("coords", coords);
+
+    router.push(`/lokalymap?lat=${coords.latitude}&lng=${coords.longitude}`);
+  } else {
+    alert('Location not found.');
+  }
+};
 
   return (
     <div className="w-full max-w-2xl ">

@@ -48,7 +48,7 @@ async function handleBlock(ad, newStatus) {
 
 
 useEffect(() => {
-  console.log('Ads updated:', ads);
+  // console.log('Ads updated:', ads);
 }, [ads]);
   return (
     <div className="flex-1 overflow-auto rounded bg-white">

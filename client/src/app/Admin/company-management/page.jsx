@@ -34,7 +34,7 @@ export default function CompanyManagement() {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log(data)
+                // console.log(data)
                 setCompanies(data?.data || []);
             } else {
                 console.error(`Failed to fetch companies: ${response.status}`);

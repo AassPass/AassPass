@@ -258,7 +258,7 @@ const [uploadingImages, setUploadingImages] = useState({});
     });
 
     const data = await res.json();
-console.log(data)
+// console.log(data)
     if (!res.ok) {
       showToast(data.message || "Failed to create ad", "error");
       return;

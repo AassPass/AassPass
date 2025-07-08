@@ -52,7 +52,7 @@ const AdsPage = () => {
   useEffect(() => {
     const fetchAds = async () => {
       const ads = await GetRandomAds();
-      console.log(ads);
+      // console.log(ads);
       if (Array.isArray(ads)) {
         setGroupedAds(groupConsecutiveAds(ads));
       }

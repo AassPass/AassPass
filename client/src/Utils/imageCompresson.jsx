@@ -10,7 +10,7 @@ export const compressImage = async (file, maxSizeMB = 0.2) => {
       maxWidthOrHeight: 720,
       useWebWorker: true,
     });
-    console.log(compressedFile);
+    // console.log(compressedFile);
 
     return compressedFile;
   } catch (err) {

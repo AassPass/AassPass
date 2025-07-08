@@ -123,7 +123,7 @@ const validateForm = () => {
     };
 
     try {
-      console.log(payload)
+      // console.log(payload)
       const res = await fetch(`${BACKEND_USER_URL}/business`, {
         method: 'POST',
         headers: {

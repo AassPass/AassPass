@@ -7,6 +7,7 @@ import AdView from "./AdView";
 import { enumKeyToLabelMap } from "@/lib/utils";
 import { useDrawerDirection } from "./useDrawerDirection";
 import CategoryFilter from "./CategoryFilter";
+import { useSearchParams } from "next/navigation";
 
 export default function MapContainer({
   businesses,
@@ -22,6 +23,8 @@ export default function MapContainer({
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedBusiness, setSelectedBusiness] = useState(null);
+  // const searchParams = useSearchParams();
+  // const [searchedLocation, setSearchedLocation] = useState(null); 
 
   const { initializeMap, updateMarkersByCategory } = useMap({
     mapRef,
@@ -33,6 +36,8 @@ export default function MapContainer({
       setSelectedBusiness(business);
       setDrawerOpen(true);
     },
+    // searchedLocation,
+    // setSearchedLocation
   });
 
   const allCategories = Object.keys(enumKeyToLabelMap);
