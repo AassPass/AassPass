@@ -138,7 +138,7 @@ export default function AdView({ selectedBusiness }) {
      <div className="w-full font-sans antialiased">
 
       {/* Banner Section */}
-      <div className="relative w-full h-24 bg-gray-200">
+      <div className="relative w-full h-24 bg-gray-200 overflow-hidden">
         <img
           src={
             selectedBusiness.owner.bannerPicture||
@@ -153,7 +153,7 @@ export default function AdView({ selectedBusiness }) {
 
       {/* Logo Overlay */}
       <div className="relative px-4">
-        <div className="absolute -top-12 left-4 w-24 h-24 rounded-full border-4 border-white shadow-md bg-white">
+        <div className="absolute -top-12 left-4 w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md bg-white">
           <img
             src={
               selectedBusiness.owner.profilePicture ||
