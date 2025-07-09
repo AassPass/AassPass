@@ -65,15 +65,15 @@ export default function MapContainer({
         onOpenChange={setDrawerOpen}
         direction={drawerDirection}
       >
-     <DrawerContent
-  side="right"
-  className="h-fit md:h-screen overflow-hidden hide-scrollbar"
->
-  {/* Visually hidden using Tailwind */}
-  <DrawerTitle className="sr-only">Business Details</DrawerTitle>
+        <DrawerContent
+          side="right"
+          className="h-fit md:h-screen overflow-hidden hide-scrollbar"
+        >
+          {/* Visually hidden using Tailwind */}
+          <DrawerTitle className="sr-only">Business Details</DrawerTitle>
 
-  <AdView selectedBusiness={selectedBusiness} />
-</DrawerContent>
+          <AdView selectedBusiness={selectedBusiness} />
+        </DrawerContent>
       </Drawer>
       <div ref={mapRef} className="w-full h-screen" />
       {/* Filter Buttons */}
