@@ -11,7 +11,7 @@ const MapSection = () => {
   const [loading, setLoading] = useState(true);
   const [locationError, setLocationError] = useState(false);
 
-  const [ userLocation, setUserLocation ] = useState({latitude: 28.676853, longitude: 77.260113});
+  const [ userLocation, setUserLocation ] = useState({latitude: 0, longitude: 0});
 
   const fetchData = async (lat, lng) => {
     try {
@@ -26,25 +26,24 @@ const MapSection = () => {
     }
   };
 
-  useEffect(() => {
+  useEffect(async () => {
     const lat = 28.676853;
     const lng = 77.260113;
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-        // setUserLocation({longitude: lng, latitude: lat});
+        setUserLocation({longitude: lng, latitude: lat});
       },
       (error) => {
         console.error("Error getting user location:", error);
       }
     );
-    fetchData(lat, lng);
-    
+    await fetchData(lat, lng);
   }, []);
 
   return (
-    <section className="w-screen h-screen bg-gradient-to-r from-[#0b161c] to-[#201446] text-white min-h-[400px] flex justify-center items-center">
+    <section className="w-screen min-h-[100dvh] bg-gradient-to-r from-[#0b161c] to-[#201446] text-white flex justify-center items-center">
       <div className="w-full h-full flex flex-row gap-4">
         {loading ? (
           <div className="text-center text-lg animate-pulse flex-1 flex items-center justify-center">
@@ -73,7 +72,7 @@ const MapSection = () => {
               animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="flex justify-center items-center w-full h-full overflow-hidden shadow-lg">
+              <div className="flex justify-center items-center w-full flex-1 overflow-hidden shadow-lg">
                 <MapContainer businesses={businesses} setBusinesses={setBusinesses} userLocation={userLocation} />
               </div>
             </motion.div>

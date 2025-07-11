@@ -43,8 +43,6 @@ export const useMap = ({
     markersRef.current = data.map((b) => {
       const el = createCustomImageMarker(b.businessType);
       el.addEventListener("click", () => {
-        // console.log("Marker clicked");
-        // console.log(b);
         onMarkerClick(b);
       });
 
@@ -84,10 +82,9 @@ export const useMap = ({
         : userLocation
         ? [userLocation.longitude, userLocation.latitude]
         : [78.9629, 20.5937],
-      zoom: 12,
+      zoom: 14,
     });
 
-    // map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
     map.addControl(
       new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
@@ -97,20 +94,22 @@ export const useMap = ({
       }),
       "top-left"
     );
-    map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+    map.addControl(new mapboxgl.NavigationControl(), "top-left");
 
-    map.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: true,
-        showUserHeading: true,
-      }),
-      "top-left"
-    );
+    const geolocateControl = new mapboxgl.GeolocateControl({
+      positionOptions: { enableHighAccuracy: true },
+      trackUserLocation: true,
+      showUserHeading: true,
+    });
+
+    map.addControl(geolocateControl, "top-left");
 
     map.on("load", () => {
       addMarkers(map, businesses, open, mapboxgl);
       searchedLocation = null;
+      setTimeout(() => {
+        geolocateControl.trigger();
+      }, 500);
     });
 
     // Attach to map

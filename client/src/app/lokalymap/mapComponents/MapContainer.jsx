@@ -71,11 +71,10 @@ export default function MapContainer({
         >
           {/* Visually hidden using Tailwind */}
           <DrawerTitle className="sr-only">Business Details</DrawerTitle>
-
           <AdView selectedBusiness={selectedBusiness} />
         </DrawerContent>
       </Drawer>
-      <div ref={mapRef} className="w-full h-screen" />
+      <div ref={mapRef} className="w-full min-h-[100dvh]"/>
       {/* Filter Buttons */}
       <CategoryFilter
         selectedCategory={selectedCategory}
