@@ -9,8 +9,8 @@ const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/lokalymap', label: 'Lokaly Map' },
     { href: '/Account/user-login', label: 'Register Your Business' },
-    { href: '/ads-plan', label: 'Ads Plan' },
-    { href: '/about-us', label: 'About Us' },
+    { href: '/adsPlan', label: 'Ads Plan' },
+    { href: '/#faq', label: 'About Us' },
     { href: '/#faq', label: 'FAQ' },
   
 ];
@@ -98,7 +98,7 @@ export default function Header() {
             Register Your Business
         </Link>
         <Link
-            href="/ads-plan"
+            href="/#adsPage"
             className="px-4 py-2 text-sm hover:bg-gray-100"
             style={{ color: colors.primary }}
         >
@@ -118,7 +118,7 @@ export default function Header() {
         style={{ zIndex: 1000 }}
     >
         <Link
-            href="/about-us"
+            href="/#faq"
             className="px-4 py-2 text-sm hover:bg-gray-100"
             style={{ color: colors.primary }}
         >

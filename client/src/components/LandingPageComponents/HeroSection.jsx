@@ -73,7 +73,7 @@ const HeroSection = ({ isDayTime }) => {
     ));
 
   return (
-    <section className="relative w-full overflow-hidden flex flex-col items-center justify-between py-6">
+    <section className="relative w-full flex flex-col items-center justify-between py-6">
       <div className="relative z-10 max-w-7xl w-full flex flex-col lg:flex-row items-center px-6 lg:px-10 gap-8">
         {/* LEFT SIDE */}
         <motion.div

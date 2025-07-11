@@ -26,21 +26,29 @@ const MapSection = () => {
     }
   };
 
-  useEffect(async () => {
-    const lat = 28.676853;
-    const lng = 77.260113;
+  useEffect(() => {
+  const lat = 28.676853;
+  const lng = 77.260113;
+
+  const fetchUserLocationAndData = async () => {
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        setUserLocation({longitude: lng, latitude: lat});
+      async (position) => {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+        setUserLocation({ longitude: userLng, latitude: userLat });
+        await fetchData(userLat, userLng);
       },
-      (error) => {
+      async (error) => {
         console.error("Error getting user location:", error);
+        // fallback fetch using default coords
+        await fetchData(lat, lng);
       }
     );
-    await fetchData(lat, lng);
-  }, []);
+  };
+
+  fetchUserLocationAndData();
+}, []);
+
 
   return (
     <section className="w-screen min-h-[100dvh] bg-gradient-to-r from-[#0b161c] to-[#201446] text-white flex justify-center items-center">

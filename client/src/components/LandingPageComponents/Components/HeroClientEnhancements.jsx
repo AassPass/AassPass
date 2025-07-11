@@ -36,6 +36,7 @@ const HeroClientEnhancements = () => {
     const [lng, lat] = place.center;
     setSearchTerm(place.place_name);
     setUserLocation({ latitude: lat, longitude: lng });
+    handleEnterSearch()
     setSuggestions([]);
   };
 
@@ -54,7 +55,7 @@ const HeroClientEnhancements = () => {
 
   return (
     <div className="w-full max-w-2xl ">
-      <div className="relative w-full">
+      <div className="relative w-full ">
         <span
           onClick={handleEnterSearch}
           className="absolute right-3 top-1/2 -translate-y-1/2 bg-yellow-400 p-2 rounded-full z-10 cursor-pointer"
@@ -72,12 +73,12 @@ const HeroClientEnhancements = () => {
           }}
           onBlur={() => setTimeout(() => setSuggestions([]), 150)}
           placeholder="Search shops, locations..."
-          className="w-full pl-4 pr-12 py-3 rounded-full focus:outline-none text-black placeholder-gray-500 shadow-md"
+          className="w-full pl-4 pr-12 py-3 rounded-full  focus:outline-none text-black placeholder-gray-500  shadow-md"
           style={{ border: '2px solid #facc15', backgroundColor: '#fff' }}
         />
 
         {suggestions.length > 0 && (
-          <ul className="absolute z-20 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-md max-h-60 overflow-y-auto">
+          <ul className="absolute z-[999] bg-white mt-2 w-full border border-gray-200 rounded-lg shadow-md max-h-60 overflow-y-auto">
             {suggestions.map((place) => (
               <li
                 key={place.id}

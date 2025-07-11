@@ -78,7 +78,7 @@ const AutoScrollRow = ({ ads }) => {
   const doubledAds = [...ads]; // duplicate for infinite scroll
 
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden  " id='adsPage'>
       <div className="flex gap-4 animate-scroll-row w-max">
         {doubledAds.map((ad, index) => (
           <div
