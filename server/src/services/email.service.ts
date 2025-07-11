@@ -8,12 +8,21 @@ const password = process.env.PASSWORD as string;
 const clientUrl = process.env.CLIENT_URL as string;
 
 // Configure Nodemailer transporter
+// const transporter = nodemailer.createTransport({
+//     service: "gmail",
+//     auth: {
+//         user: email,
+//         pass: password,
+//     },
+// });
 const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: email,
-        pass: password,
-    },
+  host: 'smtpout.secureserver.net',
+  port: 465, // or 587 if using TLS
+  secure: true, // true for port 465, false for 587
+  auth: {
+    user: email,
+    pass: password, // or App Password
+  },
 });
 
 export const sendVerificationEmail = async (to: string, token: string) => {
@@ -35,8 +44,9 @@ export const sendVerificationEmail = async (to: string, token: string) => {
 };
 
 export const sendResetPasswordEmail = async (to: string, otp: string) => {
+    console.log(email);
     const mailOptions = {
-        from: email,
+        from: `"AassPass" <${email}>`,
         to,
         subject: "Reset Your Password",
         text: `Your OTP for password reset is: ${otp}. This OTP is valid for a limited time only.`,
@@ -45,7 +55,6 @@ export const sendResetPasswordEmail = async (to: string, otp: string) => {
 
     try {
         await transporter.sendMail(mailOptions);
-        // console.log("Password reset email sent to:", to);
     } catch (error) {
         console.error("Error sending email:", error);
     }
