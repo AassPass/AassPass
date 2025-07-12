@@ -36,7 +36,6 @@ const HeroClientEnhancements = () => {
     const [lng, lat] = place.center;
     setSearchTerm(place.place_name);
     setUserLocation({ latitude: lat, longitude: lng });
-    handleEnterSearch()
     setSuggestions([]);
   };
 
