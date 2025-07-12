@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from "react";
-// import Map from "@/app/lokalymap/mapComponents/Map";
+import Map from "@/app/lokalymap/mapComponents/Map";
 import { getNearbyBusinesses } from "@/services/mapApi";
 import { motion } from "framer-motion";
 import MapContainer from "./MapContainer";
