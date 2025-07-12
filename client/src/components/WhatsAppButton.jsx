@@ -26,12 +26,12 @@ const WhatsAppButton = () => {
     <>
       {/* Chat Box */}
       {openChat && (
-        <div className="w-100 h-60 overflow-hidden flex-col flex absolute border border-indigo-500 right-2 bottom-2 rounded-4xl shadow-lg z-50">
+        <div className="w-100 h-60 overflow-hidden flex-col flex fixed border border-indigo-500 right-2 bottom-2 rounded-4xl shadow-lg z-50">
           {/* Header */}
           <div className="bg-indigo-500 px-6 py-4 flex justify-between items-center text-white">
             <h2 className="text-sm">
-              Powered by{" "}
-              <span className="text-xs ml-1 font-light">WebJuncture</span>
+              
+              <span className="text-md">AassPass</span>
             </h2>
             <X className="cursor-pointer" onClick={() => setOpenChat(false)} />
           </div>

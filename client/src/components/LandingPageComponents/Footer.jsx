@@ -58,14 +58,14 @@ export default function Footer() {
           <a href="https://instagram.com/yourhandle" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-pink-500 transition-colors">
             <FaInstagram />
           </a>
-          <a href="mailto:lokaly.map@gmail.com" target="_blank" rel="noopener noreferrer" aria-label="Email" className="hover:text-red-400 transition-colors">
+          <a href="mailto:contact@aasspass.co.in" target="_blank" rel="noopener noreferrer" aria-label="Email" className="hover:text-red-400 transition-colors">
             <FaEnvelope />
           </a>
           <a href="tel:+919599165532" target="_blank" rel="noopener noreferrer" aria-label="Phone" className="hover:text-green-400 transition-colors">
             <FaPhoneAlt />
           </a>
         </div>
-        <p className="text-white/60 text-xs text-center">Email: lokaly.map@gmail.com | Phone: +91-12345-67890</p>
+        <p className="text-white/60 text-xs text-center">Email:contact@aasspass.co.in | Phone: +91-9599165532</p>
       </div>
 
       <div className="mt-6 text-center text-white/60 text-xs border-t border-white/10 pt-4">
