@@ -7,7 +7,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { useState } from "react";
 
 const WhatsAppButton = () => {
-  const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+  const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || 919591165532;
   const [openChat, setOpenChat] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -26,7 +26,7 @@ const WhatsAppButton = () => {
     <>
       {/* Chat Box */}
       {openChat && (
-        <div className="w-100 h-60 overflow-hidden flex-col flex fixed border border-indigo-500 right-2 bottom-2 rounded-4xl shadow-lg z-50">
+        <div className=" w-80 md:w-100 h-60 overflow-hidden flex-col flex fixed border border-indigo-500 right-2 bottom-2 rounded-4xl shadow-lg z-50">
           {/* Header */}
           <div className="bg-indigo-500 px-6 py-4 flex justify-between items-center text-white">
             <h2 className="text-sm">
