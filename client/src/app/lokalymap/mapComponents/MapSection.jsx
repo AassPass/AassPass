@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from "react";
-import Map from "@/app/lokalymap/mapComponents/Map";
+// import Map from "@/app/lokalymap/mapComponents/Map";
 import { getNearbyBusinesses } from "@/services/mapApi";
 import { motion } from "framer-motion";
 import MapContainer from "./MapContainer";
@@ -27,10 +27,8 @@ const MapSection = () => {
   };
 
   useEffect(() => {
-  const lat = 28.676853;
-  const lng = 77.260113;
-
-  const fetchUserLocationAndData = async () => {
+    const lat = 28.676853;
+    const lng = 77.260113;
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const userLat = position.coords.latitude;
@@ -44,11 +42,8 @@ const MapSection = () => {
         await fetchData(lat, lng);
       }
     );
-  };
-
-  fetchUserLocationAndData();
-}, []);
-
+    fetchData(lat, lng);
+  }, []);
 
   return (
     <section className="w-screen min-h-[100dvh] bg-gradient-to-r from-[#0b161c] to-[#201446] text-white flex justify-center items-center">
