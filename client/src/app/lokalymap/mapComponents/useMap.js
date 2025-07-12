@@ -106,10 +106,12 @@ export const useMap = ({
 
     map.on("load", () => {
       addMarkers(map, businesses, open, mapboxgl);
-      searchedLocation = null;
-      setTimeout(() => {
-        geolocateControl.trigger();
-      }, 500);
+      if(!searchedLocation){
+        setTimeout(() => {
+          geolocateControl.trigger();
+        }, 100);
+        searchedLocation = null;
+      }
     });
 
     // Attach to map

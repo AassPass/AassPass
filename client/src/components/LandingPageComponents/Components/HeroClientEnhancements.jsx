@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { MapPin } from 'lucide-react';
-import { getCoordinatesFromQuery } from '@/lib/mapboxGeocode';
-import { useRole } from '@/Context/RoleContext';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from "react";
+import { MapPin } from "lucide-react";
+import { getCoordinatesFromQuery } from "@/lib/mapboxGeocode";
+import { useRole } from "@/Context/RoleContext";
+import { useRouter } from "next/navigation";
 
 const HeroClientEnhancements = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const { setUserLocation } = useRole();
   const router = useRouter();
@@ -23,34 +23,41 @@ const HeroClientEnhancements = () => {
   const fetchSuggestions = async (value) => {
     try {
       const res = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(value)}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}&autocomplete=true&limit=5`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+          value
+        )}.json?access_token=${
+          process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+        }&autocomplete=true&limit=5`
       );
       const data = await res.json();
       setSuggestions(data.features || []);
     } catch (error) {
-      console.error('Mapbox error:', error);
+      console.error("Mapbox error:", error);
     }
   };
 
   const handleSelect = (place) => {
-    const [lng, lat] = place.center;
+    console.log("selected");
+    // const [lng, lat] = place.center;
     setSearchTerm(place.place_name);
-    setUserLocation({ latitude: lat, longitude: lng });
-    setSuggestions([]);
+    // setUserLocation({ latitude: lat, longitude: lng });
+    // setSuggestions([]);
+
+    handleEnterSearch(); // This uses updated `searchTerm`
   };
 
- const handleEnterSearch = async () => {
-  const coords = await getCoordinatesFromQuery(searchTerm);
-  if (coords) {
-    setUserLocation(coords);
-    setSuggestions([]);
-    // console.log("coords", coords);
+  const handleEnterSearch = async () => {
+    const coords = await getCoordinatesFromQuery(searchTerm);
+    if (coords) {
+      setUserLocation(coords);
+      setSuggestions([]);
+      // console.log("coords", coords);
 
-    router.push(`/lokalymap?lat=${coords.latitude}&lng=${coords.longitude}`);
-  } else {
-    alert('Location not found.');
-  }
-};
+      router.push(`/lokalymap?lat=${coords.latitude}&lng=${coords.longitude}`);
+    } else {
+      alert("Location not found.");
+    }
+  };
 
   return (
     <div className="w-full max-w-2xl ">
@@ -68,12 +75,12 @@ const HeroClientEnhancements = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') handleEnterSearch();
+            if (e.key === "Enter") handleEnterSearch();
           }}
           onBlur={() => setTimeout(() => setSuggestions([]), 150)}
           placeholder="Search shops, locations..."
           className="w-full pl-4 pr-12 py-3 rounded-full focus:outline-none text-black placeholder-gray-500 shadow-md"
-          style={{ border: '2px solid #facc15', backgroundColor: '#fff' }}
+          style={{ border: "2px solid #facc15", backgroundColor: "#fff" }}
         />
 
         {suggestions.length > 0 && (
@@ -81,7 +88,7 @@ const HeroClientEnhancements = () => {
             {suggestions.map((place) => (
               <li
                 key={place.id}
-                onClick={() => handleSelect(place)}
+                onMouseDown={() => handleSelect(place)}
                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
               >
                 {place.place_name}

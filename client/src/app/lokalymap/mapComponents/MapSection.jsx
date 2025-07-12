@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from "react";
-import Map from "@/app/lokalymap/mapComponents/Map";
+// import Map from "@/app/lokalymap/mapComponents/Map";
 import { getNearbyBusinesses } from "@/services/mapApi";
 import { motion } from "framer-motion";
 import MapContainer from "./MapContainer";
@@ -26,7 +26,7 @@ const MapSection = () => {
     }
   };
 
-  useEffect(async () => {
+  useEffect(() => {
     const lat = 28.676853;
     const lng = 77.260113;
     navigator.geolocation.getCurrentPosition(
@@ -39,7 +39,7 @@ const MapSection = () => {
         console.error("Error getting user location:", error);
       }
     );
-    await fetchData(lat, lng);
+    fetchData(lat, lng);
   }, []);
 
   return (
