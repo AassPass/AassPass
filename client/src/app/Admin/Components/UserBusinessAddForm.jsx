@@ -3,6 +3,7 @@
 import { useRole } from '@/Context/RoleContext';
 import { useUser } from '@/Context/userContext';
 import { BACKEND_USER_URL } from '@/Utils/backendUrl';
+import { showToast } from '@/Utils/toastUtil';
 import React, { useEffect, useState } from 'react';
 import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
 
@@ -30,15 +31,26 @@ const validateForm = () => {
   if (!form.businessName.trim()) newErrors.businessName = 'Business name is required';
   if (!form.phoneNumber.trim()) newErrors.phoneNumber = 'Phone number is required';
   if (!/^\d{10}$/.test(form.phoneNumber)) newErrors.phoneNumber = 'Enter a valid 10-digit phone number';
+  if (!form.address.trim()) newErrors.address = 'address  is required';
   if (!form.businessType) newErrors.businessType = 'Business type is required';
   if (form.emailAddress && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.emailAddress))
     newErrors.emailAddress = 'Enter a valid email';
   if (form.websiteLink && !/^https?:\/\/\S+$/.test(form.websiteLink))
     newErrors.websiteLink = 'Enter a valid URL';
-  if (form.latitude && (form.latitude < -90 || form.latitude > 90))
-    newErrors.latitude = 'Latitude must be between -90 and 90';
-  if (form.longitude && (form.longitude < -180 || form.longitude > 180))
-    newErrors.longitude = 'Longitude must be between -180 and 180';
+if (form.latitude || form.latitude===""
+) {
+  const lat = parseFloat(form.latitude);
+  if (isNaN(lat) || lat < -90 || lat > 90) {
+    newErrors.latitude = 'Latitude must be a number between -90 and 90';
+  }
+}
+
+if (form.longitude || form.longitude==="") {
+  const lon = parseFloat(form.longitude);
+  if (isNaN(lon) || lon < -180 || lon > 180) {
+    newErrors.longitude = 'Longitude must be a number between -180 and 180';
+  }
+}
 
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
@@ -122,7 +134,7 @@ const validateForm = () => {
       ...form,
       socialLinks: socialLinksArray,
     };
-console.log(payload)
+// console.log(payload)
     try {
       // console.log(payload)
       const res = await fetch(`${BACKEND_USER_URL}/business`, {
@@ -141,6 +153,11 @@ console.log(payload)
       localStorage.setItem('token', data.token);
     } catch (err) {
       alert('Error: ' + err.message);
+    }finally{
+      showToast("business created succesfully");
+       setTimeout(() => {
+    window.location.reload();
+  }, 500); 
     }
   };
 
@@ -212,7 +229,9 @@ console.log(payload)
               onChange={handleChange}
               className={inputClass}
               readOnly={!isFormEditable} 
+
             />
+             {errors.address && <div className={errorClass}>{errors.address}</div>}
           </div>
 
           {/* GST Number */}
@@ -298,6 +317,8 @@ console.log(payload)
   Use My Location
 </button>
             </div>
+            {errors.longitude && <div className={errorClass}>{errors.longitude}</div>}
+             {errors.latitude && <div className={errorClass}>{errors.latitude}</div>}
           </div>
 
           {/* Social Links */}
