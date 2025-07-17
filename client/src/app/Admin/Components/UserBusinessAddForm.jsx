@@ -27,29 +27,16 @@ const errorClass = 'text-red-500 text-sm mt-1';
 const validateForm = () => {
   const newErrors = {};
 
-  if (!form.businessName.trim())
-    newErrors.businessName = 'Business name is required';
-
-  if (!form.phoneNumber.trim())
-    newErrors.phoneNumber = 'Phone number is required';
-  else if (!/^\d{10}$/.test(form.phoneNumber))
-    newErrors.phoneNumber = 'Enter a valid 10-digit phone number';
-
-  if (!form.businessType)
-    newErrors.businessType = 'Business type is required';
-
-  if (!form.address || !form.address.trim())
-    newErrors.address = 'Address is required';
-
+  if (!form.businessName.trim()) newErrors.businessName = 'Business name is required';
+  if (!form.phoneNumber.trim()) newErrors.phoneNumber = 'Phone number is required';
+  if (!/^\d{10}$/.test(form.phoneNumber)) newErrors.phoneNumber = 'Enter a valid 10-digit phone number';
+  if (!form.businessType) newErrors.businessType = 'Business type is required';
   if (form.emailAddress && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.emailAddress))
     newErrors.emailAddress = 'Enter a valid email';
-
   if (form.websiteLink && !/^https?:\/\/\S+$/.test(form.websiteLink))
     newErrors.websiteLink = 'Enter a valid URL';
-
   if (form.latitude && (form.latitude < -90 || form.latitude > 90))
     newErrors.latitude = 'Latitude must be between -90 and 90';
-
   if (form.longitude && (form.longitude < -180 || form.longitude > 180))
     newErrors.longitude = 'Longitude must be between -180 and 180';
 

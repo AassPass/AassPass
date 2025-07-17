@@ -19,6 +19,7 @@ const MapSection = () => {
       const response = await getNearbyBusinesses({ lat, lng, radius: 5 });
       // console.log(response.data);
       setBusinesses(response.data);
+      console.log(response.data)
     } catch (error) {
       console.error("Error fetching business data:", error);
     } finally {
