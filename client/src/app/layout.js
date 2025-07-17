@@ -46,7 +46,7 @@ export default function RootLayout({ children }) {
         <UserProvider>
 
           <RoleProvider>
-<WhatsAppButton />
+
             {children}
 
           </RoleProvider>

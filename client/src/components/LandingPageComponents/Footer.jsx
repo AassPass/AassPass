@@ -78,7 +78,7 @@ export default function Footer() {
       <div className="mt-3 text-center text-white/40 text-[11px] space-x-2 pb-4">
         Developed with ❤️ by{" "}
         <a
-          href="https://instagram.com/webjuncture"
+          href="https://www.instagram.com/webjuncture"
           target="_blank"
           rel="noopener noreferrer"
           className="text-purple-400 hover:underline"
