@@ -142,8 +142,8 @@ const validateForm = () => {
       alert('Error: ' + err.message);
     }
   };
-
- const isFormEditable = !userData;
+console.log(userData)
+ const isFormEditable = !userData.businesses || userData.businesses.length === 0;
   return (
     <form
       onSubmit={handleSubmit}
@@ -195,7 +195,7 @@ const validateForm = () => {
     value={form.emailAddress}
     onChange={handleChange}  // This is still necessary, but won't change the value of email
     className={inputClass}
-    readOnly={!isFormEditable} 
+    readOnly
     
   />
   {errors.emailAddress && <div className={errorClass}>{errors.emailAddress}</div>}
@@ -348,7 +348,7 @@ const validateForm = () => {
         setForm({
           businessName: '',
           phoneNumber: '',
-          emailAddress: '',
+          emailAddress: userData?.email || '',
           address: '',
           gstNumber: '',
           businessType: '',
