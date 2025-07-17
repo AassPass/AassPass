@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import Header from "@/components/LandingPageComponents/Header";
 import AnimatedSection from '@/components/common/AnimatedSection';
 import HeroSectionWrapper from "@/components/LandingPageComponents/HeroSectionWrapper";
+import WhatsAppButton from '@/components/WhatsAppButton';
 
 // Dynamically import client-only components with SSR disabled
 const BestPriceDeals = dynamic(
@@ -60,6 +61,7 @@ export default function Home() {
         </AnimatedSection>
 
         <Footer />
+        <WhatsAppButton/>
       </main>
     </div>
   );

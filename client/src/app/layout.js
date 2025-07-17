@@ -3,7 +3,7 @@ import "./globals.css";
 
 import { RoleProvider } from "@/Context/RoleContext";
 import { UserProvider } from "@/Context/userContext";
-import WhatsAppButton from "@/components/WhatsAppButton";
+
 import Script from "next/script";
 
 const geistSans = Geist({
